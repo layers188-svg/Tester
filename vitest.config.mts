@@ -1,10 +1,14 @@
 import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 import path from "node:path";
 
 export default defineConfig({
+  // Component tests are .tsx and opt into jsdom with a per-file
+  // `@vitest-environment` comment; everything else stays on node.
+  plugins: [react()],
   test: {
     environment: "node",
-    include: ["tests/unit/**/*.test.ts"],
+    include: ["tests/unit/**/*.test.ts", "tests/unit/**/*.test.tsx"],
   },
   resolve: {
     alias: {

@@ -124,6 +124,65 @@ the "Draft — pending review" line from all three pages.
 
 ---
 
+## Open design decisions from the Brand Guidelines
+
+The Brand Guidelines v1.0 deck and the app mockups resolve some things
+and contradict others. Where they conflict with
+`docs/HOUSE_DARK_BUILD_BRIEF.md`, the brief has been kept and the
+conflict recorded here rather than silently resolved. Each needs a
+decision from Logan.
+
+1. **Theme.** The mockups show Library and Circle on Stock Cream, and
+   Opening / No Trailer / Reveal on Projection Black. The build is
+   entirely dark. Options: keep dark-only; go two-toned as mocked (dark
+   for the ritual, paper for the reflective surfaces); or invert to
+   cream-first. Two-toned or cream-first touches every CSS module and
+   needs a second WCAG AA contrast pass.
+
+2. **Navigation.** Brief §5 mandates exactly four tabs — Tonight,
+   Circle, Library, You — and "do not add a fifth tab." The four
+   mockups show four _different_ navigations, three with five tabs, and
+   none matching the brief or each other:
+   - Home / Programme / Library / Circle / Profile
+   - Home / Discover / Library / Profile
+   - Home / Archive / Circle / Lists / Profile
+   - Opening / Films / Library / Lounge / Profile
+
+   The brief's four are what is built.
+
+3. **Imagery in Library and Circle.** The mockups show film stills
+   (_Stalker_, _In the Mood for Love_, _The Sweet Hereafter_, _The Piano
+   Teacher_) and photographic member avatars. Brief rule 8 forbids
+   third-party film imagery outright, and the guidelines' own "WHAT WE
+   AVOID" panel rules out generated people. The same mockups also use
+   velvet curtains, a spotlight, and clapperboard/curtain nav icons,
+   all of which that panel lists as avoided. Built as typographic, with
+   no imagery. If real stills are wanted, that needs written
+   confirmation the rights are cleared.
+
+4. **"House Member — a subscriber to House Dark."** The guidelines'
+   product-language table defines it that way; brief §3 and working
+   rule 6 forbid any payment or subscription in this release. Assumed
+   to be vocabulary only, not intent.
+
+5. **No Trailer duration.** The guidelines say 10–10.5 seconds; the
+   brief says 8–12 preferred. The media validator uses the brief's
+   8–12 and warns outside it.
+
+Resolved by the guidelines, no longer blocking:
+
+- **The HD ligature exists.** Still need the **vector source** (SVG or
+  AI) — a render is not enough to ship. `src/components/Wordmark.tsx`
+  is a typographic placeholder and is the only place to change.
+- **Domain candidate:** `housedark.club`, with `hello@housedark.club`
+  and `@housedark.club`. Item 4 above has a name to buy.
+- **Palette.** The seven brief §8 colours were verified against the
+  guidelines and match exactly. Deep Burgundy `#741724`, Tobacco
+  `#956433` and Dust Rose `#A88187` have been added to
+  `src/styles/tokens.css`.
+
+---
+
 ## Verified in this build, for the record
 
 These need no action — noting them so they are not re-litigated:
