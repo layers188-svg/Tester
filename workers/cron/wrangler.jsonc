@@ -1,0 +1,18 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "house-dark-cron",
+  "main": "index.ts",
+  "compatibility_date": "2026-08-11",
+  "observability": {
+    "enabled": true,
+  },
+  // Every five minutes: opens/closes scheduled openings on time and
+  // drains the email queue (brief §12 "Automate").
+  "triggers": {
+    "crons": ["*/5 * * * *"],
+  },
+  // Set with `wrangler secret put APP_URL` and
+  // `wrangler secret put CRON_SECRET` from this directory. CRON_SECRET
+  // must match the value the app is deployed with.
+  "vars": {},
+}

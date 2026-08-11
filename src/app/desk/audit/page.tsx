@@ -16,7 +16,9 @@ export default async function AuditLogPage() {
   return (
     <div>
       <h1>Audit log</h1>
-      <p>Administrative actions only. Never a film title, provider URL or other secret (brief §10).</p>
+      <p>
+        Administrative actions only. Never a film title, provider URL or other secret (brief §10).
+      </p>
       <table className={styles.table}>
         <thead>
           <tr>

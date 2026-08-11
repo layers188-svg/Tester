@@ -21,7 +21,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const { data: opening } = await supabase.from("openings").select("status").eq("id", id).maybeSingle();
+  const { data: opening } = await supabase
+    .from("openings")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
   if (!opening) {
     return NextResponse.json({ error: "Opening not found." }, { status: 404 });
   }
@@ -40,7 +44,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       .eq("opening_id", id)
       .maybeSingle();
     if (!secret?.approved_at) {
-      return NextResponse.json({ error: "Approve the opening before scheduling it." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Approve the opening before scheduling it." },
+        { status: 400 },
+      );
     }
   }
 

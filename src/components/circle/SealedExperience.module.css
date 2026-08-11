@@ -62,7 +62,7 @@
 }
 
 .error {
-  color: var(--hd-oxblood);
+  color: var(--hd-danger-ink);
   font-size: var(--hd-size-small);
   margin-bottom: var(--hd-space-4);
 }

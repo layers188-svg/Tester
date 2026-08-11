@@ -57,7 +57,9 @@ export function findTitleLeaks(
   }
 
   if (Array.isArray(value)) {
-    return value.flatMap((item, index) => findTitleLeaks(item, forbidden, `${path}[${index}]`, seen));
+    return value.flatMap((item, index) =>
+      findTitleLeaks(item, forbidden, `${path}[${index}]`, seen),
+    );
   }
 
   if (value instanceof Map) {

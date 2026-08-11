@@ -9,10 +9,7 @@ export interface EmailPayload {
 }
 
 export type OperationalEmailType =
-  | "nightly_opening"
-  | "sealed_recommendation"
-  | "screening_reminder"
-  | "after_credits";
+  "nightly_opening" | "sealed_recommendation" | "screening_reminder" | "after_credits";
 
 export type EditorialEmailType = "editorial_edm";
 

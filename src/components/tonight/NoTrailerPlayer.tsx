@@ -7,6 +7,8 @@ interface NoTrailerPlayerProps {
   /** Public Storage URL for the No Trailer file. Never a title, never a descriptive filename (brief §12). */
   src: string;
   posterSrc?: string | null;
+  /** WebVTT captions URL. Required whenever the No Trailer carries speech (brief §16). */
+  captionsSrc?: string | null;
   onComplete: () => void;
 }
 
@@ -15,7 +17,7 @@ interface NoTrailerPlayerProps {
  * controls, a restrained custom progress indicator, replay, and a
  * retry path that never falls back to revealing the title.
  */
-export function NoTrailerPlayer({ src, posterSrc, onComplete }: NoTrailerPlayerProps) {
+export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoTrailerPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
   // Reduced motion: skip straight to the still poster frame and let the
@@ -23,7 +25,9 @@ export function NoTrailerPlayer({ src, posterSrc, onComplete }: NoTrailerPlayerP
   // synchronously on mount (lazy initializer) rather than via an effect
   // that calls setState, which would trigger an avoidable extra render.
   const [reducedMotion, setReducedMotion] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const [status, setStatus] = useState<"idle" | "playing" | "ended" | "error">(() =>
     reducedMotion ? "ended" : "idle",
@@ -76,7 +80,10 @@ export function NoTrailerPlayer({ src, posterSrc, onComplete }: NoTrailerPlayerP
     if (!video) return;
     setStatus("idle");
     video.load();
-    video.play().then(() => setStatus("playing")).catch(() => setStatus("error"));
+    video
+      .play()
+      .then(() => setStatus("playing"))
+      .catch(() => setStatus("error"));
   }
 
   return (
@@ -94,7 +101,11 @@ export function NoTrailerPlayer({ src, posterSrc, onComplete }: NoTrailerPlayerP
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         onError={handleError}
-      />
+      >
+        {captionsSrc && (
+          <track kind="captions" src={captionsSrc} srcLang="en" label="English" default />
+        )}
+      </video>
 
       <div className={styles.progressTrack} role="presentation">
         <div className={styles.progressFill} style={{ transform: `scaleX(${progress})` }} />

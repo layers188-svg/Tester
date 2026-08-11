@@ -19,7 +19,11 @@ export async function requireOwner(
   if (!user) {
     return { error: "Not authenticated.", status: 401 };
   }
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
   if (profile?.role !== "owner") {
     return { error: "Owner access required.", status: 403 };
   }

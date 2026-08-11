@@ -22,8 +22,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const patch: Record<string, unknown> = {};
   if (parsed.data.contentNotes !== undefined) patch.content_notes = parsed.data.contentNotes;
-  if (parsed.data.availabilityCount !== undefined) patch.availability_count = parsed.data.availabilityCount;
-  if (parsed.data.minimumAccessType !== undefined) patch.minimum_access_type = parsed.data.minimumAccessType;
+  if (parsed.data.availabilityCount !== undefined)
+    patch.availability_count = parsed.data.availabilityCount;
+  if (parsed.data.minimumAccessType !== undefined)
+    patch.minimum_access_type = parsed.data.minimumAccessType;
 
   if (Object.keys(patch).length > 0) {
     const { error } = await supabase.from("openings").update(patch).eq("id", id);
@@ -32,7 +34,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (parsed.data.cues) {
     const cueValidation = validateCues(parsed.data.cues);
-    if (!cueValidation.valid) return NextResponse.json({ error: cueValidation.error }, { status: 400 });
+    if (!cueValidation.valid)
+      return NextResponse.json({ error: cueValidation.error }, { status: 400 });
 
     await supabase.from("opening_cues").delete().eq("opening_id", id);
     if (cueValidation.cues.length > 0) {

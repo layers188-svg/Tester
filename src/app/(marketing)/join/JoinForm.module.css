@@ -28,24 +28,29 @@
   border-color: var(--hd-accent);
 }
 
+/* The whole label is the target, so it carries the 44px minimum; the
+   box itself is sized for comfortable tapping within it. */
 .checkbox {
   display: flex;
   align-items: flex-start;
   gap: var(--hd-space-3);
+  min-height: var(--hd-touch-min);
   font-size: var(--hd-size-small);
   color: var(--hd-ink-muted);
-  padding: var(--hd-space-2) 0;
+  padding: var(--hd-space-3) 0;
+  cursor: pointer;
 }
 
 .checkbox input {
-  margin-top: 0.2em;
-  width: 18px;
-  height: 18px;
+  margin-top: 0.1em;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
+  accent-color: var(--hd-accent);
 }
 
 .error {
-  color: var(--hd-oxblood);
+  color: var(--hd-danger-ink);
   background: color-mix(in srgb, var(--hd-oxblood) 16%, transparent);
   border: 1px solid var(--hd-oxblood);
   border-radius: var(--hd-radius-control);

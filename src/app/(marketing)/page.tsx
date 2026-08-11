@@ -49,8 +49,7 @@ export default async function HomePage() {
         <div className={styles.heroContent}>
           <h1>The best film experiences happen when you know nothing.</h1>
           <p className={styles.heroSub}>
-            Trailers show the plot. Reviews tell you how to feel. House Dark lets the film go
-            first.
+            Trailers show the plot. Reviews tell you how to feel. House Dark lets the film go first.
           </p>
           <div className={styles.heroActions}>
             <Button href="/join" variant="primary">

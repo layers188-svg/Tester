@@ -73,6 +73,7 @@ interface OpeningRow {
   minimum_access_type: AccessType;
   no_trailer_storage_path: string;
   no_trailer_poster_path: string | null;
+  no_trailer_captions_path: string | null;
   content_notes: string | null;
   created_at: string;
   updated_at: string;
@@ -327,7 +328,10 @@ export interface Database {
         OpeningSecretRow,
         Partial<OpeningSecretRow> & { opening_id: string; film_id: string }
       >;
-      opening_cues: Table<OpeningCueRow, Partial<OpeningCueRow> & { opening_id: string; cue: string }>;
+      opening_cues: Table<
+        OpeningCueRow,
+        Partial<OpeningCueRow> & { opening_id: string; cue: string }
+      >;
       playback_destinations: Table<
         PlaybackDestinationRow,
         Partial<PlaybackDestinationRow> & {
@@ -379,7 +383,10 @@ export interface Database {
         ScreeningAttendanceRow,
         Partial<ScreeningAttendanceRow> & { screening_id: string; user_id: string }
       >;
-      email_preferences: Table<EmailPreferencesRow, Partial<EmailPreferencesRow> & { user_id: string }>;
+      email_preferences: Table<
+        EmailPreferencesRow,
+        Partial<EmailPreferencesRow> & { user_id: string }
+      >;
       notification_queue: Table<
         NotificationQueueRow,
         Partial<NotificationQueueRow> & {
@@ -419,7 +426,10 @@ export interface Database {
       };
       get_house_words: { Args: { p_limit?: number }; Returns: { body: string }[] };
       get_circle_member_names: { Args: { p_circle_id: string }; Returns: CircleMemberName[] };
-      list_my_sealed_recommendations: { Args: Record<string, never>; Returns: MySealedRecommendation[] };
+      list_my_sealed_recommendations: {
+        Args: Record<string, never>;
+        Returns: MySealedRecommendation[];
+      };
       get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };

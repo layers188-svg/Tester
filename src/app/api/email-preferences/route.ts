@@ -28,7 +28,8 @@ export async function PATCH(request: Request) {
   if (parsed.data.nightlyOpening !== undefined) patch.nightly_opening = parsed.data.nightlyOpening;
   if (parsed.data.sealedRecommendations !== undefined)
     patch.sealed_recommendations = parsed.data.sealedRecommendations;
-  if (parsed.data.screeningReminders !== undefined) patch.screening_reminders = parsed.data.screeningReminders;
+  if (parsed.data.screeningReminders !== undefined)
+    patch.screening_reminders = parsed.data.screeningReminders;
   if (parsed.data.afterCredits !== undefined) patch.after_credits = parsed.data.afterCredits;
   if (parsed.data.editorialEdm !== undefined) patch.editorial_edm = parsed.data.editorialEdm;
 

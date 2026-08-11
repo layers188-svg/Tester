@@ -17,6 +17,7 @@ export interface OpeningSafe {
   availabilityCount: number;
   minimumAccessType: Database["public"]["Tables"]["openings"]["Row"]["minimum_access_type"];
   noTrailerStoragePath: string;
+  noTrailerCaptionsPath: string | null;
   contentNotes: string | null;
   cues: string[];
 }
@@ -40,6 +41,7 @@ async function attachCues(
     availabilityCount: opening.availability_count,
     minimumAccessType: opening.minimum_access_type,
     noTrailerStoragePath: opening.no_trailer_storage_path,
+    noTrailerCaptionsPath: opening.no_trailer_captions_path,
     contentNotes: opening.content_notes,
     cues: (cueRows ?? []).map((row) => row.cue),
   };
@@ -50,7 +52,9 @@ async function attachCues(
  * the soonest scheduled one (so Tonight can render "not available" with
  * an honest opening number rather than an empty screen).
  */
-export async function getTonightOpening(supabase: SupabaseClient<Database>): Promise<OpeningSafe | null> {
+export async function getTonightOpening(
+  supabase: SupabaseClient<Database>,
+): Promise<OpeningSafe | null> {
   const { data: open } = await supabase
     .from("openings")
     .select("*")

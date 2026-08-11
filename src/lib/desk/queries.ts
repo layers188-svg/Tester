@@ -19,7 +19,9 @@ export interface DeskOpeningRow {
   approved: boolean;
 }
 
-export async function listDeskOpenings(supabase: SupabaseClient<Database>): Promise<DeskOpeningRow[]> {
+export async function listDeskOpenings(
+  supabase: SupabaseClient<Database>,
+): Promise<DeskOpeningRow[]> {
   const { data: openings } = await supabase
     .from("openings")
     .select("*")
@@ -27,10 +29,14 @@ export async function listDeskOpenings(supabase: SupabaseClient<Database>): Prom
 
   if (!openings) return [];
 
-  const { data: secrets } = await supabase.from("opening_secrets").select("opening_id, film_id, approved_at");
+  const { data: secrets } = await supabase
+    .from("opening_secrets")
+    .select("opening_id, film_id, approved_at");
   const filmIds = (secrets ?? []).map((s) => s.film_id);
   const { data: films } =
-    filmIds.length > 0 ? await supabase.from("films").select("id, title").in("id", filmIds) : { data: [] };
+    filmIds.length > 0
+      ? await supabase.from("films").select("id, title").in("id", filmIds)
+      : { data: [] };
 
   const secretByOpening = new Map((secrets ?? []).map((s) => [s.opening_id, s]));
   const filmById = new Map((films ?? []).map((f) => [f.id, f.title]));

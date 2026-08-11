@@ -12,7 +12,9 @@ const schema = z.object({
   rightsNotes: z.string().trim().max(2000).nullable().optional(),
   contentNotes: z.string().trim().max(1000).nullable().optional(),
   cues: z.array(z.string().trim().max(24)).max(3).optional(),
-  minimumAccessType: z.enum(["subscription", "rental", "free", "mixed", "unknown"]).default("unknown"),
+  minimumAccessType: z
+    .enum(["subscription", "rental", "free", "mixed", "unknown"])
+    .default("unknown"),
 });
 
 /** Owner-only. Creates the film, opening (draft), opening_secrets link and cues together. */

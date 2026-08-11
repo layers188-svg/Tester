@@ -94,7 +94,8 @@ export async function POST(request: Request) {
       .eq("screening_id", screening.id)
       .neq("response", "declined");
 
-    const circleName = (screening.circles as unknown as { name: string } | null)?.name ?? "Your Circle";
+    const circleName =
+      (screening.circles as unknown as { name: string } | null)?.name ?? "Your Circle";
 
     for (const attendee of attendees ?? []) {
       const { count } = await supabase

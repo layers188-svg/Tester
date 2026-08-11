@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "house-dark",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-08-11",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  // No "triggers" here on purpose: the OpenNext worker only exports a
+  // fetch handler, so a Cron Trigger bound to it would have no
+  // scheduled() to call. The schedule lives in its own tiny worker at
+  // workers/cron/, which POSTs to /api/cron. See OPERATIONS.md.
+  //
+  // Secrets are NOT set here. Set them with `wrangler secret put <NAME>`
+  // (or in the Cloudflare dashboard) so they never enter the repo:
+  //   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  //   SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, RESEND_FROM_EMAIL,
+  //   ADMIN_EMAILS, CRON_SECRET, NEXT_PUBLIC_APP_URL
+  "vars": {},
+}

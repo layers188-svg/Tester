@@ -19,6 +19,14 @@
   font-size: var(--hd-size-small);
 }
 
+.inviteCode {
+  font-family: var(--hd-font-utility);
+  font-size: 1.125rem;
+  letter-spacing: 0.06em;
+  color: var(--hd-accent);
+  margin: var(--hd-space-2) 0;
+}
+
 .members,
 .activity {
   list-style: none;
@@ -50,7 +58,7 @@
   background: none;
   border: none;
   padding: 0;
-  color: var(--hd-oxblood);
+  color: var(--hd-danger-ink);
   text-decoration: underline;
   cursor: pointer;
   min-height: 44px;

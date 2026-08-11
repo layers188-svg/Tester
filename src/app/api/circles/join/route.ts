@@ -23,7 +23,10 @@ export async function POST(request: Request) {
   });
 
   if (error || !data) {
-    return NextResponse.json({ error: error?.message ?? "That code was not recognised." }, { status: 400 });
+    return NextResponse.json(
+      { error: error?.message ?? "That code was not recognised." },
+      { status: 400 },
+    );
   }
 
   return NextResponse.json({ circleId: data }, { headers: { "Cache-Control": "no-store" } });

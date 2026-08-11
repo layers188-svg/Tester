@@ -11,14 +11,19 @@ export async function POST() {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
 
-  const [profile, watches, reviews, emailPreferences, circles, recommendations] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase.from("watches").select("*").eq("user_id", user.id),
-    supabase.from("six_word_reviews").select("*").eq("user_id", user.id),
-    supabase.from("email_preferences").select("*").eq("user_id", user.id).maybeSingle(),
-    supabase.from("circle_members").select("circle_id, role, joined_at, circles(name)").eq("user_id", user.id),
-    supabase.rpc("list_my_sealed_recommendations"),
-  ]);
+  const [profile, watches, reviews, emailPreferences, circles, recommendations] = await Promise.all(
+    [
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      supabase.from("watches").select("*").eq("user_id", user.id),
+      supabase.from("six_word_reviews").select("*").eq("user_id", user.id),
+      supabase.from("email_preferences").select("*").eq("user_id", user.id).maybeSingle(),
+      supabase
+        .from("circle_members")
+        .select("circle_id, role, joined_at, circles(name)")
+        .eq("user_id", user.id),
+      supabase.rpc("list_my_sealed_recommendations"),
+    ],
+  );
 
   const payload = {
     exportedAt: new Date().toISOString(),

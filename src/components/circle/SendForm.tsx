@@ -17,7 +17,13 @@ interface CircleOption {
   name: string;
 }
 
-export function SendForm({ recipients, circles }: { recipients: Recipient[]; circles: CircleOption[] }) {
+export function SendForm({
+  recipients,
+  circles,
+}: {
+  recipients: Recipient[];
+  circles: CircleOption[];
+}) {
   const router = useRouter();
   const [filmTitle, setFilmTitle] = useState("");
   const [releaseYear, setReleaseYear] = useState("");
@@ -32,7 +38,9 @@ export function SendForm({ recipients, circles }: { recipients: Recipient[]; cir
   const [sent, setSent] = useState(false);
 
   function toggleRecipient(userId: string) {
-    setSelected((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]));
+    setSelected((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
+    );
   }
 
   async function submit(e: React.FormEvent) {

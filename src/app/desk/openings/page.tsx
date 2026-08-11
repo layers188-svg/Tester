@@ -39,7 +39,14 @@ export default async function DeskOpeningsPage() {
               <td className={styles.status} data-status={o.status}>
                 {o.status}
               </td>
-              <td>{new Date(o.opensAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
+              <td>
+                {new Date(o.opensAt).toLocaleString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </td>
               <td>{o.approved ? "Yes" : "No"}</td>
             </tr>
           ))}

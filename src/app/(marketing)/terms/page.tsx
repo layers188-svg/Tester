@@ -17,8 +17,8 @@ export default function TermsPage() {
         <h2>What House Dark is</h2>
         <p>
           House Dark is a Founding Beta: a free, invitation friendly service that introduces one
-          human chosen film each night and lets friends send films to one another under seal.
-          There is no payment, subscription or trial clock in this release.
+          human chosen film each night and lets friends send films to one another under seal. There
+          is no payment, subscription or trial clock in this release.
         </p>
       </section>
 
@@ -36,18 +36,18 @@ export default function TermsPage() {
       <section>
         <h2>Your account</h2>
         <p>
-          You sign in with a one time email code. Keep access to your email secure — anyone with
-          a valid code can sign in as you. You are responsible for what you send to your Circle.
+          You sign in with a one time email code. Keep access to your email secure — anyone with a
+          valid code can sign in as you. You are responsible for what you send to your Circle.
         </p>
       </section>
 
       <section>
         <h2>Your words</h2>
         <p>
-          Your six word responses and any notes you write remain yours. By posting them within
-          House Dark you grant House Dark a limited licence to display them according to the
-          visibility you choose (private, your Circle, or, only with separate approval, on the
-          public site as a beta demonstration). You can delete a review at any time.
+          Your six word responses and any notes you write remain yours. By posting them within House
+          Dark you grant House Dark a limited licence to display them according to the visibility
+          you choose (private, your Circle, or, only with separate approval, on the public site as a
+          beta demonstration). You can delete a review at any time.
         </p>
       </section>
 

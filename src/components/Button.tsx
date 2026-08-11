@@ -9,11 +9,9 @@ interface CommonProps {
   fullWidth?: boolean;
 }
 
-type ButtonAsButton = CommonProps &
-  ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
+type ButtonAsButton = CommonProps & ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
 
-type ButtonAsLink = CommonProps &
-  AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
+type ButtonAsLink = CommonProps & AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
 export function Button(props: ButtonAsButton | ButtonAsLink) {
   const { variant = "primary", fullWidth = false, className, ...rest } = props;

@@ -7,7 +7,14 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://housedark.app";
  * template" (brief §13). One thought, one action. No poster, no logo
  * art, just the wordmark as text.
  */
-function wrapper(opts: { previewText: string; heading: string; body: string; actionLabel: string; actionHref: string; footerNote?: string }): string {
+function wrapper(opts: {
+  previewText: string;
+  heading: string;
+  body: string;
+  actionLabel: string;
+  actionHref: string;
+  footerNote?: string;
+}): string {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -77,12 +84,21 @@ export function nightlyOpeningEmail(opts: { to: string; openingNumber: number })
     to: opts.to,
     subject: "Tonight's opening is ready",
     previewText: "Sealed and waiting. You choose when to enter.",
-    html: wrapper({ previewText: "Sealed and waiting. You choose when to enter.", heading, body, actionLabel, actionHref }),
+    html: wrapper({
+      previewText: "Sealed and waiting. You choose when to enter.",
+      heading,
+      body,
+      actionLabel,
+      actionHref,
+    }),
     text: toText(heading, body, actionLabel, actionHref),
   };
 }
 
-export function sealedRecommendationEmail(opts: { to: string; senderDisplayName: string }): EmailPayload {
+export function sealedRecommendationEmail(opts: {
+  to: string;
+  senderDisplayName: string;
+}): EmailPayload {
   const heading = "A friend sent you a film under seal.";
   const body = `${escapeHtml(opts.senderDisplayName)} sent you something to watch. The title stays sealed until you choose to reveal it.`;
   const actionLabel = "Open the seal";
@@ -91,12 +107,27 @@ export function sealedRecommendationEmail(opts: { to: string; senderDisplayName:
     to: opts.to,
     subject: `${opts.senderDisplayName} sent you a film under seal`,
     previewText: "The title stays sealed until you choose to reveal it.",
-    html: wrapper({ previewText: "The title stays sealed until you choose to reveal it.", heading, body, actionLabel, actionHref }),
-    text: toText(heading, `${opts.senderDisplayName} sent you something to watch. The title stays sealed until you choose to reveal it.`, actionLabel, actionHref),
+    html: wrapper({
+      previewText: "The title stays sealed until you choose to reveal it.",
+      heading,
+      body,
+      actionLabel,
+      actionHref,
+    }),
+    text: toText(
+      heading,
+      `${opts.senderDisplayName} sent you something to watch. The title stays sealed until you choose to reveal it.`,
+      actionLabel,
+      actionHref,
+    ),
   };
 }
 
-export function screeningReminderEmail(opts: { to: string; circleName: string; scheduledForLabel: string }): EmailPayload {
+export function screeningReminderEmail(opts: {
+  to: string;
+  circleName: string;
+  scheduledForLabel: string;
+}): EmailPayload {
   const heading = "Your Circle screening is approaching.";
   const body = `${escapeHtml(opts.circleName)} is gathering ${escapeHtml(opts.scheduledForLabel)}. Lights down soon.`;
   const actionLabel = "See the Circle";
@@ -106,7 +137,12 @@ export function screeningReminderEmail(opts: { to: string; circleName: string; s
     subject: "Your Circle screening is approaching",
     previewText: "Lights down soon.",
     html: wrapper({ previewText: "Lights down soon.", heading, body, actionLabel, actionHref }),
-    text: toText(heading, `${opts.circleName} is gathering ${opts.scheduledForLabel}. Lights down soon.`, actionLabel, actionHref),
+    text: toText(
+      heading,
+      `${opts.circleName} is gathering ${opts.scheduledForLabel}. Lights down soon.`,
+      actionLabel,
+      actionHref,
+    ),
   };
 }
 
@@ -119,12 +155,24 @@ export function afterCreditsEmail(opts: { to: string }): EmailPayload {
     to: opts.to,
     subject: "The conversation is open",
     previewText: "You left your six words.",
-    html: wrapper({ previewText: "You left your six words.", heading, body, actionLabel, actionHref }),
+    html: wrapper({
+      previewText: "You left your six words.",
+      heading,
+      body,
+      actionLabel,
+      actionHref,
+    }),
     text: toText(heading, body, actionLabel, actionHref),
   };
 }
 
-export function editorialEmail(opts: { to: string; heading: string; body: string; actionLabel: string; actionHref: string }): EmailPayload {
+export function editorialEmail(opts: {
+  to: string;
+  heading: string;
+  body: string;
+  actionLabel: string;
+  actionHref: string;
+}): EmailPayload {
   return {
     to: opts.to,
     subject: opts.heading,

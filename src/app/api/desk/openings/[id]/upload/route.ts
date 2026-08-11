@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { requireOwner } from "@/lib/auth/require-owner";
-import { validateMediaFile, generateStorageName, isDurationInPreferredRange } from "@/lib/media/validate";
+import {
+  validateMediaFile,
+  generateStorageName,
+  isDurationInPreferredRange,
+} from "@/lib/media/validate";
 
 /**
  * No Trailer upload (brief §12 media checks). The uploaded object gets
@@ -28,7 +32,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     .maybeSingle();
   const filmTitle = (secret?.films as unknown as { title: string } | null)?.title ?? "";
 
-  const issues = validateMediaFile({ type: file.type, size: file.size, name: file.name }, filmTitle);
+  const issues = validateMediaFile(
+    { type: file.type, size: file.size, name: file.name },
+    filmTitle,
+  );
   const blocking = issues.filter((i) => i.blocking);
   if (blocking.length > 0) {
     return NextResponse.json({ error: blocking.map((i) => i.message).join(" ") }, { status: 400 });
@@ -43,9 +50,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Upload failed. Try again." }, { status: 400 });
   }
 
-  const { error } = await supabase.from("openings").update({ no_trailer_storage_path: storageName }).eq("id", id);
+  const { error } = await supabase
+    .from("openings")
+    .update({ no_trailer_storage_path: storageName })
+    .eq("id", id);
   if (error) {
-    return NextResponse.json({ error: "Uploaded, but could not link it to the opening." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Uploaded, but could not link it to the opening." },
+      { status: 400 },
+    );
   }
 
   const durationSeconds = Number(form.get("durationSeconds") ?? NaN);

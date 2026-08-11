@@ -164,7 +164,11 @@ export function YouForm({
         ))}
         <label className={styles.toggleRow}>
           <span>Editorial notes from House Dark</span>
-          <input type="checkbox" checked={prefs.editorialEdm} onChange={() => togglePref("editorialEdm")} />
+          <input
+            type="checkbox"
+            checked={prefs.editorialEdm}
+            onChange={() => togglePref("editorialEdm")}
+          />
         </label>
         <label className={styles.toggleRow}>
           <span>Marketing consent</span>
@@ -196,12 +200,19 @@ export function YouForm({
         </div>
 
         {!confirmDelete ? (
-          <button type="button" className={styles.dangerLink} onClick={() => setConfirmDelete(true)}>
+          <button
+            type="button"
+            className={styles.dangerLink}
+            onClick={() => setConfirmDelete(true)}
+          >
             Delete account and all content
           </button>
         ) : (
           <div className={styles.confirmBox}>
-            <p>This permanently deletes your account, reviews, and Circle memberships. It cannot be undone.</p>
+            <p>
+              This permanently deletes your account, reviews, and Circle memberships. It cannot be
+              undone.
+            </p>
             <div className={styles.actionsRow}>
               <Button variant="secondary" onClick={() => setConfirmDelete(false)}>
                 Cancel

@@ -79,7 +79,9 @@ export function JoinForm() {
       router.push(nextPath.current);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "That code did not work. Check it and try again.");
+      setError(
+        err instanceof Error ? err.message : "That code did not work. Check it and try again.",
+      );
     } finally {
       setBusy(false);
     }

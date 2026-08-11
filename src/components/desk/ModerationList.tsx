@@ -36,27 +36,42 @@ export function ModerationList({ reviews: initial }: { reviews: Review[] }) {
           </p>
           <div className={styles.actions}>
             {r.moderation_state !== "hidden" && (
-              <button disabled={busy === r.id} onClick={() => update(r.id, { moderationState: "hidden" })}>
+              <button
+                disabled={busy === r.id}
+                onClick={() => update(r.id, { moderationState: "hidden" })}
+              >
                 Hide
               </button>
             )}
             {r.moderation_state !== "visible" && (
-              <button disabled={busy === r.id} onClick={() => update(r.id, { moderationState: "visible" })}>
+              <button
+                disabled={busy === r.id}
+                onClick={() => update(r.id, { moderationState: "visible" })}
+              >
                 Unhide
               </button>
             )}
             {r.moderation_state !== "removed" && (
-              <button disabled={busy === r.id} onClick={() => update(r.id, { moderationState: "removed" })}>
+              <button
+                disabled={busy === r.id}
+                onClick={() => update(r.id, { moderationState: "removed" })}
+              >
                 Remove
               </button>
             )}
             {r.visibility !== "house_approved" && (
-              <button disabled={busy === r.id} onClick={() => update(r.id, { visibility: "house_approved" })}>
+              <button
+                disabled={busy === r.id}
+                onClick={() => update(r.id, { visibility: "house_approved" })}
+              >
                 Approve for public site
               </button>
             )}
             {r.visibility === "house_approved" && (
-              <button disabled={busy === r.id} onClick={() => update(r.id, { visibility: "circle" })}>
+              <button
+                disabled={busy === r.id}
+                onClick={() => update(r.id, { visibility: "circle" })}
+              >
                 Unapprove
               </button>
             )}
@@ -70,7 +85,8 @@ export function ModerationList({ reviews: initial }: { reviews: Review[] }) {
 
 function toReviewPatch(patch: Record<string, string>): Partial<Review> {
   const out: Partial<Review> = {};
-  if (patch.moderationState) out.moderation_state = patch.moderationState as Review["moderation_state"];
+  if (patch.moderationState)
+    out.moderation_state = patch.moderationState as Review["moderation_state"];
   if (patch.visibility) out.visibility = patch.visibility as Review["visibility"];
   return out;
 }

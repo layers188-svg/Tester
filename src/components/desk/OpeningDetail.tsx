@@ -18,6 +18,7 @@ interface OpeningData {
   availabilityCount: number;
   minimumAccessType: string;
   noTrailerStoragePath: string;
+  noTrailerCaptionsPath: string | null;
   contentNotes: string | null;
 }
 
@@ -54,6 +55,7 @@ export function OpeningDetail({
 }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionsInputRef = useRef<HTMLInputElement>(null);
   const [cues, setCues] = useState<string[]>([...initialCues, "", "", ""].slice(0, 3));
   const [contentNotes, setContentNotes] = useState(opening.contentNotes ?? "");
   const [availabilityCount, setAvailabilityCount] = useState(String(opening.availabilityCount));
@@ -110,7 +112,10 @@ export function OpeningDetail({
       form.append("width", String(meta.width));
       form.append("height", String(meta.height));
 
-      const res = await fetch(`/api/desk/openings/${opening.id}/upload`, { method: "POST", body: form });
+      const res = await fetch(`/api/desk/openings/${opening.id}/upload`, {
+        method: "POST",
+        body: form,
+      });
       if (!res.ok) throw new Error((await res.json()).error);
       const payload = await res.json();
       if (!isDurationInPreferredRange(meta.duration)) {
@@ -120,6 +125,26 @@ export function OpeningDetail({
       } else {
         setMessage("No Trailer uploaded.");
       }
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function uploadCaptions(file: File) {
+    setBusy("captions");
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`/api/desk/openings/${opening.id}/captions`, {
+        method: "POST",
+        body: form,
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      setMessage("Captions uploaded.");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
@@ -151,7 +176,9 @@ export function OpeningDetail({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           status,
-          ...(status === "scheduled" && opensAt ? { opensAt: new Date(opensAt).toISOString() } : {}),
+          ...(status === "scheduled" && opensAt
+            ? { opensAt: new Date(opensAt).toISOString() }
+            : {}),
         }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
@@ -177,7 +204,12 @@ export function OpeningDetail({
       if (!res.ok) throw new Error((await res.json()).error);
       const created = await res.json();
       setProviders((prev) => [...prev, created]);
-      setProviderForm({ territory: "AU", providerName: "", accessType: "subscription", deepLink: "" });
+      setProviderForm({
+        territory: "AU",
+        providerName: "",
+        accessType: "subscription",
+        deepLink: "",
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not add provider.");
     } finally {
@@ -192,7 +224,11 @@ export function OpeningDetail({
       body: JSON.stringify({ verified: !provider.verified_at }),
     });
     setProviders((prev) =>
-      prev.map((p) => (p.id === provider.id ? { ...p, verified_at: p.verified_at ? null : new Date().toISOString() } : p)),
+      prev.map((p) =>
+        p.id === provider.id
+          ? { ...p, verified_at: p.verified_at ? null : new Date().toISOString() }
+          : p,
+      ),
     );
   }
 
@@ -206,7 +242,8 @@ export function OpeningDetail({
       <p className={styles.eyebrow}>Opening {opening.openingNumber}</p>
       <h1>{film?.title ?? "Untitled"}</h1>
       <p className={styles.statusLine}>
-        Status: <strong>{opening.status}</strong> · Approved: <strong>{approvedAt ? "Yes" : "No"}</strong>
+        Status: <strong>{opening.status}</strong> · Approved:{" "}
+        <strong>{approvedAt ? "Yes" : "No"}</strong>
       </p>
 
       {error && <p className={formStyles.error}>{error}</p>}
@@ -237,7 +274,12 @@ export function OpeningDetail({
           {nextStatuses
             .filter((s) => s !== "approved")
             .map((s) => (
-              <Button key={s} variant="secondary" onClick={() => changeStatus(s)} disabled={busy === s}>
+              <Button
+                key={s}
+                variant="secondary"
+                onClick={() => changeStatus(s)}
+                disabled={busy === s}
+              >
                 Move to {s}
               </Button>
             ))}
@@ -260,8 +302,42 @@ export function OpeningDetail({
             if (file) void uploadFile(file);
           }}
         />
-        <Button variant="secondary" onClick={() => fileInputRef.current?.click()} disabled={busy === "upload"}>
+        <Button
+          variant="secondary"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={busy === "upload"}
+        >
           {busy === "upload" ? "Uploading…" : hasUpload ? "Replace file" : "Upload file"}
+        </Button>
+      </section>
+
+      <section className={styles.section}>
+        <h2>Captions</h2>
+        <p className={formStyles.hint}>
+          {opening.noTrailerCaptionsPath
+            ? `Uploaded: ${opening.noTrailerCaptionsPath}`
+            : "None. Required if this No Trailer carries speech."}
+        </p>
+        <input
+          ref={captionsInputRef}
+          type="file"
+          accept=".vtt,text/vtt"
+          className={styles.fileInput}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void uploadCaptions(file);
+          }}
+        />
+        <Button
+          variant="secondary"
+          onClick={() => captionsInputRef.current?.click()}
+          disabled={busy === "captions"}
+        >
+          {busy === "captions"
+            ? "Uploading…"
+            : opening.noTrailerCaptionsPath
+              ? "Replace captions"
+              : "Upload captions (.vtt)"}
         </Button>
       </section>
 
@@ -344,10 +420,18 @@ export function OpeningDetail({
                   {p.provider_name} · {p.territory} · {p.access_type}
                 </span>
                 <span className={styles.providerActions}>
-                  <button type="button" className={styles.linkButton} onClick={() => toggleVerified(p)}>
+                  <button
+                    type="button"
+                    className={styles.linkButton}
+                    onClick={() => toggleVerified(p)}
+                  >
                     {p.verified_at ? "Verified" : "Mark verified"}
                   </button>
-                  <button type="button" className={styles.linkButtonDanger} onClick={() => removeProvider(p.id)}>
+                  <button
+                    type="button"
+                    className={styles.linkButtonDanger}
+                    onClick={() => removeProvider(p.id)}
+                  >
                     Remove
                   </button>
                 </span>
@@ -367,7 +451,12 @@ export function OpeningDetail({
               <select
                 className={formStyles.select}
                 value={providerForm.accessType}
-                onChange={(e) => setProviderForm((f) => ({ ...f, accessType: e.target.value as PlaybackAccessType }))}
+                onChange={(e) =>
+                  setProviderForm((f) => ({
+                    ...f,
+                    accessType: e.target.value as PlaybackAccessType,
+                  }))
+                }
               >
                 <option value="subscription">Subscription</option>
                 <option value="rental">Rental</option>
@@ -415,7 +504,9 @@ export function OpeningDetail({
             <div className={styles.previewCard}>
               <p className={styles.eyebrow}>Opening {opening.openingNumber}</p>
               <h3>Tonight is sealed.</h3>
-              <p>{opening.runtimeMinutes} minutes · {providers.length} verified place(s) to watch</p>
+              <p>
+                {opening.runtimeMinutes} minutes · {providers.length} verified place(s) to watch
+              </p>
               <ul className={styles.cuesPreview}>
                 {cues.filter(Boolean).map((c) => (
                   <li key={c}>{c}</li>

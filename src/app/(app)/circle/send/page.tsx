@@ -23,10 +23,15 @@ export default async function SendPage() {
     .map((m) => m.circles as unknown as { id: string; name: string } | null)
     .filter((c): c is { id: string; name: string } => Boolean(c));
 
-  const recipientMap = new Map<string, { userId: string; displayName: string; circleNames: string[] }>();
+  const recipientMap = new Map<
+    string,
+    { userId: string; displayName: string; circleNames: string[] }
+  >();
 
   for (const circle of circles) {
-    const { data: members } = await supabase.rpc("get_circle_member_names", { p_circle_id: circle.id });
+    const { data: members } = await supabase.rpc("get_circle_member_names", {
+      p_circle_id: circle.id,
+    });
     for (const member of members ?? []) {
       if (member.user_id === user.id) continue;
       const existing = recipientMap.get(member.user_id);
@@ -48,10 +53,7 @@ export default async function SendPage() {
       <p className={styles.lead}>
         They will see your note and up to three cues. Never the title, never a poster.
       </p>
-      <SendForm
-        recipients={Array.from(recipientMap.values())}
-        circles={circles}
-      />
+      <SendForm recipients={Array.from(recipientMap.values())} circles={circles} />
     </div>
   );
 }

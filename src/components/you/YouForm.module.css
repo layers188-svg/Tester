@@ -78,7 +78,7 @@
   background: none;
   border: none;
   padding: var(--hd-space-2) 0;
-  color: var(--hd-oxblood);
+  color: var(--hd-danger-ink);
   text-decoration: underline;
   cursor: pointer;
   min-height: var(--hd-touch-min);

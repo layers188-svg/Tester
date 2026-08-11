@@ -100,11 +100,14 @@ export function TonightExperience({
         <h1>Opening not yet available.</h1>
         <p>
           {opening
-            ? `Opening ${opening.openingNumber} opens ${new Date(opening.opensAt).toLocaleString(undefined, {
-                weekday: "long",
-                hour: "numeric",
-                minute: "2-digit",
-              })}.`
+            ? `Opening ${opening.openingNumber} opens ${new Date(opening.opensAt).toLocaleString(
+                undefined,
+                {
+                  weekday: "long",
+                  hour: "numeric",
+                  minute: "2-digit",
+                },
+              )}.`
             : "Nothing is scheduled yet. Check back soon."}
         </p>
       </div>
@@ -171,6 +174,9 @@ export function TonightExperience({
       <div className={styles.trailerStage}>
         <NoTrailerPlayer
           src={publicStorageUrl(opening.noTrailerStoragePath)}
+          captionsSrc={
+            opening.noTrailerCaptionsPath ? publicStorageUrl(opening.noTrailerCaptionsPath) : null
+          }
           onComplete={() => setPhase("revealing")}
         />
         <Button variant="secondary" fullWidth onClick={() => void doReveal(opening.id)}>
@@ -197,7 +203,9 @@ export function TonightExperience({
         <>
           <h1>
             {reveal.title}
-            {reveal.releaseYear ? <span className={styles.year}> ({reveal.releaseYear})</span> : null}
+            {reveal.releaseYear ? (
+              <span className={styles.year}> ({reveal.releaseYear})</span>
+            ) : null}
           </h1>
 
           {reveal.providers.length > 0 ? (
@@ -207,7 +215,10 @@ export function TonightExperience({
                   <a href={p.deep_link} target="_blank" rel="noreferrer">
                     {p.provider_name}
                   </a>
-                  <span className={styles.providerMeta}> · {p.access_type} · {p.territory}</span>
+                  <span className={styles.providerMeta}>
+                    {" "}
+                    · {p.access_type} · {p.territory}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -243,8 +254,15 @@ export function TonightExperience({
             <SixWordsPanel
               target={{ openingId: opening.id }}
               initialOwnReview={
-                progress?.hasSixWords && progress.sixWordsId && progress.sixWordsBody && progress.sixWordsCreatedAt
-                  ? { id: progress.sixWordsId, body: progress.sixWordsBody, createdAt: progress.sixWordsCreatedAt }
+                progress?.hasSixWords &&
+                progress.sixWordsId &&
+                progress.sixWordsBody &&
+                progress.sixWordsCreatedAt
+                  ? {
+                      id: progress.sixWordsId,
+                      body: progress.sixWordsBody,
+                      createdAt: progress.sixWordsCreatedAt,
+                    }
                   : null
               }
             />

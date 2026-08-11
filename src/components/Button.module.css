@@ -14,7 +14,8 @@
   border-radius: var(--hd-radius-control);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform var(--hd-motion-button) var(--hd-ease-standard),
+  transition:
+    transform var(--hd-motion-button) var(--hd-ease-standard),
     background-color var(--hd-motion-button) var(--hd-ease-standard),
     border-color var(--hd-motion-button) var(--hd-ease-standard),
     opacity var(--hd-motion-button) var(--hd-ease-standard);

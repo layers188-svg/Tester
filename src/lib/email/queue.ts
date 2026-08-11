@@ -23,7 +23,12 @@ interface EnqueueArgs {
 }
 
 /** Inserts a queue row, respecting the member's email_preferences opt-out for that type. */
-export async function enqueueNotification({ userId, type, sendAt = new Date(), payload }: EnqueueArgs): Promise<void> {
+export async function enqueueNotification({
+  userId,
+  type,
+  sendAt = new Date(),
+  payload,
+}: EnqueueArgs): Promise<void> {
   const supabase = getServiceSupabase();
 
   const { data: prefs } = await supabase
@@ -63,7 +68,10 @@ function renderPayload(type: NotificationType, payload: Record<string, unknown>)
     case "nightly_opening":
       return nightlyOpeningEmail({ to, openingNumber: Number(payload.openingNumber) });
     case "sealed_recommendation":
-      return sealedRecommendationEmail({ to, senderDisplayName: String(payload.senderDisplayName ?? "A friend") });
+      return sealedRecommendationEmail({
+        to,
+        senderDisplayName: String(payload.senderDisplayName ?? "A friend"),
+      });
     case "screening_reminder":
       return screeningReminderEmail({
         to,
@@ -73,7 +81,9 @@ function renderPayload(type: NotificationType, payload: Record<string, unknown>)
     case "after_credits":
       return afterCreditsEmail({ to });
     case "editorial_edm":
-      throw new Error("Editorial email must be composed and sent explicitly, not via the automatic queue.");
+      throw new Error(
+        "Editorial email must be composed and sent explicitly, not via the automatic queue.",
+      );
   }
 }
 
@@ -122,7 +132,10 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
     if (!claim.data) continue; // another run claimed it first
 
     try {
-      const rendered = renderPayload(row.type as NotificationType, row.payload as Record<string, unknown>);
+      const rendered = renderPayload(
+        row.type as NotificationType,
+        row.payload as Record<string, unknown>,
+      );
       await sendEmail(rendered, forbiddenTitles);
       await supabase
         .from("notification_queue")
@@ -133,7 +146,8 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
       const attempts = row.attempts + 1;
       const isExhausted = attempts >= MAX_ATTEMPTS;
       const message = sendError instanceof Error ? sendError.message : "Unknown send error";
-      const backoffMinutes = RETRY_BACKOFF_MINUTES[Math.min(attempts, RETRY_BACKOFF_MINUTES.length - 1)];
+      const backoffMinutes =
+        RETRY_BACKOFF_MINUTES[Math.min(attempts, RETRY_BACKOFF_MINUTES.length - 1)];
       const nextSendAt = new Date(now.getTime() + backoffMinutes * 60_000);
 
       await supabase

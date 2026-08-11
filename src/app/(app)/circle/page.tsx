@@ -17,7 +17,10 @@ export default async function CirclePage() {
   if (!user) return null;
 
   const [{ data: memberships }, { data: recommendations }] = await Promise.all([
-    supabase.from("circle_members").select("role, circles(id, name, invite_code)").eq("user_id", user.id),
+    supabase
+      .from("circle_members")
+      .select("role, circles(id, name, invite_code)")
+      .eq("user_id", user.id),
     supabase.rpc("list_my_sealed_recommendations"),
   ]);
 
@@ -41,7 +44,8 @@ export default async function CirclePage() {
                 <Link href={`/circle/recommendation/${rec.id}`} className={styles.recCard}>
                   <span className={styles.recSender}>{rec.sender_display_name}</span>
                   <span className={styles.recMeta}>
-                    {rec.revealed_at ? "Revealed, not yet watched" : "Sealed"} · {rec.runtime_minutes} min
+                    {rec.revealed_at ? "Revealed, not yet watched" : "Sealed"} ·{" "}
+                    {rec.runtime_minutes} min
                   </span>
                 </Link>
               </li>
@@ -82,7 +86,10 @@ export default async function CirclePage() {
               <li key={rec.id} className={styles.recCardStatic}>
                 <span className={styles.recMeta}>
                   {rec.runtime_minutes} min · sent{" "}
-                  {new Date(rec.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  {new Date(rec.created_at).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </span>
               </li>
             ))}

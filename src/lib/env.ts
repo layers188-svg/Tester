@@ -43,9 +43,7 @@ export function getServerEnv(): ServerEnv {
   }
   const parsed = serverSchema.safeParse(process.env);
   if (!parsed.success) {
-    const missing = parsed.error.issues
-      .map((issue) => issue.path.join("."))
-      .join(", ");
+    const missing = parsed.error.issues.map((issue) => issue.path.join(".")).join(", ");
     throw new Error(
       `House Dark cannot start: missing or invalid environment variable(s): ${missing}. ` +
         "See .env.example.",

@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
-import {
-  countWords,
-  validateSixWords,
-  withinEditWindow,
-} from "@/lib/validation/six-words";
+import { countWords, validateSixWords, withinEditWindow } from "@/lib/validation/six-words";
 import { Button } from "@/components/Button";
 import styles from "./SixWordsPanel.module.css";
 
@@ -55,9 +51,10 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
         .eq("moderation_state", "visible")
         .neq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "");
 
-      query = "openingId" in target
-        ? query.eq("opening_id", target.openingId)
-        : query.eq("sealed_recommendation_id", target.sealedRecommendationId);
+      query =
+        "openingId" in target
+          ? query.eq("opening_id", target.openingId)
+          : query.eq("sealed_recommendation_id", target.sealedRecommendationId);
 
       const { data } = await query;
       if (!cancelled) setOthers((data ?? []).map((row) => ({ id: row.id, body: row.body })));
@@ -82,7 +79,9 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
         body: JSON.stringify({
           id: own?.id,
           body: validation.normalized,
-          ...("openingId" in target ? { openingId: target.openingId } : { sealedRecommendationId: target.sealedRecommendationId }),
+          ...("openingId" in target
+            ? { openingId: target.openingId }
+            : { sealedRecommendationId: target.sealedRecommendationId }),
         }),
       });
       if (!res.ok) {
@@ -116,7 +115,9 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
     return (
       <div className={styles.panel}>
         <h3>Six words</h3>
-        <p className={styles.hint}>Write what you felt. Exactly six words. You will see it before anyone else&rsquo;s.</p>
+        <p className={styles.hint}>
+          Write what you felt. Exactly six words. You will see it before anyone else&rsquo;s.
+        </p>
         <textarea
           className={styles.textarea}
           rows={2}

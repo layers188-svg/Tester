@@ -16,7 +16,9 @@ export default async function ModerationPage() {
   return (
     <div>
       <h1>Moderation</h1>
-      <p>Hide or remove spoiler-unsafe or abusive reviews. Curate approved ones for the public site.</p>
+      <p>
+        Hide or remove spoiler-unsafe or abusive reviews. Curate approved ones for the public site.
+      </p>
       <ModerationList reviews={reviews ?? []} />
     </div>
   );

@@ -11,15 +11,18 @@ export default function HowItWorksPage() {
   return (
     <div className={styles.page}>
       <h1>How it works</h1>
-      <p className={styles.lead}>No posters. No plot. No star rating. Just a feeling, a choice, and a conversation that starts after the credits.</p>
+      <p className={styles.lead}>
+        No posters. No plot. No star rating. Just a feeling, a choice, and a conversation that
+        starts after the credits.
+      </p>
 
       <section>
         <h2>1. Receive the feeling</h2>
         <p>
-          Each night House Dark presents one human chosen film. Before you know anything about
-          it, you see a short, original No Trailer &mdash; an emotional temperature, not a
-          summary. Alongside it: the running time, how many verified legal places you can watch
-          it, and any content notes, tucked behind their own tap.
+          Each night House Dark presents one human chosen film. Before you know anything about it,
+          you see a short, original No Trailer &mdash; an emotional temperature, not a summary.
+          Alongside it: the running time, how many verified legal places you can watch it, and any
+          content notes, tucked behind their own tap.
         </p>
       </section>
 
@@ -27,9 +30,9 @@ export default function HowItWorksPage() {
         <h2>2. Choose to enter</h2>
         <p>
           Nothing plays until you dim the house yourself. That is a deliberate, physical-feeling
-          gesture, not an autoplay. After the No Trailer finishes, you decide whether to reveal
-          the title. Only then does the film&rsquo;s name appear, along with verified legal
-          services where you can watch it. House Dark never hosts or streams the film itself.
+          gesture, not an autoplay. After the No Trailer finishes, you decide whether to reveal the
+          title. Only then does the film&rsquo;s name appear, along with verified legal services
+          where you can watch it. House Dark never hosts or streams the film itself.
         </p>
       </section>
 
@@ -55,8 +58,8 @@ export default function HowItWorksPage() {
         <h2>Circles</h2>
         <p>
           Private groups of friends can hold a shared opening together. Thursday at 8pm is the
-          starting ritual, though any Circle can change it. Circle activity shows what was
-          watched or sent &mdash; never a sealed title.
+          starting ritual, though any Circle can change it. Circle activity shows what was watched
+          or sent &mdash; never a sealed title.
         </p>
       </section>
 

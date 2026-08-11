@@ -61,7 +61,9 @@ export function CircleDetail({
   const [busy, setBusy] = useState<string | null>(null);
 
   const inviteLink =
-    typeof window !== "undefined" ? `${window.location.origin}/join?circle=${circle.inviteCode}` : "";
+    typeof window !== "undefined"
+      ? `${window.location.origin}/join?circle=${circle.inviteCode}`
+      : "";
 
   async function copyInvite() {
     try {
@@ -134,7 +136,10 @@ export function CircleDetail({
 
       <section className={styles.section}>
         <h2>Invite</h2>
-        <p className={styles.hint}>Anyone with this link can join {circle.name}.</p>
+        <p className={styles.hint}>Anyone with this code can join {circle.name}.</p>
+        <p className={styles.inviteCode} aria-label="Invite code">
+          {circle.inviteCode}
+        </p>
         <Button variant="secondary" onClick={copyInvite}>
           {copyLabel}
         </Button>
@@ -145,7 +150,9 @@ export function CircleDetail({
           <h2>Screenings</h2>
           <ul className={styles.screenings}>
             {screenings.map((s) => {
-              const mine = attendance.find((a) => a.screening_id === s.id && a.user_id === currentUserId);
+              const mine = attendance.find(
+                (a) => a.screening_id === s.id && a.user_id === currentUserId,
+              );
               return (
                 <li key={s.id} className={styles.screeningCard}>
                   <p>

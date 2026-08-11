@@ -6,7 +6,11 @@ import { OpeningDetail } from "@/components/desk/OpeningDetail";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Opening — Programming Desk" };
 
-export default async function DeskOpeningDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function DeskOpeningDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const supabase = await getServerSupabase();
 
@@ -48,6 +52,7 @@ export default async function DeskOpeningDetailPage({ params }: { params: Promis
         availabilityCount: opening.availability_count,
         minimumAccessType: opening.minimum_access_type,
         noTrailerStoragePath: opening.no_trailer_storage_path,
+        noTrailerCaptionsPath: opening.no_trailer_captions_path,
         contentNotes: opening.content_notes,
       }}
       film={film}

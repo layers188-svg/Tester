@@ -8,7 +8,10 @@ export interface AfterCreditsInput {
   hasSubmittedSixWords: boolean;
 }
 
-export function isAfterCreditsEligible({ hasWatched, hasSubmittedSixWords }: AfterCreditsInput): boolean {
+export function isAfterCreditsEligible({
+  hasWatched,
+  hasSubmittedSixWords,
+}: AfterCreditsInput): boolean {
   return hasWatched && hasSubmittedSixWords;
 }
 
@@ -18,7 +21,10 @@ export interface MarketingConsentRecord {
 }
 
 /** Marketing consent must be its own explicit, unchecked opt-in — never inferred from auth. */
-export function recordMarketingConsent(source: string, now: Date = new Date()): MarketingConsentRecord {
+export function recordMarketingConsent(
+  source: string,
+  now: Date = new Date(),
+): MarketingConsentRecord {
   if (!source || source.trim().length === 0) {
     throw new Error("Marketing consent requires a source.");
   }

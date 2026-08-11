@@ -37,7 +37,9 @@ export function SealedExperience({
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/reveal/recommendation/${recommendation.id}`, { method: "POST" });
+      const res = await fetch(`/api/reveal/recommendation/${recommendation.id}`, {
+        method: "POST",
+      });
       if (!res.ok) throw new Error((await res.json()).error ?? "Could not reveal this.");
       const data = (await res.json()) as RevealData;
       setReveal(data);
@@ -74,7 +76,9 @@ export function SealedExperience({
       <div className={styles.card}>
         <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
         <h1>A film under seal.</h1>
-        {recommendation.personalNote && <p className={styles.note}>&ldquo;{recommendation.personalNote}&rdquo;</p>}
+        {recommendation.personalNote && (
+          <p className={styles.note}>&ldquo;{recommendation.personalNote}&rdquo;</p>
+        )}
         <dl className={styles.factList}>
           <div>
             <dt>Running time</dt>
@@ -114,7 +118,9 @@ export function SealedExperience({
         {reveal.title}
         {reveal.releaseYear ? <span className={styles.year}> ({reveal.releaseYear})</span> : null}
       </h1>
-      {recommendation.personalNote && <p className={styles.note}>&ldquo;{recommendation.personalNote}&rdquo;</p>}
+      {recommendation.personalNote && (
+        <p className={styles.note}>&ldquo;{recommendation.personalNote}&rdquo;</p>
+      )}
 
       {reveal.providers.length > 0 ? (
         <ul className={styles.providers}>
@@ -123,7 +129,10 @@ export function SealedExperience({
               <a href={p.deep_link} target="_blank" rel="noreferrer">
                 {p.provider_name}
               </a>
-              <span className={styles.providerMeta}> · {p.access_type} · {p.territory}</span>
+              <span className={styles.providerMeta}>
+                {" "}
+                · {p.access_type} · {p.territory}
+              </span>
             </li>
           ))}
         </ul>
@@ -138,10 +147,16 @@ export function SealedExperience({
       </div>
 
       <div className={styles.actionsRow}>
-        <Button variant={watchState === "saved" ? "primary" : "secondary"} onClick={() => setWatch("saved")}>
+        <Button
+          variant={watchState === "saved" ? "primary" : "secondary"}
+          onClick={() => setWatch("saved")}
+        >
           Save for later
         </Button>
-        <Button variant={watchState === "watched" ? "primary" : "secondary"} onClick={() => setWatch("watched")}>
+        <Button
+          variant={watchState === "watched" ? "primary" : "secondary"}
+          onClick={() => setWatch("watched")}
+        >
           Mark watched
         </Button>
       </div>
@@ -150,8 +165,15 @@ export function SealedExperience({
         <SixWordsPanel
           target={{ sealedRecommendationId: recommendation.id }}
           initialOwnReview={
-            progress.hasSixWords && progress.sixWordsId && progress.sixWordsBody && progress.sixWordsCreatedAt
-              ? { id: progress.sixWordsId, body: progress.sixWordsBody, createdAt: progress.sixWordsCreatedAt }
+            progress.hasSixWords &&
+            progress.sixWordsId &&
+            progress.sixWordsBody &&
+            progress.sixWordsCreatedAt
+              ? {
+                  id: progress.sixWordsId,
+                  body: progress.sixWordsBody,
+                  createdAt: progress.sixWordsCreatedAt,
+                }
               : null
           }
         />

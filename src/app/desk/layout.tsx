@@ -10,7 +10,11 @@ export default async function DeskLayout({ children }: { children: React.ReactNo
   } = await supabase.auth.getUser();
   if (!user) redirect("/join?next=/desk");
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
   if (profile?.role !== "owner") redirect("/tonight");
 
   return (

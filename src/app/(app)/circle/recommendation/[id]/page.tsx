@@ -8,7 +8,11 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Sent under seal" };
 
-export default async function SealedRecommendationPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function SealedRecommendationPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const supabase = await getServerSupabase();
   const {

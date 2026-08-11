@@ -36,19 +36,27 @@ export default async function DeskHomePage() {
         </div>
         <div className={styles.card}>
           <h2>Scheduled</h2>
-          <p>{scheduled.length} opening{scheduled.length === 1 ? "" : "s"} queued.</p>
+          <p>
+            {scheduled.length} opening{scheduled.length === 1 ? "" : "s"} queued.
+          </p>
         </div>
         <div className={styles.card}>
           <h2>In progress</h2>
-          <p>{drafts.length} opening{drafts.length === 1 ? "" : "s"} awaiting approval.</p>
+          <p>
+            {drafts.length} opening{drafts.length === 1 ? "" : "s"} awaiting approval.
+          </p>
         </div>
         <div className={styles.card}>
           <h2>Email queue</h2>
-          <p>{failedEmails ?? 0} failed send{failedEmails === 1 ? "" : "s"}.</p>
+          <p>
+            {failedEmails ?? 0} failed send{failedEmails === 1 ? "" : "s"}.
+          </p>
         </div>
         <div className={styles.card}>
           <h2>Moderation</h2>
-          <p>{pendingReviews ?? 0} visible six-word review{pendingReviews === 1 ? "" : "s"}.</p>
+          <p>
+            {pendingReviews ?? 0} visible six-word review{pendingReviews === 1 ? "" : "s"}.
+          </p>
         </div>
       </div>
 

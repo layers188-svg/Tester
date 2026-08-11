@@ -13,7 +13,10 @@ export interface MediaValidationIssue {
   blocking: boolean;
 }
 
-export function validateMediaFile(file: { type: string; size: number; name: string }, filmTitle: string): MediaValidationIssue[] {
+export function validateMediaFile(
+  file: { type: string; size: number; name: string },
+  filmTitle: string,
+): MediaValidationIssue[] {
   const issues: MediaValidationIssue[] = [];
 
   if (!ACCEPTED_MIME_TYPES.includes(file.type as (typeof ACCEPTED_MIME_TYPES)[number])) {
@@ -41,7 +44,10 @@ export function validateMediaFile(file: { type: string; size: number; name: stri
 
 /** Brief §12 rule 5: "Reject filenames containing the film title." */
 export function filenameContainsTitle(filename: string, title: string): boolean {
-  const normalizedTitle = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const normalizedTitle = title
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
   if (normalizedTitle.length === 0) return false;
   const normalizedFilename = filename.toLowerCase().replace(/[^a-z0-9]+/g, "");
   return normalizedFilename.includes(normalizedTitle);

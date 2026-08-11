@@ -56,7 +56,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error?.message ?? "Could not send that." }, { status: 400 });
   }
 
-  const { data: profile } = await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .maybeSingle();
 
   await Promise.all(
     parsed.data.recipientIds.map((recipientId) =>

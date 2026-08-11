@@ -19,7 +19,10 @@ function getResend(): Resend {
  * rule 9 requires an automated check on "outgoing email payloads", and
  * this is where that check runs on the live path, not just in tests.
  */
-export async function sendEmail(payload: EmailPayload, forbiddenTerms: string[]): Promise<{ id: string | null }> {
+export async function sendEmail(
+  payload: EmailPayload,
+  forbiddenTerms: string[],
+): Promise<{ id: string | null }> {
   assertSafeEmailPayload(payload, forbiddenTerms);
 
   const env = getServerEnv();

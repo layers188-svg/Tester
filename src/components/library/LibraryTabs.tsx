@@ -92,7 +92,8 @@ export function LibraryTabs({
           {circleActivity.map((row, i) => (
             <li key={i} className={styles.activityRow}>
               <strong>{row.actor_display_name}</strong>{" "}
-              {row.kind === "watched" ? "watched something" : "sent a film under seal"} in {row.circle_name}.
+              {row.kind === "watched" ? "watched something" : "sent a film under seal"} in{" "}
+              {row.circle_name}.
             </li>
           ))}
         </ul>
@@ -106,7 +107,10 @@ export function LibraryTabs({
               <div className={styles.cardHead}>
                 <span>{opening.title ?? `Opening ${opening.opening_number}`}</span>
                 <span className={styles.badge}>
-                  {new Date(opening.opens_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  {new Date(opening.opens_at).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </span>
               </div>
               {!opening.revealed && <p className={styles.hint}>You never revealed this one.</p>}

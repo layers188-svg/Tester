@@ -51,7 +51,12 @@ function TonightIcon({ active }: IconProps) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth={active ? 2 : 1.5} />
-      <path d="M12 3.5V12l6 3.5" stroke="currentColor" strokeWidth={active ? 2 : 1.5} strokeLinecap="round" />
+      <path
+        d="M12 3.5V12l6 3.5"
+        stroke="currentColor"
+        strokeWidth={active ? 2 : 1.5}
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

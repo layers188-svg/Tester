@@ -31,7 +31,11 @@ export async function POST(request: Request) {
     // No body — treat as no consent given.
   }
 
-  const { data: existing } = await supabase.from("profiles").select("id").eq("id", user.id).maybeSingle();
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
 
   if (!existing) {
     const displayName = user.email ? user.email.split("@")[0] : "New member";

@@ -16,9 +16,9 @@ export default function PrivacyPage() {
       <section>
         <h2>What we collect</h2>
         <p>
-          Your email, display name, city and timezone if you provide them, your Circle
-          memberships, what you have watched or saved, your six word responses, and your email
-          and reminder preferences. We store only what the service needs to run (brief §14).
+          Your email, display name, city and timezone if you provide them, your Circle memberships,
+          what you have watched or saved, your six word responses, and your email and reminder
+          preferences. We store only what the service needs to run (brief §14).
         </p>
       </section>
 
@@ -36,16 +36,16 @@ export default function PrivacyPage() {
         <p>
           Sign in is separate from marketing consent. We only send editorial notes if you opt in
           with an unchecked box, and every editorial email includes an unsubscribe link. You can
-          withdraw consent any time from <a href="/join">the You page</a> once signed in.
+          withdraw consent any time from <a href="/you">the You page</a> once signed in.
         </p>
       </section>
 
       <section>
         <h2>Your rights</h2>
         <p>
-          You can export your personal data and delete your account and its associated content
-          from the You page at any time. Administrative access to member data is recorded in a
-          safe audit log that never stores film titles or other spoiler information.
+          You can export your personal data and delete your account and its associated content from
+          the You page at any time. Administrative access to member data is recorded in a safe audit
+          log that never stores film titles or other spoiler information.
         </p>
       </section>
 

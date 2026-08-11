@@ -14,21 +14,33 @@
   --hd-patina-brass: #b9a16c;
   --hd-cool-green: #36524c;
 
+  /*
+   * Palette tints. Oxblood and Cool Green are deep enough that as text
+   * or as a focus ring on a near-black ground they fail WCAG 2.2 AA
+   * (1.6:1 and 2.4:1 measured). These are the same two hues lifted
+   * toward Stock Cream until they pass — the palette is unchanged, the
+   * full-strength values below are still what fills and rules use.
+   */
+  --hd-oxblood-raised: #aa7e7b; /* 5.8:1 on bg — error text */
+  --hd-cool-green-raised: #65776e; /* 4.3:1 on bg — focus ring */
+
   /* Semantic roles (dark, projection-room default) */
   --hd-bg: var(--hd-projection-black);
   --hd-surface: var(--hd-house-black);
   --hd-ink: var(--hd-stock-cream);
   --hd-ink-muted: var(--hd-aged-paper);
   --hd-accent: var(--hd-patina-brass);
-  --hd-danger: var(--hd-oxblood);
-  --hd-focus: var(--hd-cool-green);
-  --hd-rule: rgba(233, 224, 208, 0.16);
-  --hd-rule-strong: rgba(233, 224, 208, 0.32);
+  --hd-danger: var(--hd-oxblood); /* fills, borders */
+  --hd-danger-ink: var(--hd-oxblood-raised); /* error text */
+  --hd-focus: var(--hd-cool-green-raised);
+  --hd-rule: rgba(233, 224, 208, 0.16); /* decorative hairlines */
+  /* Control borders are UI component boundaries: WCAG 1.4.11 needs 3:1. */
+  --hd-rule-strong: rgba(233, 224, 208, 0.48);
   --hd-scrim: rgba(3, 3, 3, 0.72);
 
   /* Type */
-  --hd-font-editorial: var(--font-newsreader), "Iowan Old Style", "Palatino Linotype",
-    Georgia, serif;
+  --hd-font-editorial:
+    var(--font-newsreader), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --hd-font-utility: var(--font-barlow-condensed), "Arial Narrow", Arial, sans-serif;
 
   --hd-size-display: clamp(2.25rem, 7vw, 3.75rem);

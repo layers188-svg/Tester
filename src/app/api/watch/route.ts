@@ -63,5 +63,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Could not update watch state." }, { status: 400 });
   }
 
-  return NextResponse.json({ id: data.id, state: data.state }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json(
+    { id: data.id, state: data.state },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

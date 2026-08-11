@@ -40,8 +40,7 @@ export function computeTonightState({
 }: TonightStateInput): TonightState {
   const opens = opensAt ? (typeof opensAt === "string" ? new Date(opensAt) : opensAt) : null;
 
-  const isOpen =
-    openingStatus === "open" || (openingStatus === "closed" && hasRevealed);
+  const isOpen = openingStatus === "open" || (openingStatus === "closed" && hasRevealed);
 
   if (!openingStatus || (opens && opens.getTime() > now.getTime()) || !isOpen) {
     if (openingStatus === "scheduled" || openingStatus === "open" || openingStatus === "closed") {

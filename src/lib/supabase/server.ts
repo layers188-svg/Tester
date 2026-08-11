@@ -14,22 +14,26 @@ export async function getServerSupabase() {
   const env = getServerEnv();
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        try {
-          for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
+  return createServerClient<Database>(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            for (const { name, value, options } of cookiesToSet) {
+              cookieStore.set(name, value, options);
+            }
+          } catch {
+            // Called from a Server Component that cannot set cookies (e.g.
+            // during static rendering). Middleware refreshes the session on
+            // the next request, so this is safe to ignore.
           }
-        } catch {
-          // Called from a Server Component that cannot set cookies (e.g.
-          // during static rendering). Middleware refreshes the session on
-          // the next request, so this is safe to ignore.
-        }
+        },
       },
     },
-  });
+  );
 }
