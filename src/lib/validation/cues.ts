@@ -13,7 +13,22 @@ export interface CueValidation {
 }
 
 export function validateCues(rawCues: string[]): CueValidation {
-  const cues = rawCues.map((cue) => cue.trim()).filter((cue) => cue.length > 0);
+  // Drop repeats, keeping the first spelling. Duplicate cues carry no
+  // extra meaning, they read as a mistake on the sealed card, and the
+  // database now rejects them outright (migration 0012) — so collapse
+  // them here rather than failing a submission over it. Matching is
+  // case-insensitive, which is stricter than the database's exact-match
+  // unique index, so anything this accepts will always insert cleanly.
+  const seen = new Set<string>();
+  const cues: string[] = [];
+  for (const raw of rawCues) {
+    const cue = raw.trim();
+    if (cue.length === 0) continue;
+    const key = cue.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    cues.push(cue);
+  }
 
   if (cues.length > MAX_CUES) {
     return { valid: false, cues, error: `Use at most ${MAX_CUES} cues.` };

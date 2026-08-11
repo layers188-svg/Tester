@@ -14,6 +14,24 @@ describe("validateCues", () => {
     expect(result.cues).toEqual(["Drummer"]);
   });
 
+  it("collapses repeats instead of rejecting them", () => {
+    const result = validateCues(["Drummer", "Drummer", "School"]);
+    expect(result.valid).toBe(true);
+    expect(result.cues).toEqual(["Drummer", "School"]);
+  });
+
+  it("treats repeats case-insensitively and keeps the first spelling", () => {
+    const result = validateCues(["Drummer", "drummer", "DRUMMER"]);
+    expect(result.cues).toEqual(["Drummer"]);
+  });
+
+  it("counts the limit after collapsing repeats", () => {
+    // Four entries, but only three distinct cues — this must pass.
+    const result = validateCues(["One", "Two", "Three", "one"]);
+    expect(result.valid).toBe(true);
+    expect(result.cues).toEqual(["One", "Two", "Three"]);
+  });
+
   it(`rejects more than ${MAX_CUES} cues`, () => {
     const result = validateCues(["One", "Two", "Three", "Four"]);
     expect(result.valid).toBe(false);

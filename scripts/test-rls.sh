@@ -33,7 +33,12 @@ if [[ -n "${HOUSE_DARK_TEST_DATABASE_URL:-}" ]]; then
     echo "  applying $(basename "$migration")"
     "${PSQL[@]}" -f "$migration"
   done
-  exec psql "$HOUSE_DARK_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/01_rls.sql
+  for suite in supabase/tests/[0-9][0-9]_*.sql; do
+    [[ "$(basename "$suite")" == 00_* ]] && continue
+    echo "  running $(basename "$suite")"
+    psql "$HOUSE_DARK_TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$suite"
+  done
+  exit 0
 fi
 
 # ---------------------------------------------------------------------
@@ -102,6 +107,11 @@ for migration in supabase/migrations/*.sql; do
   "${PSQL[@]}" -f "$migration"
 done
 
-echo "Running RLS policy tests"
-psql -h "$PGSOCK" -p "$PGPORT" -U postgres -d postgres -v ON_ERROR_STOP=1 \
-  -f supabase/tests/01_rls.sql
+echo "Running database tests"
+# Test files share one sequence: 01+ record assertions into tests.results
+# and 99_report prints them and fails the run if any did not hold.
+for suite in supabase/tests/[0-9][0-9]_*.sql; do
+  [[ "$(basename "$suite")" == 00_* ]] && continue
+  echo "  $(basename "$suite")"
+  psql -h "$PGSOCK" -p "$PGPORT" -U postgres -d postgres -v ON_ERROR_STOP=1 -q -f "$suite"
+done
