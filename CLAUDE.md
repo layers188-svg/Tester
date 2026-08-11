@@ -55,6 +55,10 @@ responses.
 - Never prefetch or statically generate a reveal route.
 - Run `npm run test:spoiler` (title leak detector) whenever opening,
   reveal, email, or seed code changes.
+- Run `npm run test:rls` whenever anything under `supabase/migrations`
+  changes. It applies every migration to a throwaway Postgres and
+  asserts all seven brief §17 cases — the only thing that actually
+  proves a policy holds, since RLS filters rows rather than raising.
 
 ## Stack
 
@@ -86,7 +90,8 @@ npm run typecheck      # tsc --noEmit
 npm run format          # prettier --write
 npm run test             # vitest unit tests
 npm run test:spoiler      # title leak regression suite
-npm run test:e2e           # playwright critical journeys (needs a running app + Supabase)
+npm run test:rls           # RLS policy tests (throwaway Postgres, needs a local server install)
+npm run test:e2e            # playwright critical journeys (needs a running app + Supabase)
 npm run db:migrate           # apply SQL migrations to the linked Supabase project
 npm run db:seed               # seed demo data incl. protected Whiplash mapping
 ```

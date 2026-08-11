@@ -121,6 +121,7 @@ npm run typecheck      # tsc --noEmit
 npm run format         # prettier --write
 npm run test           # vitest unit tests
 npm run test:spoiler   # title leak regression suite only
+npm run test:rls       # RLS policy tests on a throwaway Postgres
 npm run test:e2e       # playwright (starts its own dev server on :3100)
 npm run cf:build       # build the Cloudflare Workers bundle
 npm run cf:preview     # run that bundle locally in workerd

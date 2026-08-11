@@ -18,7 +18,8 @@
     "db:seed": "supabase db reset",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare deploy"
+    "cf:deploy": "opennextjs-cloudflare deploy",
+    "test:rls": "bash scripts/test-rls.sh"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
