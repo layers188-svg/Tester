@@ -1,0 +1,43 @@
+.lead {
+  max-width: 44ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--hd-space-4);
+  margin: var(--hd-space-5) 0;
+}
+
+.card {
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  padding: var(--hd-space-4);
+}
+
+.card h2 {
+  font-size: var(--hd-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--hd-font-utility);
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-2);
+}
+
+.card p {
+  margin: 0;
+  color: var(--hd-ink);
+}
+
+.cta {
+  display: inline-block;
+  background: var(--hd-accent);
+  color: var(--hd-projection-black);
+  text-decoration: none;
+  padding: var(--hd-space-3) var(--hd-space-5);
+  border-radius: var(--hd-radius-control);
+  font-family: var(--hd-font-utility);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}

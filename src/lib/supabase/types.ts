@@ -323,7 +323,10 @@ export interface Database {
           no_trailer_storage_path: string;
         }
       >;
-      opening_secrets: Table<OpeningSecretRow, OpeningSecretRow>;
+      opening_secrets: Table<
+        OpeningSecretRow,
+        Partial<OpeningSecretRow> & { opening_id: string; film_id: string }
+      >;
       opening_cues: Table<OpeningCueRow, Partial<OpeningCueRow> & { opening_id: string; cue: string }>;
       playback_destinations: Table<
         PlaybackDestinationRow,

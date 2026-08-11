@@ -1,0 +1,48 @@
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--hd-space-3);
+}
+
+.newLink {
+  color: var(--hd-accent);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  text-transform: uppercase;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--hd-space-5);
+  font-size: var(--hd-size-small);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--hd-space-3);
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.table th {
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 500;
+}
+
+.table a {
+  color: var(--hd-accent);
+}
+
+.status {
+  text-transform: capitalize;
+}
+
+.status[data-status="open"] {
+  color: var(--hd-accent);
+}
