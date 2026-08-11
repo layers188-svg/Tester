@@ -1,0 +1,12 @@
+.wordmark {
+  font-family: var(--hd-font-editorial);
+  font-weight: 500;
+  font-size: var(--hd-size-heading);
+  letter-spacing: 0.01em;
+  color: var(--hd-ink);
+}
+
+.dark {
+  font-style: italic;
+  color: var(--hd-accent);
+}

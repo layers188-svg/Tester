@@ -1,0 +1,73 @@
+/*
+ * House Dark design tokens.
+ * Source: build brief §8 (visual system). Do not add gradients, glass,
+ * neon or generic component-library styling here — the brief forbids it.
+ */
+
+:root {
+  /* Colour — brief §8. Brass is a minor registration colour only. */
+  --hd-house-black: #080807;
+  --hd-projection-black: #030303;
+  --hd-stock-cream: #e9e0d0;
+  --hd-aged-paper: #d8ccb8;
+  --hd-oxblood: #65131f;
+  --hd-patina-brass: #b9a16c;
+  --hd-cool-green: #36524c;
+
+  /* Semantic roles (dark, projection-room default) */
+  --hd-bg: var(--hd-projection-black);
+  --hd-surface: var(--hd-house-black);
+  --hd-ink: var(--hd-stock-cream);
+  --hd-ink-muted: var(--hd-aged-paper);
+  --hd-accent: var(--hd-patina-brass);
+  --hd-danger: var(--hd-oxblood);
+  --hd-focus: var(--hd-cool-green);
+  --hd-rule: rgba(233, 224, 208, 0.16);
+  --hd-rule-strong: rgba(233, 224, 208, 0.32);
+  --hd-scrim: rgba(3, 3, 3, 0.72);
+
+  /* Type */
+  --hd-font-editorial: var(--font-newsreader), "Iowan Old Style", "Palatino Linotype",
+    Georgia, serif;
+  --hd-font-utility: var(--font-barlow-condensed), "Arial Narrow", Arial, sans-serif;
+
+  --hd-size-display: clamp(2.25rem, 7vw, 3.75rem);
+  --hd-size-title: clamp(1.5rem, 5vw, 2.25rem);
+  --hd-size-heading: 1.25rem;
+  --hd-size-body: 1rem;
+  --hd-size-small: 0.875rem;
+  --hd-size-micro: 0.75rem;
+
+  /* Space — 4px rhythm */
+  --hd-space-1: 0.25rem;
+  --hd-space-2: 0.5rem;
+  --hd-space-3: 0.75rem;
+  --hd-space-4: 1rem;
+  --hd-space-5: 1.5rem;
+  --hd-space-6: 2rem;
+  --hd-space-7: 3rem;
+  --hd-space-8: 4.5rem;
+
+  /* Structure */
+  --hd-radius: 2px;
+  --hd-radius-control: 3px;
+  --hd-touch-min: 44px;
+  --hd-max-width: 30rem; /* editorial phone-first column, widens per breakpoint */
+  --hd-max-width-wide: 68rem;
+
+  /* Motion — brief §8 timings */
+  --hd-motion-button: 100ms;
+  --hd-motion-panel: 220ms;
+  --hd-motion-dim: 360ms;
+  --hd-motion-reveal: 560ms;
+  --hd-ease-standard: cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --hd-motion-button: 0ms;
+    --hd-motion-panel: 0ms;
+    --hd-motion-dim: 0ms;
+    --hd-motion-reveal: 0ms;
+  }
+}

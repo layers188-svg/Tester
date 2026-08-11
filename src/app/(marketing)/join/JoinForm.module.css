@@ -1,0 +1,91 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-3);
+  max-width: 24rem;
+  margin-top: var(--hd-space-5);
+}
+
+.label {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+.input {
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-4);
+  background: var(--hd-surface);
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  color: var(--hd-ink);
+  font-size: 1rem;
+}
+
+.input:focus {
+  border-color: var(--hd-accent);
+}
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hd-space-3);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  padding: var(--hd-space-2) 0;
+}
+
+.checkbox input {
+  margin-top: 0.2em;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.error {
+  color: var(--hd-oxblood);
+  background: color-mix(in srgb, var(--hd-oxblood) 16%, transparent);
+  border: 1px solid var(--hd-oxblood);
+  border-radius: var(--hd-radius-control);
+  padding: var(--hd-space-3);
+  font-size: var(--hd-size-small);
+  margin: 0;
+}
+
+.fineprint {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+.fineprint a {
+  color: var(--hd-ink-muted);
+  text-decoration: underline;
+}
+
+.sentTo {
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--hd-accent);
+  font-size: var(--hd-size-small);
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: var(--hd-touch-min);
+  text-align: left;
+}
+
+.linkButton:disabled {
+  color: var(--hd-ink-muted);
+  cursor: not-allowed;
+  text-decoration: none;
+}

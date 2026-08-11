@@ -1,12 +1,21 @@
 {
-  "name": "hd-scaffold",
+  "name": "house-dark",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:spoiler": "vitest run tests/unit/spoiler",
+    "test:e2e": "playwright test",
+    "db:migrate": "supabase db push",
+    "db:seed": "supabase db reset"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
@@ -15,6 +24,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "resend": "^6.19.0",
+    "server-only": "^0.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
