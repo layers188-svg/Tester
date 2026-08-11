@@ -12,8 +12,14 @@ import type { NotificationType } from "./types";
 
 const MAX_ATTEMPTS = 5;
 const BATCH_SIZE = 25;
-/** Exponential backoff in minutes, indexed by attempt count. */
+/** Backoff before retry N, so RETRY_BACKOFF_MINUTES[0] follows the first failure. */
 const RETRY_BACKOFF_MINUTES = [1, 5, 15, 60, 240];
+/**
+ * How long a row may sit in 'sending' before a later run assumes the
+ * run that claimed it died and takes it back. Comfortably longer than
+ * any real send, and shorter than the gap a member would notice.
+ */
+const STALE_CLAIM_MINUTES = 10;
 
 interface EnqueueArgs {
   userId: string;
@@ -104,6 +110,18 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
   const supabase = getServiceSupabase();
   const result: ProcessResult = { processed: 0, sent: 0, failed: 0, cancelled: 0 };
 
+  // Take back rows stranded in 'sending' by a run that died mid-send.
+  // Without this they are invisible to every later run — never sent,
+  // never failed, and never surfaced on the Programming Desk. The
+  // attempt count is not touched here: the claim below increments it,
+  // so a row that reliably kills the worker still exhausts its retries
+  // rather than looping forever.
+  await supabase
+    .from("notification_queue")
+    .update({ status: "pending" })
+    .eq("status", "sending")
+    .lt("updated_at", new Date(now.getTime() - STALE_CLAIM_MINUTES * 60_000).toISOString());
+
   const { data: due, error } = await supabase
     .from("notification_queue")
     .select("*")
@@ -146,8 +164,11 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
       const attempts = row.attempts + 1;
       const isExhausted = attempts >= MAX_ATTEMPTS;
       const message = sendError instanceof Error ? sendError.message : "Unknown send error";
+      // `attempts` is 1-based after the claim, so the first failure must
+      // read index 0. Indexing by `attempts` skipped the first interval
+      // and made every retry wait one step too long.
       const backoffMinutes =
-        RETRY_BACKOFF_MINUTES[Math.min(attempts, RETRY_BACKOFF_MINUTES.length - 1)];
+        RETRY_BACKOFF_MINUTES[Math.min(attempts - 1, RETRY_BACKOFF_MINUTES.length - 1)];
       const nextSendAt = new Date(now.getTime() + backoffMinutes * 60_000);
 
       await supabase
