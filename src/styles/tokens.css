@@ -15,6 +15,18 @@
   --hd-cool-green: #36524c;
 
   /*
+   * Added from the Brand Guidelines v1.0 palette, which extends the
+   * seven in brief §8. Deep Burgundy is the weight behind Oxblood for a
+   * filled surface (the guidelines use it for the primary action and
+   * the tonight card); Tobacco and Dust Rose are warm accents. All
+   * three are palette members, not new semantic roles — reach for the
+   * role tokens below in components.
+   */
+  --hd-deep-burgundy: #741724;
+  --hd-tobacco: #956433;
+  --hd-dust-rose: #a88187;
+
+  /*
    * Palette tints. Oxblood and Cool Green are deep enough that as text
    * or as a focus ring on a near-black ground they fail WCAG 2.2 AA
    * (1.6:1 and 2.4:1 measured). These are the same two hues lifted
