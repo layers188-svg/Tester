@@ -85,11 +85,12 @@ insert into openings (
   106,
   3,
   'subscription',
-  -- UUID storage name — brief §12 media checks rule 6. This path is a
-  -- placeholder: the real No Trailer file has not been supplied to this
-  -- environment. Upload it from the Programming Desk before relying on
-  -- this opening (see LAUNCH_CHECKLIST.md).
-  'no-trailer/cccccccc-cccc-4ccc-8ccc-cccccccccccc.mp4',
+  -- UUID storage name within the "no-trailer" Storage bucket — brief
+  -- §12 media checks rule 6. This is a placeholder: the real No Trailer
+  -- file has not been supplied to this environment. Upload it from the
+  -- Programming Desk before relying on this opening (see
+  -- LAUNCH_CHECKLIST.md).
+  'cccccccc-cccc-4ccc-8ccc-cccccccccccc.mp4',
   'Depicts intense mentorship and high pressure practice. No flashing imagery.'
 )
 on conflict (id) do update set status = excluded.status;
