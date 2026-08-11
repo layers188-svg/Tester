@@ -1,0 +1,110 @@
+.card {
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
+  max-width: var(--hd-max-width);
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.note {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--hd-ink);
+}
+
+.factList {
+  margin: var(--hd-space-5) 0;
+  padding: var(--hd-space-4) 0;
+  border-top: 1px solid var(--hd-rule);
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.factList div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.factList dt {
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+}
+
+.factList dd {
+  margin: 0;
+}
+
+.cues {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hd-space-2);
+  padding: 0;
+  margin: 0 0 var(--hd-space-5);
+}
+
+.cues li {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  text-transform: uppercase;
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: 999px;
+  padding: var(--hd-space-1) var(--hd-space-3);
+  color: var(--hd-ink-muted);
+}
+
+.error {
+  color: var(--hd-oxblood);
+  font-size: var(--hd-size-small);
+  margin-bottom: var(--hd-space-4);
+}
+
+.year {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  color: var(--hd-ink-muted);
+  font-size: 0.6em;
+}
+
+.providers {
+  list-style: none;
+  margin: var(--hd-space-4) 0;
+  padding: var(--hd-space-4) 0;
+  border-top: 1px solid var(--hd-rule);
+  border-bottom: 1px solid var(--hd-rule);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-3);
+}
+
+.providers a {
+  color: var(--hd-accent);
+  text-decoration: underline;
+  font-family: var(--hd-font-utility);
+}
+
+.providerMeta {
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  text-transform: capitalize;
+}
+
+.hint {
+  font-size: var(--hd-size-small);
+}
+
+.actionsRow {
+  display: flex;
+  gap: var(--hd-space-3);
+  margin-bottom: var(--hd-space-4);
+  flex-wrap: wrap;
+}

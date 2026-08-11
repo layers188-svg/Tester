@@ -1,0 +1,9 @@
+.page {
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
+  max-width: var(--hd-max-width);
+  margin: 0 auto;
+}
+
+.lead {
+  margin-top: calc(var(--hd-space-3) * -1);
+}

@@ -1,0 +1,113 @@
+.page {
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
+  max-width: var(--hd-max-width);
+  margin: 0 auto;
+}
+
+.lead {
+  margin-top: calc(var(--hd-space-3) * -1);
+  text-transform: capitalize;
+}
+
+.section {
+  border-top: 1px solid var(--hd-rule);
+  padding-top: var(--hd-space-5);
+  margin-top: var(--hd-space-5);
+}
+
+.hint {
+  font-size: var(--hd-size-small);
+}
+
+.members,
+.activity {
+  list-style: none;
+  margin: var(--hd-space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-3);
+}
+
+.members li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.memberMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--hd-oxblood);
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: 44px;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: var(--hd-size-small);
+}
+
+.screenings {
+  list-style: none;
+  margin: var(--hd-space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-4);
+}
+
+.screeningCard {
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  padding: var(--hd-space-4);
+}
+
+.screeningCard p {
+  margin: 0 0 var(--hd-space-3);
+  color: var(--hd-ink);
+}
+
+.attendanceRow {
+  display: flex;
+  gap: var(--hd-space-2);
+}
+
+.attendanceButton {
+  min-height: 40px;
+  padding: 0 var(--hd-space-3);
+  background: transparent;
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.attendanceButton[data-active="true"] {
+  border-color: var(--hd-accent);
+  color: var(--hd-accent);
+}
+
+.activity li {
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.activity strong {
+  color: var(--hd-ink);
+  font-weight: 500;
+}

@@ -256,6 +256,59 @@ export interface CircleActivityRow {
   happened_at: string | null;
 }
 
+export interface CircleMemberName {
+  user_id: string;
+  display_name: string;
+  avatar_path: string | null;
+  role: CircleRole;
+  joined_at: string;
+}
+
+export interface LibraryItem {
+  kind: "opening" | "recommendation";
+  target_id: string;
+  opening_number: number | null;
+  watch_state: WatchState;
+  watched_at: string | null;
+  revealed: boolean;
+  title: string | null;
+  release_year: number | null;
+  six_words: string | null;
+}
+
+export interface HouseOpening {
+  id: string;
+  opening_number: number;
+  opens_at: string;
+  status: OpeningStatus;
+  runtime_minutes: number;
+  revealed: boolean;
+  title: string | null;
+  release_year: number | null;
+}
+
+export interface CirclesActivityRow {
+  kind: "watched" | "sent";
+  actor_id: string;
+  actor_display_name: string;
+  circle_name: string;
+  happened_at: string | null;
+}
+
+export interface MySealedRecommendation {
+  id: string;
+  sender_id: string;
+  sender_display_name: string;
+  is_sender: boolean;
+  personal_note: string | null;
+  runtime_minutes: number;
+  scheduled_for: string | null;
+  created_at: string;
+  cues: string[];
+  revealed_at: string | null;
+  watched_at: string | null;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -362,6 +415,11 @@ export interface Database {
         Returns: string;
       };
       get_house_words: { Args: { p_limit?: number }; Returns: { body: string }[] };
+      get_circle_member_names: { Args: { p_circle_id: string }; Returns: CircleMemberName[] };
+      list_my_sealed_recommendations: { Args: Record<string, never>; Returns: MySealedRecommendation[] };
+      get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
+      get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
+      get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
     };
   };
 }

@@ -1,0 +1,107 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+}
+
+.section {
+  border-top: 1px solid var(--hd-rule);
+  padding-top: var(--hd-space-5);
+  margin-top: var(--hd-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+}
+
+.label {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  margin-top: var(--hd-space-3);
+}
+
+.input {
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-4);
+  background: var(--hd-surface);
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  color: var(--hd-ink);
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+.toggleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: var(--hd-touch-min);
+  gap: var(--hd-space-4);
+}
+
+.toggleRow input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.hint {
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.circleList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+}
+
+.circleList a {
+  color: var(--hd-accent);
+}
+
+.actionsRow {
+  display: flex;
+  gap: var(--hd-space-3);
+  flex-wrap: wrap;
+}
+
+.dangerLink {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: var(--hd-space-2) 0;
+  color: var(--hd-oxblood);
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: var(--hd-touch-min);
+}
+
+.confirmBox {
+  border: 1px solid var(--hd-oxblood);
+  border-radius: var(--hd-radius-control);
+  padding: var(--hd-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-3);
+}
+
+.legalNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  margin-bottom: var(--hd-space-5);
+}
+
+.legalNav a {
+  color: var(--hd-ink-muted);
+}
