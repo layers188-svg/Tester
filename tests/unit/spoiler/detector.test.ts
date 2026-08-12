@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertNoTitleLeak, findTitleLeaks } from "@/lib/spoiler/detector";
+import { assertNoTitleLeak, findTitleLeaks, TitleLeakError } from "@/lib/spoiler/detector";
 
 const FORBIDDEN = ["Whiplash"];
 
@@ -44,8 +44,43 @@ describe("findTitleLeaks", () => {
 describe("assertNoTitleLeak", () => {
   it("throws with the offending path when a leak is present", () => {
     expect(() => assertNoTitleLeak({ subject: "Whiplash" }, FORBIDDEN, "test payload")).toThrow(
-      /Whiplash/,
+      /\$\.subject/,
     );
+  });
+
+  it("never puts the leaked title in the error message", () => {
+    // The message is the most likely thing to be logged, serialised into
+    // a response, or written to notification_queue.last_error — which
+    // the member can read. Naming the title there would make the guard
+    // the leak. The excerpts stay on `error.leaks` for tests only.
+    let caught: unknown;
+    try {
+      assertNoTitleLeak({ subject: "Tonight: Whiplash" }, FORBIDDEN, "test payload");
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toBeInstanceOf(TitleLeakError);
+    const error = caught as TitleLeakError;
+    expect(error.message).not.toMatch(/Whiplash/i);
+    expect(error.message).toContain("$.subject");
+    expect(error.paths).toEqual(["$.subject"]);
+    // The detail is still recoverable for debugging, just not in the message.
+    expect(error.leaks[0].excerpt).toContain("Whiplash");
+  });
+
+  it("reports every distinct path without repeating one", () => {
+    let caught: unknown;
+    try {
+      assertNoTitleLeak(
+        { subject: "Whiplash", body: "Whiplash and Whiplash" },
+        FORBIDDEN,
+        "test payload",
+      );
+    } catch (error) {
+      caught = error;
+    }
+    expect((caught as TitleLeakError).paths).toEqual(["$.subject", "$.body"]);
   });
 
   it("does not throw for a clean payload", () => {

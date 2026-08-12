@@ -130,6 +130,10 @@ export async function POST(request: Request) {
   report.emailsProcessed = sendResult.processed;
   report.emailsSent = sendResult.sent;
   report.emailsFailed = sendResult.failed;
+  // Reported separately from emailsFailed (which already counts these):
+  // a non-zero value means a protected title reached a queued payload,
+  // which needs a person to look, not a retry.
+  report.emailsBlockedBySpoilerGuard = sendResult.blockedBySpoilerGuard;
 
   await supabase.from("audit_log").insert({
     actor_id: null,

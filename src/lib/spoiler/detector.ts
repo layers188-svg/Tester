@@ -111,6 +111,43 @@ export function findTitleLeaks(
   return walk(value, "$");
 }
 
+/**
+ * Raised when a protected title reaches somewhere it must not.
+ *
+ * The message names *where* the leak was found and never *what* leaked.
+ * That is not tidiness — this error is thrown at exactly the moment a
+ * title is somewhere sensitive, and an error is the most likely thing
+ * in the system to be logged, serialised into a response, or written
+ * to a database column. `notification_queue.last_error` is readable by
+ * the member the notification belongs to
+ * (notification_queue_select_own, 0003_rls.sql), so a message quoting
+ * the offending excerpt would disclose the title to precisely the
+ * person it was being withheld from — the guard becoming the leak.
+ *
+ * The matched excerpts stay available on `leaks` for tests and for a
+ * debugger, and must not be persisted, logged, or returned to a client.
+ */
+export class TitleLeakError extends Error {
+  readonly leaks: LeakMatch[];
+
+  constructor(context: string, leaks: LeakMatch[]) {
+    const paths = [...new Set(leaks.map((leak) => leak.path))];
+    const shown = paths.slice(0, 5).join(", ");
+    const rest = paths.length > 5 ? `, and ${paths.length - 5} more` : "";
+    super(
+      `Title leak detected in ${context}: ${leaks.length} match(es) at ${shown}${rest}. ` +
+        `Excerpts withheld — they contain the protected title.`,
+    );
+    this.name = "TitleLeakError";
+    this.leaks = leaks;
+  }
+
+  /** The JSON paths that leaked, safe to persist and to show an operator. */
+  get paths(): string[] {
+    return [...new Set(this.leaks.map((leak) => leak.path))];
+  }
+}
+
 export function assertNoTitleLeak(
   value: unknown,
   forbidden: string[],
@@ -119,10 +156,6 @@ export function assertNoTitleLeak(
 ): void {
   const leaks = findTitleLeaks(value, forbidden, options);
   if (leaks.length > 0) {
-    const summary = leaks
-      .slice(0, 5)
-      .map((leak) => `  ${leak.path}: "${leak.excerpt}"`)
-      .join("\n");
-    throw new Error(`Title leak detected in ${context}:\n${summary}`);
+    throw new TitleLeakError(context, leaks);
   }
 }

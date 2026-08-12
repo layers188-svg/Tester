@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { TitleLeakError } from "@/lib/spoiler/detector";
 
 /**
  * The scheduled worker (brief §12 "Automate", §16 rule 4: "Email jobs
@@ -389,5 +390,80 @@ describe("processDueNotifications — crash recovery", () => {
 
     expect(result.processed).toBe(0);
     expect(sendEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe("processDueNotifications — spoiler guard rejections", () => {
+  /**
+   * A guard rejection is not a flaky network. The same payload will be
+   * rejected identically on every attempt, so retrying it just delays
+   * the operator finding out — and `last_error` is readable by the
+   * member the row belongs to (notification_queue_select_own), so the
+   * message written there must never name the title.
+   */
+  function leak() {
+    sendEmail.mockRejectedValue(
+      new TitleLeakError("notification data", [
+        { path: "$.title", forbidden: "Whiplash", excerpt: "Tonight: Whiplash" },
+      ]),
+    );
+  }
+
+  it("fails a rejected notification immediately instead of retrying", async () => {
+    leak();
+    db = new FakeSupabase([queueRow()], [{ title: "Whiplash" }]);
+
+    const result = await processDueNotifications(NOW);
+
+    expect(result.failed).toBe(1);
+    expect(result.blockedBySpoilerGuard).toBe(1);
+    // One attempt, not five — and terminal, so no later run picks it up.
+    expect(db.rows.get("row-1")?.attempts).toBe(1);
+    expect(db.rows.get("row-1")?.status).toBe("failed");
+  });
+
+  it("does not reschedule a rejected notification", async () => {
+    leak();
+    const original = queueRow();
+    db = new FakeSupabase([original], [{ title: "Whiplash" }]);
+
+    await processDueNotifications(NOW);
+
+    expect(db.rows.get("row-1")?.send_at).toBe(original.send_at);
+  });
+
+  it("never writes the title into the member-readable last_error", async () => {
+    leak();
+    db = new FakeSupabase([queueRow()], [{ title: "Whiplash" }]);
+
+    await processDueNotifications(NOW);
+
+    const lastError = db.rows.get("row-1")?.last_error ?? "";
+    expect(lastError).not.toMatch(/Whiplash/i);
+    expect(lastError).toBe("Held back by the spoiler guard. See the audit log.");
+  });
+
+  it("records the rejection distinctly in the audit log, paths only", async () => {
+    leak();
+    db = new FakeSupabase([queueRow()], [{ title: "Whiplash" }]);
+
+    await processDueNotifications(NOW);
+
+    const entry = db.audit.at(-1);
+    expect(entry?.action).toBe("notification.blocked_by_spoiler_guard");
+    expect(entry?.safe_metadata).toMatchObject({ paths: ["$.title"], exhausted: true });
+    expect(JSON.stringify(entry)).not.toMatch(/Whiplash/i);
+  });
+
+  it("still retries an ordinary send failure", async () => {
+    // The permanent-failure path must not swallow transient errors.
+    sendEmail.mockRejectedValue(new Error("rate limited"));
+    db = new FakeSupabase([queueRow()]);
+
+    const result = await processDueNotifications(NOW);
+
+    expect(result.blockedBySpoilerGuard).toBe(0);
+    expect(result.failed).toBe(0);
+    expect(db.rows.get("row-1")?.status).toBe("pending");
   });
 });

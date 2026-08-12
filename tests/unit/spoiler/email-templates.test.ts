@@ -58,6 +58,17 @@ describe("assertSafeEmailPayload", () => {
       // simulates the detector catching it if it somehow did.
       senderDisplayName: "Whiplash fan",
     });
-    expect(() => assertSafeEmailPayload(leaked, FORBIDDEN)).toThrow(/Whiplash/);
+    // The throw names where the leak is, never what leaked — the
+    // message can end up in a log or in a member-readable column.
+    expect(() => assertSafeEmailPayload(leaked, FORBIDDEN)).toThrow(/Title leak detected/);
+    expect(() => assertSafeEmailPayload(leaked, FORBIDDEN)).not.toThrow(/Whiplash/);
+  });
+
+  it("redacts the recipient address in the failure it raises", () => {
+    const leaked = sealedRecommendationEmail({
+      to: "member@example.com",
+      senderDisplayName: "Whiplash fan",
+    });
+    expect(() => assertSafeEmailPayload(leaked, FORBIDDEN)).not.toThrow(/member@example\.com/);
   });
 });

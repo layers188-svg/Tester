@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getServiceSupabase } from "@/lib/supabase/service";
+import { TitleLeakError } from "@/lib/spoiler/detector";
 import { sendEmail } from "./send";
 import {
   afterCreditsEmail,
@@ -98,6 +99,13 @@ export interface ProcessResult {
   sent: number;
   failed: number;
   cancelled: number;
+  /**
+   * Rows the spoiler guard refused, counted separately because they
+   * mean something different from a failed send: not "the mail did not
+   * go out" but "a protected title had reached a queued payload".
+   * Included in `failed` as well — these are never retried.
+   */
+  blockedBySpoilerGuard: number;
 }
 
 /**
@@ -108,7 +116,13 @@ export interface ProcessResult {
  */
 export async function processDueNotifications(now: Date = new Date()): Promise<ProcessResult> {
   const supabase = getServiceSupabase();
-  const result: ProcessResult = { processed: 0, sent: 0, failed: 0, cancelled: 0 };
+  const result: ProcessResult = {
+    processed: 0,
+    sent: 0,
+    failed: 0,
+    cancelled: 0,
+    blockedBySpoilerGuard: 0,
+  };
 
   // Take back rows stranded in 'sending' by a run that died mid-send.
   // Without this they are invisible to every later run — never sent,
@@ -168,8 +182,25 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
       result.sent += 1;
     } catch (sendError) {
       const attempts = row.attempts + 1;
-      const isExhausted = attempts >= MAX_ATTEMPTS;
-      const message = sendError instanceof Error ? sendError.message : "Unknown send error";
+      const isLeak = sendError instanceof TitleLeakError;
+
+      // A spoiler rejection is a permanent fault, not a flaky network.
+      // The same payload will fail identically every time, so retrying
+      // only delays the operator finding out — by which point five
+      // hours of backoff have passed and the opening it belonged to is
+      // over. Fail it now and make it loud.
+      const isExhausted = isLeak || attempts >= MAX_ATTEMPTS;
+
+      // Never persist a TitleLeakError's detail: last_error is readable
+      // by the member this row belongs to (notification_queue_select_own,
+      // 0003_rls.sql). Even the safe message is replaced with a fixed
+      // string so no leak metadata reaches a member-visible column.
+      const message = isLeak
+        ? "Held back by the spoiler guard. See the audit log."
+        : sendError instanceof Error
+          ? sendError.message
+          : "Unknown send error";
+
       // `attempts` is 1-based after the claim, so the first failure must
       // read index 0. Indexing by `attempts` skipped the first interval
       // and made every retry wait one step too long.
@@ -187,12 +218,19 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
         .eq("id", row.id);
 
       if (isExhausted) result.failed += 1;
+      if (isLeak) result.blockedBySpoilerGuard += 1;
 
       await supabase.from("audit_log").insert({
-        action: "notification.send_failed",
+        action: isLeak ? "notification.blocked_by_spoiler_guard" : "notification.send_failed",
         target_type: "notification_queue",
         target_id: row.id,
-        safe_metadata: { type: row.type, attempts, exhausted: isExhausted },
+        // audit_log is owner-only (audit_log_select_owner), and the
+        // owner already knows the titles they programmed — but record
+        // only the offending paths, never the matched excerpt, so the
+        // column stays honest to its name.
+        safe_metadata: isLeak
+          ? { type: row.type, attempts, exhausted: true, paths: sendError.paths }
+          : { type: row.type, attempts, exhausted: isExhausted },
       });
     }
   }
