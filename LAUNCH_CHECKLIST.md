@@ -197,7 +197,7 @@ Resolved by the guidelines, no longer blocking:
 
 These need no action — noting them so they are not re-litigated:
 
-- `npm run lint`, `npm run typecheck`, `npm run test` (148 unit tests),
+- `npm run lint`, `npm run typecheck`, `npm run test` (153 unit tests),
   `npm run build` and `npm run cf:build` all pass.
 - `npm run test:rls` — 130 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
@@ -205,13 +205,20 @@ These need no action — noting them so they are not re-litigated:
   column. This is what proves a policy holds; RLS filters rows rather
   than raising, so a test that only looked for an error would pass
   while leaking everything.
-- Playwright: 94 journeys — 81 passing (public site, PWA installability,
+- Playwright: 95 journeys — 82 passing (public site, PWA installability,
   spoiler regression, auth gating on all five protected route groups),
   13 skipped. The skipped ones self-document why: each needs a live
   Supabase project and an authenticated session. Unskipping them needs a
   global setup that mints a real session, which is not written yet — the
   schema now exists, but a session does not.
 - All public pages checked at a 390px viewport.
+- Form errors are announced and tied to the field that caused them
+  (§16 accessibility rule 8). Fixing that turned up a real bug on the
+  You page: it never checked whether a save succeeded, so a rejected
+  change still said "Saved" and a refused toggle stayed switched. That
+  mattered most for marketing consent, which is a record of what a
+  member agreed to, and for the timezone that decides when their
+  nightly email is sent.
 - Brief §15 analytics is built and is first party — no third party
   provider to sign up for, nothing to add to item 1-4. The twelve events
   record into this project's own database and read back at

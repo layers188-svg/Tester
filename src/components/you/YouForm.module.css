@@ -49,6 +49,12 @@
   flex-shrink: 0;
 }
 
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: var(--hd-space-2) 0 0;
+}
+
 .hint {
   font-size: var(--hd-size-small);
   color: var(--hd-ink-muted);

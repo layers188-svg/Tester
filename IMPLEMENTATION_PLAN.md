@@ -81,6 +81,9 @@ used instead (brief §2, §23) and the gap is logged in
   house's own 404, and idempotent sends. The error boundaries never
   render `error.message` — §11 lists error messages among the places a
   title must not appear.
+- Accessibility rule 8: every form error is announced and pointed at by
+  the input that caused it, and the two inputs that had only a
+  placeholder for a label now have one.
 
 ## What is genuinely blocked on Logan
 

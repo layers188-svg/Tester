@@ -44,44 +44,73 @@ export function YouForm({
   const [profile, setProfile] = useState(initialProfile);
   const [prefs, setPrefs] = useState(initialPrefs);
   const [savedProfile, setSavedProfile] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
     setBusy("profile");
-    await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        displayName: profile.displayName,
-        city: profile.city || null,
-        timezone: profile.timezone,
-      }),
-    });
-    setBusy(null);
-    setSavedProfile(true);
-    setTimeout(() => setSavedProfile(false), 2000);
+    setError(null);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          displayName: profile.displayName,
+          city: profile.city || null,
+          timezone: profile.timezone,
+        }),
+      });
+      // This used to report "Saved" whatever came back, so a rejected
+      // save left the member believing their timezone had changed —
+      // which then decides when their nightly email arrives.
+      if (!res.ok) throw new Error("Could not save your profile. Try again.");
+      setSavedProfile(true);
+      setTimeout(() => setSavedProfile(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save your profile.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function toggleMarketing() {
-    const next = !profile.marketingConsent;
+    const previous = profile.marketingConsent;
+    const next = !previous;
     setProfile((p) => ({ ...p, marketingConsent: next }));
-    await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ marketingConsent: next }),
-    });
+    setError(null);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ marketingConsent: next }),
+      });
+      if (!res.ok) throw new Error("Could not change your consent. Try again.");
+    } catch (err) {
+      // Consent is the one switch that must never show a state the
+      // server did not accept (brief §13).
+      setProfile((p) => ({ ...p, marketingConsent: previous }));
+      setError(err instanceof Error ? err.message : "Could not change your consent.");
+    }
   }
 
   async function togglePref(key: keyof EmailPreferences) {
+    const previous = prefs;
     const next = { ...prefs, [key]: !prefs[key] };
     setPrefs(next);
-    await fetch("/api/email-preferences", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [key]: next[key] }),
-    });
+    setError(null);
+    try {
+      const res = await fetch("/api/email-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [key]: next[key] }),
+      });
+      if (!res.ok) throw new Error("Could not change that preference. Try again.");
+    } catch (err) {
+      setPrefs(previous);
+      setError(err instanceof Error ? err.message : "Could not change that preference.");
+    }
   }
 
   async function exportData() {
@@ -149,10 +178,28 @@ export function YouForm({
           onChange={(e) => setProfile((p) => ({ ...p, timezone: e.target.value }))}
         />
 
-        <Button type="submit" variant="secondary" disabled={busy === "profile"}>
+        <Button
+          type="submit"
+          variant="secondary"
+          disabled={busy === "profile"}
+          aria-describedby={error ? "you-error" : undefined}
+        >
           {savedProfile ? "Saved" : busy === "profile" ? "Saving…" : "Save profile"}
         </Button>
       </form>
+
+      {/* One region for the whole page: the email toggles below save on
+          change and have no submit of their own to speak through.
+          role="alert" is assertive, which is right for a change that
+          did not stick. */}
+      {error && (
+        <p className={styles.error} id="you-error" role="alert">
+          {error}
+        </p>
+      )}
+      <span className="hd-visually-hidden" role="status">
+        {savedProfile ? "Profile saved." : ""}
+      </span>
 
       <section className={styles.section}>
         <h2>Email</h2>

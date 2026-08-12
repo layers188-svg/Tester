@@ -246,8 +246,19 @@ export function OpeningDetail({
         <strong>{approvedAt ? "Yes" : "No"}</strong>
       </p>
 
-      {error && <p className={formStyles.error}>{error}</p>}
-      {message && <p className={formStyles.success}>{message}</p>}
+      {/* The Desk acts on one opening through many small controls, so
+          both outcomes are announced from one region rather than being
+          attached to whichever button was pressed. */}
+      {error && (
+        <p className={formStyles.error} role="alert">
+          {error}
+        </p>
+      )}
+      {message && (
+        <p className={formStyles.success} role="status">
+          {message}
+        </p>
+      )}
 
       <section className={styles.section}>
         <h2>Lifecycle</h2>

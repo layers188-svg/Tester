@@ -143,9 +143,18 @@ export function NewOpeningForm() {
         ))}
       </div>
 
-      {error && <p className={styles.error}>{error}</p>}
+      {error && (
+        <p className={styles.error} id="new-opening-error" role="alert">
+          {error}
+        </p>
+      )}
 
-      <Button type="submit" variant="primary" disabled={busy}>
+      <Button
+        type="submit"
+        variant="primary"
+        disabled={busy}
+        aria-describedby={error ? "new-opening-error" : undefined}
+      >
         {busy ? "Creating…" : "Create opening"}
       </Button>
     </form>

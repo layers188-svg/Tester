@@ -236,9 +236,22 @@ export function SendForm({
         </>
       )}
 
-      {error && <p className={styles.error}>{error}</p>}
+      {/* Form-level: the message can come from the cues, the recipient
+          list or the server, so it is announced and tied to the submit
+          rather than to one field (brief §16 accessibility rule 8). */}
+      {error && (
+        <p className={styles.error} id="send-error" role="alert">
+          {error}
+        </p>
+      )}
 
-      <Button type="submit" variant="primary" fullWidth disabled={busy}>
+      <Button
+        type="submit"
+        variant="primary"
+        fullWidth
+        disabled={busy}
+        aria-describedby={error ? "send-error" : undefined}
+      >
         {busy ? "Sending…" : "Send under seal"}
       </Button>
     </form>

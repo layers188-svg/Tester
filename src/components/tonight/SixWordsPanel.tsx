@@ -118,16 +118,29 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
         <p className={styles.hint}>
           Write what you felt. Exactly six words. You will see it before anyone else&rsquo;s.
         </p>
+        <label className="hd-visually-hidden" htmlFor="six-words">
+          Your six words
+        </label>
         <textarea
+          id="six-words"
           className={styles.textarea}
           rows={2}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Six words, exactly."
+          aria-invalid={error ? true : undefined}
+          // The count is part of the field's description, not decoration:
+          // "exactly six" is the rule, so the running total has to be
+          // reachable without sight (brief §16 accessibility rule 8).
+          aria-describedby={error ? "six-words-count six-words-error" : "six-words-count"}
         />
         <div className={styles.meta}>
-          <span>{wordCount} / 6 words</span>
-          {error && <span className={styles.error}>{error}</span>}
+          <span id="six-words-count">{wordCount} / 6 words</span>
+          {error && (
+            <span className={styles.error} id="six-words-error" role="alert">
+              {error}
+            </span>
+          )}
         </div>
         <Button variant="primary" onClick={submit} disabled={busy || !validation.valid}>
           {busy ? "Saving…" : "Leave your six words"}

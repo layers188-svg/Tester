@@ -103,6 +103,11 @@ export function JoinForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
+          // Brief §16 accessibility rule 8. Without these the error is
+          // a paragraph the field knows nothing about: a screen reader
+          // user lands on the input and hears no reason it failed.
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "email-error" : undefined}
         />
 
         <label className={styles.checkbox}>
@@ -118,7 +123,7 @@ export function JoinForm() {
         </label>
 
         {error && (
-          <p className={styles.error} role="alert">
+          <p className={styles.error} id="email-error" role="alert">
             {error}
           </p>
         )}
@@ -160,10 +165,12 @@ export function JoinForm() {
         value={code}
         onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
         placeholder="123456"
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? "code-error" : undefined}
       />
 
       {error && (
-        <p className={styles.error} role="alert">
+        <p className={styles.error} id="code-error" role="alert">
           {error}
         </p>
       )}
