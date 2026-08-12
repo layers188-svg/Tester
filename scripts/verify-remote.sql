@@ -146,6 +146,32 @@ results(sort_key, check_name, status, detail) as (
 
   union all
 
+  -- 6b. 0014's two artefacts. A function keeps its name when its
+  --     signature changes, so "functions present" cannot see this: the
+  --     old eight-argument version and the new nine-argument one are
+  --     both called create_sealed_recommendation. Without this check a
+  --     project missing 0014 reports entirely green.
+  select 7.5, 'send retry protection applied (0014)',
+    case when (
+      select count(*) from information_schema.columns
+      where table_name = 'sealed_recommendations' and column_name = 'idempotency_key'
+    ) = 1 and (
+      select count(*) from pg_proc
+      where pronamespace = 'public'::regnamespace
+        and proname = 'create_sealed_recommendation'
+        and pronargs = 9
+    ) = 1 then 'PASS' else 'FAIL' end,
+    'idempotency_key column: ' || (
+      select count(*)::text from information_schema.columns
+      where table_name = 'sealed_recommendations' and column_name = 'idempotency_key'
+    ) || ', 9-arg function: ' || (
+      select count(*)::text from pg_proc
+      where pronamespace = 'public'::regnamespace
+        and proname = 'create_sealed_recommendation' and pronargs = 9
+    )
+
+  union all
+
   -- 7. Storage buckets for the No Trailer and its captions.
   select 8, 'storage buckets created',
     case when count(*) >= 1 then 'PASS' else 'CHECK' end,
