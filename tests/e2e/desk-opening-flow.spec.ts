@@ -1,11 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { skipWithoutLiveSupabase } from "./helpers";
+import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS } from "./auth-state";
 
 // Brief §17 item 8: "Create and schedule an opening in the Programming
 // Desk." Requires an owner-role session (ADMIN_EMAILS) and a real No
 // Trailer file to upload.
 test.describe("Programming Desk: create and schedule an opening", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.owner);
 
   test("owner creates a draft, uploads a No Trailer, approves, and schedules it", async ({
     page,

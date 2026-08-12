@@ -13,6 +13,9 @@ export default defineConfig({
   // and returns immediately when one is not — so the public suite runs
   // unchanged with no Supabase at all. See tests/e2e/global-setup.ts.
   globalSetup: "./tests/e2e/global-setup.ts",
+  // Removes the accounts and content the setup created, and fails the
+  // run if anything survives. See tests/e2e/global-teardown.ts.
+  globalTeardown: "./tests/e2e/global-teardown.ts",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,

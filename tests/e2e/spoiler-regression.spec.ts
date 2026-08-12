@@ -1,5 +1,6 @@
 import { test, expect, type ConsoleMessage } from "@playwright/test";
-import { skipWithoutLiveSupabase } from "./helpers";
+import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS } from "./auth-state";
 
 // Brief §17 "Spoiler regression test": the seeded title "Whiplash"
 // must never appear in pre-reveal HTML, JSON, storage filenames,
@@ -65,6 +66,7 @@ test.describe("spoiler regression — public surfaces (always run)", () => {
 
 test.describe("spoiler regression — signed-in Tonight, before reveal", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.member);
 
   test("sealed Tonight leaks nothing in HTML, JSON, or storage path before reveal", async ({
     page,
@@ -87,10 +89,12 @@ test.describe("spoiler regression — signed-in Tonight, before reveal", () => {
     expect(JSON.stringify(snapshot)).not.toMatch(FORBIDDEN);
 
     // The No Trailer storage path must be a UUID filename, not a title.
-    const videoSrc = await page
-      .locator("video")
-      .getAttribute("src")
-      .catch(() => null);
+    // Count first. Before the dim there is no <video> at all, and
+    // asking a locator that matches nothing for an attribute waits the
+    // full timeout — which is the whole test's timeout, so the catch
+    // below never gets its turn.
+    const video = page.locator("video");
+    const videoSrc = (await video.count()) > 0 ? await video.getAttribute("src") : null;
     if (videoSrc) {
       expect(videoSrc).not.toMatch(FORBIDDEN);
       expect(videoSrc).toMatch(

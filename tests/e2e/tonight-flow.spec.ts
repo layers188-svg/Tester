@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { skipWithoutLiveSupabase } from "./helpers";
+import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS } from "./auth-state";
 
 // Brief §17 item 3: "Dim, play No Trailer, reveal and open provider
 // handoff." Requires a signed-in session and the seeded Whiplash
@@ -10,6 +11,7 @@ import { skipWithoutLiveSupabase } from "./helpers";
 // pass today.
 test.describe("Tonight: dim, play, reveal, provider handoff", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.member);
 
   test("sealed opening dims, plays the No Trailer, and reveals on demand", async ({ page }) => {
     await page.goto("/tonight");

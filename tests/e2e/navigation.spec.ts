@@ -1,11 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { skipWithoutLiveSupabase } from "./helpers";
+import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS } from "./auth-state";
 
 // Brief §17 item 7: "Navigate Tonight, Circle, Library and You in both
 // directions" — and brief §20 rule 14 ("check every route and all back
 // navigation on a phone viewport").
 test.describe("four-tab navigation, both directions", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.member);
 
   test("every tab is reachable and back navigation returns to the previous tab", async ({
     page,

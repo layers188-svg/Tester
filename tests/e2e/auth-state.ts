@@ -17,6 +17,13 @@ export const PERSONAS = {
   member: "member",
   /** A second member, for anything needing two people in a Circle. */
   friend: "friend",
+  /**
+   * Deleted by the account-deletion journey, which is the point. It has
+   * its own persona because that journey destroys the account it runs
+   * as, and files run in parallel — sharing `member` would pull the
+   * ground out from under whatever else was mid-flight.
+   */
+  expendable: "expendable",
 } as const;
 
 export type Persona = (typeof PERSONAS)[keyof typeof PERSONAS];

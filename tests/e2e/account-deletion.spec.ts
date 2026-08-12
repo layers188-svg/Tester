@@ -1,9 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { skipWithoutLiveSupabase } from "./helpers";
+import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS } from "./auth-state";
 
 // Brief §17 item 9: "Delete review and account."
 test.describe("delete review and account", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.expendable);
 
   test("member deletes their own six-word review", async ({ page }) => {
     await page.goto("/tonight");
