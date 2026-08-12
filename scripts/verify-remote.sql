@@ -18,8 +18,8 @@
 -- on a throwaway database; this proves they are actually *present* on
 -- yours.
 
-\pset border 2
-\pset title 'House Dark — remote schema verification'
+-- Deliberately plain SQL: no psql backslash commands, so the same file
+-- runs through psql and pastes straight into the Supabase SQL editor.
 
 with
 expected_tables(name) as (
