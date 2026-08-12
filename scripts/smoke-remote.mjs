@@ -133,6 +133,41 @@ if (serviceKey) {
     record(`service role can read ${table}`, res.status === 200, `HTTP ${res.status}`);
   }
 
+  // 0013 and 0014 landed? Both are invisible to a table-name check: a
+  // truncated paste once left this project with every earlier
+  // migration and neither of these, and nothing said so.
+  const idempotency = await rest(
+    "sealed_recommendations?select=idempotency_key&limit=0",
+    serviceKey,
+  );
+  record(
+    "send retry protection applied (0014)",
+    idempotency.status === 200,
+    idempotency.status === 200 ? "idempotency_key column present" : `HTTP ${idempotency.status}`,
+  );
+
+  // PostgREST publishes its own schema, so the function's parameters
+  // can be read without calling it — calling it would create a real
+  // recommendation.
+  const specRes = await fetch(`${url}/rest/v1/`, {
+    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+  });
+  const spec = specRes.ok ? await specRes.json() : null;
+  const rpc = spec?.paths?.["/rpc/create_sealed_recommendation"];
+  const params = JSON.stringify(rpc ?? "");
+  record(
+    "the sealed-send function takes an idempotency key",
+    params.includes("p_idempotency_key"),
+    rpc ? "p_idempotency_key present" : `no RPC in spec (HTTP ${specRes.status})`,
+  );
+
+  const analyticsRpc = spec?.paths?.["/rpc/get_analytics_summary"];
+  record(
+    "analytics summary is exposed (0013)",
+    Boolean(analyticsRpc),
+    analyticsRpc ? "get_analytics_summary present" : "missing from the API spec",
+  );
+
   const buckets = await fetch(`${url}/storage/v1/bucket`, {
     headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
   });
