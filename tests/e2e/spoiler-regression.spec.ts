@@ -44,6 +44,17 @@ test.describe("spoiler regression — public surfaces (always run)", () => {
     expect(body).not.toMatch(FORBIDDEN);
   });
 
+  test("the analytics ingest refuses an unauthenticated event", async ({ request }) => {
+    // Brief §15 events are attributed to a member. Without a session
+    // there is no actor, and an open ingest would let anyone write to
+    // house instrumentation.
+    const response = await request.post("/api/analytics", {
+      data: { event: "opening_viewed", openingNumber: 1 },
+      failOnStatusCode: false,
+    });
+    expect(response.status()).toBe(401);
+  });
+
   test("API responses are never cacheable", async ({ request }) => {
     // A cached response is one more place a sealed title could survive,
     // so no intermediary may hold one (brief §11).

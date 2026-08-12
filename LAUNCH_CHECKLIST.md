@@ -197,21 +197,26 @@ Resolved by the guidelines, no longer blocking:
 
 These need no action — noting them so they are not re-litigated:
 
-- `npm run lint`, `npm run typecheck`, `npm run test` (137 unit tests),
+- `npm run lint`, `npm run typecheck`, `npm run test` (148 unit tests),
   `npm run build` and `npm run cf:build` all pass.
-- `npm run test:rls` — 107 assertions against a throwaway Postgres with
+- `npm run test:rls` — 120 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
   title gating, and that no protected title reaches a member-readable
   column. This is what proves a policy holds; RLS filters rows rather
   than raising, so a test that only looked for an error would pass
   while leaking everything.
-- Playwright: 92 journeys — 79 passing (public site, PWA installability,
+- Playwright: 93 journeys — 80 passing (public site, PWA installability,
   spoiler regression, auth gating on all five protected route groups),
   13 skipped. The skipped ones self-document why: each needs a live
   Supabase project and an authenticated session. Unskipping them needs a
   global setup that mints a real session, which is not written yet — the
   schema now exists, but a session does not.
 - All public pages checked at a 390px viewport.
+- Brief §15 analytics is built and is first party — no third party
+  provider to sign up for, nothing to add to item 1-4. The twelve events
+  record into this project's own database and read back at
+  `/desk/analytics`. Worth knowing for the privacy policy review in item
+  7: there is no analytics cookie and no data leaves the project.
 - `POST /api/cron` rejects both a missing and an incorrect bearer token.
 - `/tonight`, `/circle`, `/library`, `/you`, `/desk` all redirect to
   `/join` when signed out.

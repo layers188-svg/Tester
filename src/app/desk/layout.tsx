@@ -31,6 +31,7 @@ export default async function DeskLayout({ children }: { children: React.ReactNo
         <Link href="/desk/openings">Openings</Link>
         <Link href="/desk/moderation">Moderation</Link>
         <Link href="/desk/emails">Email queue</Link>
+        <Link href="/desk/analytics">Analytics</Link>
         <Link href="/desk/audit">Audit log</Link>
       </nav>
       <main className={styles.main}>{children}</main>

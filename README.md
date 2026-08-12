@@ -92,6 +92,7 @@ Migrations, in order:
 | `0010_fix_union_ordering.sql`                   | Corrects result ordering across a UNION in the Library queries      |
 | `0011_six_word_reviews_anon.sql`                | Closes anonymous read access to six-word reviews                    |
 | `0012_prevent_duplicate_cues_and_providers.sql` | Uniqueness for opening cues and per-territory providers             |
+| `0013_analytics.sql`                            | The brief §15 events table, owner-only policy, and its summary      |
 
 For local development with seeded demo data (including the protected
 `Whiplash` example from brief §18):

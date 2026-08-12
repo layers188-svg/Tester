@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { getServiceSupabase } from "@/lib/supabase/service";
 
 /** Brief §7 "You" rule 7 / §14 rule 9: members can export their personal data. */
 export async function POST() {
@@ -25,6 +26,17 @@ export async function POST() {
     ],
   );
 
+  // analytics_events is owner-read-only, so the member's own session
+  // cannot see it — but the brief §15 events are still their personal
+  // data, and /privacy now says we record them. Read through the
+  // service role, pinned to this member's own rows. Nothing in them can
+  // identify a film (see 0013_analytics.sql).
+  const { data: analyticsEvents } = await getServiceSupabase()
+    .from("analytics_events")
+    .select("event, opening_number, detail, created_at")
+    .eq("actor_id", user.id)
+    .order("created_at", { ascending: false });
+
   const payload = {
     exportedAt: new Date().toISOString(),
     account: { id: user.id, email: user.email },
@@ -34,6 +46,7 @@ export async function POST() {
     sixWordReviews: reviews.data,
     emailPreferences: emailPreferences.data,
     sealedRecommendations: recommendations.data,
+    usageEvents: analyticsEvents,
   };
 
   return NextResponse.json(payload, {

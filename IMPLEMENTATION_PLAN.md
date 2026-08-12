@@ -58,6 +58,11 @@ used instead (brief §2, §23) and the gap is logged in
   email, sealed recommendation email, screening reminders, After Credits
   prompts, retries with a cap.
 - Review moderation (hide, not silently rewrite).
+- Analytics (brief §15): the twelve permitted events, first party, with
+  no third party provider and no cookie. The table has no free text
+  column and no film or opening reference, so §15's prohibitions hold by
+  construction rather than by a scan someone has to remember to run.
+  Read back as aggregate counts at `/desk/analytics`.
 
 ## Phase 6 — Launch readiness
 

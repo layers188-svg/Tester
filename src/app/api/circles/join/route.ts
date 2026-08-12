@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
 const schema = z.object({ inviteCode: z.string().trim().min(1) });
 
@@ -28,6 +29,11 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  // Brief §15 event 11. The invite code itself is never recorded — it
+  // is a shared secret, and the event only needs to say that one was
+  // accepted.
+  await recordAnalyticsEvent({ event: "circle_invitation_accepted", actorId: user.id });
 
   return NextResponse.json({ circleId: data }, { headers: { "Cache-Control": "no-store" } });
 }

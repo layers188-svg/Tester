@@ -20,6 +20,26 @@ export type ProfileRole = "member" | "moderator" | "owner";
 export type CircleRole = "member" | "organiser";
 export type AttendanceResponse = "invited" | "attending" | "maybe" | "declined";
 export type NotificationStatus = "pending" | "sending" | "sent" | "failed" | "cancelled";
+/**
+ * Mirrors the `analytics_event` enum. Spelled out here rather than
+ * imported from `@/lib/analytics/events` because this file stands in
+ * for generated output — `supabase gen types` would emit the literals.
+ * `tests/unit/analytics.test.ts` asserts the two lists stay identical.
+ */
+export type AnalyticsEventName =
+  | "sign_in_completed"
+  | "opening_viewed"
+  | "dimming_started"
+  | "no_trailer_completed"
+  | "reveal_completed"
+  | "provider_handoff_selected"
+  | "saved_for_later"
+  | "marked_watched"
+  | "six_words_submitted"
+  | "recommendation_sent"
+  | "circle_invitation_accepted"
+  | "screening_attendance_response";
+export type AnalyticsDetailValue = "invited" | "attending" | "maybe" | "declined";
 
 /**
  * Shorthand matching postgrest-js's GenericTable shape
@@ -226,6 +246,26 @@ interface AuditLogRow {
   created_at: string;
 }
 
+/**
+ * Brief §15. Note the absence of any free text column — see
+ * `supabase/migrations/0013_analytics.sql` for why that is the whole
+ * spoiler defence for this table.
+ */
+interface AnalyticsEventRow {
+  id: string;
+  event: AnalyticsEventName;
+  actor_id: string;
+  opening_number: number | null;
+  detail: AnalyticsDetailValue | null;
+  created_at: string;
+}
+
+export interface AnalyticsSummaryRow {
+  event: AnalyticsEventName;
+  occurrences: number;
+  members: number;
+}
+
 export interface RevealResult {
   title: string;
   release_year: number | null;
@@ -397,6 +437,10 @@ export interface Database {
         }
       >;
       audit_log: Table<AuditLogRow, Partial<AuditLogRow> & { action: string; target_type: string }>;
+      analytics_events: Table<
+        AnalyticsEventRow,
+        Partial<AnalyticsEventRow> & { event: AnalyticsEventName; actor_id: string }
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -433,6 +477,7 @@ export interface Database {
       get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
+      get_analytics_summary: { Args: { p_days?: number }; Returns: AnalyticsSummaryRow[] };
     };
   };
 }

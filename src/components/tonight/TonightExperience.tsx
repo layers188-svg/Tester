@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { OpeningSafe, MemberOpeningProgress } from "@/lib/opening/queries";
 import type { RevealPayload } from "@/lib/reveal/payload";
 import { Button } from "@/components/Button";
 import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
+import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SixWordsPanel } from "./SixWordsPanel";
 import styles from "./TonightExperience.module.css";
@@ -34,6 +35,17 @@ export function TonightExperience({
       return () => clearTimeout(timer);
     }
   }, [phase]);
+
+  // Brief §15 event 2, once per mounted opening. The ref keeps React's
+  // development double-invoke — and any later re-render — from counting
+  // the same view twice.
+  const viewReported = useRef<number | null>(null);
+  useEffect(() => {
+    if (!opening || opening.status !== "open") return;
+    if (viewReported.current === opening.openingNumber) return;
+    viewReported.current = opening.openingNumber;
+    reportAnalyticsEvent("opening_viewed", opening.openingNumber);
+  }, [opening]);
 
   useEffect(() => {
     if (phase === "revealed" && !reveal && opening) {
@@ -146,7 +158,15 @@ export function TonightExperience({
 
         {revealError && <p className={styles.error}>{revealError}</p>}
 
-        <Button variant="primary" fullWidth onClick={() => setPhase("dimming")}>
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={() => {
+            // Brief §15 event 3, recorded on the gesture itself.
+            reportAnalyticsEvent("dimming_started", opening.openingNumber);
+            setPhase("dimming");
+          }}
+        >
           Dim the house
         </Button>
       </div>
@@ -165,7 +185,12 @@ export function TonightExperience({
           captionsSrc={
             opening.noTrailerCaptionsPath ? publicStorageUrl(opening.noTrailerCaptionsPath) : null
           }
-          onComplete={() => setPhase("revealing")}
+          onComplete={() => {
+            // Brief §15 event 4 — the No Trailer ran to the end, which
+            // only the player can know.
+            reportAnalyticsEvent("no_trailer_completed", opening.openingNumber);
+            setPhase("revealing");
+          }}
         />
         <Button variant="secondary" fullWidth onClick={() => void doReveal(opening.id)}>
           Reveal the title

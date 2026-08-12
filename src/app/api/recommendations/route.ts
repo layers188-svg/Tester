@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { validateCues } from "@/lib/validation/cues";
 import { enqueueNotification } from "@/lib/email/queue";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
 const schema = z.object({
   filmTitle: z.string().trim().min(1).max(200),
@@ -71,6 +72,12 @@ export async function POST(request: Request) {
       }),
     ),
   );
+
+  // Brief §15 event 10. This route holds the most dangerous payload in
+  // the product — a plain-text film title the sender typed. None of it
+  // travels: no title, no personal note, no recipient list, and no
+  // recommendation id, which would join straight back to the film.
+  await recordAnalyticsEvent({ event: "recommendation_sent", actorId: user.id });
 
   return NextResponse.json({ id: recommendationId }, { headers: { "Cache-Control": "no-store" } });
 }
