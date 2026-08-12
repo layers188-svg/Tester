@@ -2,7 +2,14 @@ import fs from "node:fs";
 import { chromium, type FullConfig } from "@playwright/test";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
-import { AUTH_DIR, PERSONAS, emailFor, storageStateFor, type Persona } from "./auth-state";
+import {
+  AUTH_DIR,
+  PERSONA_IDS_FILE,
+  PERSONAS,
+  emailFor,
+  storageStateFor,
+  type Persona,
+} from "./auth-state";
 import { FIXTURE } from "./fixtures";
 import { loadEnvLocal } from "./load-env";
 
@@ -168,6 +175,16 @@ export default async function globalSetup(config: FullConfig) {
   } finally {
     await browser.close();
   }
+
+  // Written down for the teardown — see PERSONA_IDS_FILE.
+  const { data: everyone } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+  const personaEmails = new Set((Object.values(PERSONAS) as Persona[]).map((p) => emailFor(p)));
+  fs.writeFileSync(
+    PERSONA_IDS_FILE,
+    JSON.stringify(
+      (everyone?.users ?? []).filter((u) => u.email && personaEmails.has(u.email)).map((u) => u.id),
+    ),
+  );
 
   // The owner persona has to actually be an owner, or the Desk journeys
   // get a redirect instead of a page. ADMIN_EMAILS grants this on first

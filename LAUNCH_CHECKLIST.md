@@ -199,7 +199,7 @@ These need no action — noting them so they are not re-litigated:
 
 - `npm run lint`, `npm run typecheck`, `npm run test` (153 unit tests),
   `npm run build` and `npm run cf:build` all pass.
-- `npm run test:rls` — 130 assertions against a throwaway Postgres with
+- `npm run test:rls` — 134 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
   title gating, and that no protected title reaches a member-readable
   column. This is what proves a policy holds; RLS filters rows rather
@@ -209,17 +209,20 @@ These need no action — noting them so they are not re-litigated:
   spoiler regression, auth gating on all five protected route groups),
   13 skipped. The skipped ones self-document why: each needs a live
   Supabase project and an authenticated session.
-- `tests/e2e/global-setup.ts` now mints those sessions — it asks the
-  admin API for the code that would have been emailed and types it into
-  the real `/join` form, so the session comes from the app's own auth
-  path rather than a forged cookie. **It has never run.** There is no
-  project to run it against, so treat it as written-not-proven until it
-  does; that is the whole of what stands between 82 passing journeys
-  and 95. What _is_ proven: it no-ops with no project configured (the
-  public suite is unchanged at 82), and it refuses outright to run
-  against a configured project unless `E2E_DESTRUCTIVE_OK=1` declares
-  it disposable — it creates members, and brief §18 forbids those in
-  production.
+- The signed-in product has now been run against the real project.
+  93 of 95 journeys pass, including Tonight sealed/dim/reveal, the
+  provider handoff, six words, After Credits, Circle creation and
+  joining, sending under seal, account deletion, and a Desk upload that
+  put a real file into Supabase Storage. Two are skipped: one needs
+  working SMTP (item 2), the other is a `test.fixme` for a live inbox.
+- Those runs create member accounts and content, which brief §18
+  forbids in production, so they only run with `E2E_DESTRUCTIVE_OK=1`
+  and the teardown removes everything and verifies it afterwards.
+  Logan authorised running against the real project while it is still
+  empty; once real members exist, point it at a second project instead.
+- `npm run smoke:remote` — 16 read-only checks against the hosted
+  project. The browser's own anon key returns zero rows from `films`,
+  `opening_secrets`, `playback_destinations` and `analytics_events`.
 - All public pages checked at a 390px viewport.
 - Form errors are announced and tied to the field that caused them
   (§16 accessibility rule 8). Fixing that turned up a real bug on the

@@ -28,6 +28,16 @@ export const PERSONAS = {
 
 export type Persona = (typeof PERSONAS)[keyof typeof PERSONAS];
 
+/**
+ * Ids of the accounts this run created, written by the setup.
+ *
+ * The teardown cannot always look them up: the account-deletion journey
+ * deletes its own persona, and the audit row that records the deletion
+ * outlives it with a null actor. Without the id written down there is
+ * nothing left to match that row on.
+ */
+export const PERSONA_IDS_FILE = path.join(AUTH_DIR, "persona-ids.json");
+
 export function storageStateFor(persona: Persona): string {
   return path.join(AUTH_DIR, `${persona}.json`);
 }
