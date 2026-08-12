@@ -1,0 +1,139 @@
+name: CI
+
+# Runs on GitHub's runners, which reach the wider internet freely. That
+# matters here: the agent session that wrote this repository is behind an
+# egress policy that blocks Supabase, Cloudflare and Resend outright, so
+# anything needing a third-party service has to be verified here instead.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Format, lint, types, unit tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Prettier
+        run: npx prettier --check .
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Spoiler regression suite
+        run: npm run test:spoiler
+
+      # The build needs every variable in src/lib/env.ts to parse. These
+      # are deliberately fake: this job proves the app compiles, not that
+      # it can reach anything. Real credentials never enter CI.
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_URL: https://example.com
+          NEXT_PUBLIC_SUPABASE_URL: https://localdev.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-key
+          RESEND_API_KEY: ci-placeholder-resend-key
+          RESEND_FROM_EMAIL: house@example.com
+          ADMIN_EMAILS: owner@example.com
+          CRON_SECRET: ci-placeholder-cron-secret-value
+
+  database:
+    name: RLS and database policy tests
+    runs-on: ubuntu-latest
+
+    # A real Postgres, thrown away with the job. RLS filters rows rather
+    # than raising, so a broken policy looks exactly like "no data" from
+    # the application — executing the policies is the only thing that
+    # actually proves they hold.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql-client
+
+      # Path A of scripts/test-rls.sh: applies the Supabase compatibility
+      # shim, then every migration unmodified, then the assertion suites.
+      - name: Apply migrations and run the policy suites
+        run: npm run test:rls
+        env:
+          HOUSE_DARK_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+  journeys:
+    name: Browser journeys (public site)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      # No Supabase here on purpose. The placeholder URL is what
+      # tests/e2e/helpers.ts checks for, so the journeys needing an
+      # authenticated session skip themselves and say why, rather than
+      # failing noisily or pretending to pass.
+      #
+      # Unskipping them needs a global setup that mints a real session —
+      # see tests/e2e/README-ci.md.
+      - name: Playwright
+        run: npm run test:e2e
+        env:
+          NEXT_PUBLIC_APP_URL: http://localhost:3100
+          NEXT_PUBLIC_SUPABASE_URL: https://localdev.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-key
+          RESEND_API_KEY: ci-placeholder-resend-key
+          RESEND_FROM_EMAIL: house@example.com
+          ADMIN_EMAILS: owner@example.com
+          CRON_SECRET: ci-placeholder-cron-secret-value
+
+      - name: Upload traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

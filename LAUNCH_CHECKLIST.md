@@ -195,10 +195,12 @@ These need no action — noting them so they are not re-litigated:
   column. This is what proves a policy holds; RLS filters rows rather
   than raising, so a test that only looked for an error would pass
   while leaking everything.
-- Playwright: 21 passing (public site, PWA installability, spoiler
-  regression, auth gating on all five protected route groups). 13 are
-  skipped and self-document why — each needs the live Supabase project
-  from item 1 and an authenticated session.
+- Playwright: 92 journeys — 79 passing (public site, PWA installability,
+  spoiler regression, auth gating on all five protected route groups),
+  13 skipped. The skipped ones self-document why: each needs a live
+  Supabase project and an authenticated session. Unskipping them needs a
+  global setup that mints a real session, which is not written yet — the
+  schema now exists, but a session does not.
 - All public pages checked at a 390px viewport.
 - `POST /api/cron` rejects both a missing and an incorrect bearer token.
 - `/tonight`, `/circle`, `/library`, `/you`, `/desk` all redirect to
