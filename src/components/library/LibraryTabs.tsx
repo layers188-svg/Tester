@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { CirclesActivityRow, HouseOpening, LibraryItem } from "@/lib/supabase/types";
+import { WATCH_STATE_LABEL } from "@/lib/labels";
+import { EntryField } from "./EntryField";
 import styles from "./LibraryTabs.module.css";
 
 type Tab = "yours" | "circle" | "house";
@@ -66,21 +68,26 @@ export function LibraryTabs({
           {filteredMine.length === 0 && <p className={styles.hint}>Nothing here yet.</p>}
           {filteredMine.map((item) => (
             <li key={`${item.kind}-${item.target_id}`} className={styles.card}>
-              <div className={styles.cardHead}>
-                <span>{item.title ?? "Sealed"}</span>
-                <span className={styles.badge}>{item.watch_state}</span>
+              <EntryField id={item.target_id} revealed={item.revealed} />
+              <div className={styles.cardBody}>
+                <div className={styles.cardHead}>
+                  <span>{item.title ?? "Sealed"}</span>
+                  <span className={styles.badge}>{WATCH_STATE_LABEL[item.watch_state]}</span>
+                </div>
+                {item.six_words && (
+                  <p className={styles.sixWords}>&ldquo;{item.six_words}&rdquo;</p>
+                )}
+                {!item.revealed && item.kind === "opening" && (
+                  <Link href="/tonight" className={styles.link}>
+                    Open tonight&rsquo;s house
+                  </Link>
+                )}
+                {!item.revealed && item.kind === "recommendation" && (
+                  <Link href={`/circle/recommendation/${item.target_id}`} className={styles.link}>
+                    Open the seal
+                  </Link>
+                )}
               </div>
-              {item.six_words && <p className={styles.sixWords}>&ldquo;{item.six_words}&rdquo;</p>}
-              {!item.revealed && item.kind === "opening" && (
-                <Link href="/tonight" className={styles.link}>
-                  Open tonight&rsquo;s house
-                </Link>
-              )}
-              {!item.revealed && item.kind === "recommendation" && (
-                <Link href={`/circle/recommendation/${item.target_id}`} className={styles.link}>
-                  Open the seal
-                </Link>
-              )}
             </li>
           ))}
         </ul>
@@ -104,16 +111,19 @@ export function LibraryTabs({
           {filteredHouse.length === 0 && <p className={styles.hint}>Nothing programmed yet.</p>}
           {filteredHouse.map((opening) => (
             <li key={opening.id} className={styles.card}>
-              <div className={styles.cardHead}>
-                <span>{opening.title ?? `Opening ${opening.opening_number}`}</span>
-                <span className={styles.badge}>
-                  {new Date(opening.opens_at).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
+              <EntryField id={opening.id} revealed={opening.revealed} />
+              <div className={styles.cardBody}>
+                <div className={styles.cardHead}>
+                  <span>{opening.title ?? `Opening ${opening.opening_number}`}</span>
+                  <span className={styles.badge}>
+                    {new Date(opening.opens_at).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                {!opening.revealed && <p className={styles.hint}>You never revealed this one.</p>}
               </div>
-              {!opening.revealed && <p className={styles.hint}>You never revealed this one.</p>}
             </li>
           ))}
         </ul>

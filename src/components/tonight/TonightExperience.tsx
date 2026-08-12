@@ -2,26 +2,14 @@
 
 import { useEffect, useState } from "react";
 import type { OpeningSafe, MemberOpeningProgress } from "@/lib/opening/queries";
+import type { RevealPayload } from "@/lib/reveal/payload";
 import { Button } from "@/components/Button";
+import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SixWordsPanel } from "./SixWordsPanel";
 import styles from "./TonightExperience.module.css";
 
 type Phase = "not_available" | "sealed" | "dimming" | "trailer" | "revealing" | "revealed";
-
-interface RevealData {
-  title: string;
-  releaseYear: number | null;
-  providers: { provider_name: string; access_type: string; deep_link: string; territory: string }[];
-}
-
-const ACCESS_LABEL: Record<string, string> = {
-  subscription: "Included with a subscription",
-  rental: "Available to rent",
-  free: "Free to watch",
-  mixed: "Subscription or rental",
-  unknown: "Availability confirmed after reveal",
-};
 
 export function TonightExperience({
   opening,
@@ -35,7 +23,7 @@ export function TonightExperience({
     return progress?.hasRevealed ? "revealed" : "sealed";
   });
   const [contentNotesOpen, setContentNotesOpen] = useState(false);
-  const [reveal, setReveal] = useState<RevealData | null>(null);
+  const [reveal, setReveal] = useState<RevealPayload | null>(null);
   const [revealError, setRevealError] = useState<string | null>(null);
   const [watchState, setWatchState] = useState(progress?.watchState ?? null);
   const [copyLabel, setCopyLabel] = useState("Copy title");
@@ -63,7 +51,7 @@ export function TonightExperience({
         const payload = await res.json().catch(() => ({}));
         throw new Error(payload.error ?? "The house could not open tonight's opening.");
       }
-      const data = (await res.json()) as RevealData;
+      const data = (await res.json()) as RevealPayload;
       setReveal(data);
       setPhase("revealed");
     } catch (err) {
@@ -130,7 +118,7 @@ export function TonightExperience({
           </div>
           <div>
             <dt>Access</dt>
-            <dd>{ACCESS_LABEL[opening.minimumAccessType]}</dd>
+            <dd>{MINIMUM_ACCESS_LABEL[opening.minimumAccessType]}</dd>
           </div>
         </dl>
 
@@ -217,7 +205,7 @@ export function TonightExperience({
                   </a>
                   <span className={styles.providerMeta}>
                     {" "}
-                    · {p.access_type} · {p.territory}
+                    · {PLAYBACK_ACCESS_LABEL[p.access_type]} · {p.territory}
                   </span>
                 </li>
               ))}

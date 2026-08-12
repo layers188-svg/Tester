@@ -1,0 +1,33 @@
+/*
+ * Square edges and fine rules, per the guidelines. No gradient, no
+ * shadow, no rounded card — the block is the whole device.
+ */
+.field,
+.sealed {
+  position: relative;
+  flex: 0 0 auto;
+  width: 3.5rem;
+  height: 4.5rem;
+  overflow: hidden;
+}
+
+.sealed {
+  border: 1px solid var(--hd-rule);
+  background: var(--hd-surface);
+}
+
+.band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(3, 3, 3, 0.35);
+}
+
+@media (min-width: 480px) {
+  .field,
+  .sealed {
+    width: 4.5rem;
+    height: 6rem;
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MODERATION_STATE_LABEL, REVIEW_VISIBILITY_LABEL } from "@/lib/labels";
 import styles from "./ModerationList.module.css";
 
 interface Review {
@@ -32,7 +33,8 @@ export function ModerationList({ reviews: initial }: { reviews: Review[] }) {
         <li key={r.id} className={styles.card}>
           <p className={styles.body}>&ldquo;{r.body}&rdquo;</p>
           <p className={styles.meta}>
-            {r.visibility} · {r.moderation_state} · {new Date(r.created_at).toLocaleDateString()}
+            {REVIEW_VISIBILITY_LABEL[r.visibility]} · {MODERATION_STATE_LABEL[r.moderation_state]} ·{" "}
+            {new Date(r.created_at).toLocaleDateString()}
           </p>
           <div className={styles.actions}>
             {r.moderation_state !== "hidden" && (

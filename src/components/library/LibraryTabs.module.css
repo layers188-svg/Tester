@@ -49,10 +49,22 @@
   gap: var(--hd-space-3);
 }
 
+/*
+ * A fine rule between entries rather than a boxed card — the field
+ * block carries the weight, so a border around it as well reads as
+ * clutter (guidelines: square edges, fine rules, avoid heavy cards).
+ */
 .card {
-  border: 1px solid var(--hd-rule-strong);
-  border-radius: var(--hd-radius-control);
-  padding: var(--hd-space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hd-space-4);
+  padding: var(--hd-space-4) 0;
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
 }
 
 .cardHead {

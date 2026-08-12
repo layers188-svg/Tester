@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/Button";
+import type { RevealPayload } from "@/lib/reveal/payload";
+import { PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
 import { SixWordsPanel } from "@/components/tonight/SixWordsPanel";
 import type { SealedProgress } from "@/lib/sealed/queries";
 import styles from "./SealedExperience.module.css";
-
-interface RevealData {
-  title: string;
-  releaseYear: number | null;
-  providers: { provider_name: string; access_type: string; deep_link: string; territory: string }[];
-}
 
 export function SealedExperience({
   recommendation,
@@ -27,7 +23,7 @@ export function SealedExperience({
   progress: SealedProgress;
 }) {
   const [revealed, setRevealed] = useState(Boolean(recommendation.revealedAt));
-  const [reveal, setReveal] = useState<RevealData | null>(null);
+  const [reveal, setReveal] = useState<RevealPayload | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [watchState, setWatchState] = useState(progress.watchState);
@@ -41,7 +37,7 @@ export function SealedExperience({
         method: "POST",
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Could not reveal this.");
-      const data = (await res.json()) as RevealData;
+      const data = (await res.json()) as RevealPayload;
       setReveal(data);
       setRevealed(true);
     } catch (err) {
@@ -131,7 +127,7 @@ export function SealedExperience({
               </a>
               <span className={styles.providerMeta}>
                 {" "}
-                · {p.access_type} · {p.territory}
+                · {PLAYBACK_ACCESS_LABEL[p.access_type]} · {p.territory}
               </span>
             </li>
           ))}

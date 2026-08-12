@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { toRevealPayload } from "@/lib/reveal/payload";
 
 /**
  * The single path from "sealed" to "revealed" for a nightly opening
@@ -34,8 +35,7 @@ export async function POST(
   }
 
   const [result] = data;
-  return NextResponse.json(
-    { title: result.title, releaseYear: result.release_year, providers: result.providers },
-    { headers: { "Cache-Control": "no-store" } },
-  );
+  return NextResponse.json(toRevealPayload(result), {
+    headers: { "Cache-Control": "no-store" },
+  });
 }
