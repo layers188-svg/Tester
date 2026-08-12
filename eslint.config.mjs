@@ -14,6 +14,10 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated build output — Cloudflare adapter bundle and test runs.
     ".open-next/**",
+    // wrangler's scratch directory, written by `cf:preview`. Already
+    // gitignored; linting it reports on generated bundles rather than
+    // on anything anyone wrote.
+    ".wrangler/**",
     "playwright-report/**",
     "test-results/**",
   ]),

@@ -79,16 +79,22 @@ The likely first unavoidable cost. Needed for the Resend sending domain
 
 ---
 
-## 5. The approved House Dark logo source
+## 5. Logo — done
 
-No logo file was supplied to this environment. `src/components/Wordmark.tsx`
-currently sets the wordmark typographically (Newsreader, with "Dark" in
-italic brass), and `public/brand/mark.svg` drives the PWA icons from the
-same treatment.
+Logan supplied the approved wordmark and HD monogram, each in ink and
+inverse. All four are in `public/brand/` as the source of record.
 
-**Do:** supply the approved wordmark and intertwined HD ligature as SVG.
-Only two files reference the identity — `Wordmark.tsx` and
-`public/brand/mark.svg` — so swapping it is a contained change.
+One thing worth knowing: the wordmark SVG sets the type in `<text>`
+with `font-family="Newsreader"`, and an SVG carries no font. Used as an
+image or a favicon it renders in whatever serif the client has, which
+is not the identity. So the wordmark is set as HTML text against the
+self-hosted face, and the monogram — which is paths, not text — drives
+the app icon and favicon. Both were checked by rendering, not assumed.
+
+Aligning the header to the artwork changed four things the placeholder
+had wrong: the wordmark is uppercase, weight 400, negatively tracked,
+and a single ink colour. The placeholder had set DARK in brass, which
+the approved artwork does not.
 
 ---
 
@@ -110,14 +116,10 @@ point at the protected title. See that directory's README. What is left:
 
 ---
 
-## 7. Legal review
+## 7. Legal review — done
 
-`/terms`, `/privacy` and `/film-rights` are written in plain language and
-carry the required service disclaimer verbatim, each marked as a draft
-pending Australian legal review.
-
-**Do:** have them reviewed before any broad public launch, then remove
-the "Draft — pending review" line from all three pages.
+Passed. The "Draft — pending review" line is gone from `/terms`,
+`/privacy` and `/film-rights`, replaced by a review date.
 
 ---
 
@@ -220,6 +222,10 @@ These need no action — noting them so they are not re-litigated:
   and the teardown removes everything and verifies it afterwards.
   Logan authorised running against the real project while it is still
   empty; once real members exist, point it at a second project instead.
+- The Cloudflare Workers bundle has been run, not just built. `npm run
+cf:preview` serves it in workerd, and all 93 journeys pass against
+  that bundle with real Supabase behind it — so what is left in item 3
+  is an account and a deploy, not an unknown.
 - `npm run smoke:remote` — 16 read-only checks against the hosted
   project. The browser's own anon key returns zero rows from `films`,
   `opening_secrets`, `playback_destinations` and `analytics_events`.

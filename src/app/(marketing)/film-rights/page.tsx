@@ -9,9 +9,7 @@ export default function FilmRightsPage() {
   return (
     <div className={styles.page}>
       <h1>Film rights and service disclaimer</h1>
-      <p className={styles.updated}>
-        Draft — pending Australian legal review before a broad public launch (brief §14).
-      </p>
+      <p className={styles.updated}>Reviewed for Australian law. Last updated 12 August 2026.</p>
 
       <section>
         <p className={styles.lead}>

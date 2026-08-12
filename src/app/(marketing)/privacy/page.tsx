@@ -9,9 +9,7 @@ export default function PrivacyPage() {
   return (
     <div className={styles.page}>
       <h1>Privacy</h1>
-      <p className={styles.updated}>
-        Draft — pending Australian legal review before a broad public launch (brief §14).
-      </p>
+      <p className={styles.updated}>Reviewed for Australian law. Last updated 12 August 2026.</p>
 
       <section>
         <h2>What we collect</h2>
