@@ -9,6 +9,10 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Mints a real session per persona when a live project is configured,
+  // and returns immediately when one is not — so the public suite runs
+  // unchanged with no Supabase at all. See tests/e2e/global-setup.ts.
+  globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,

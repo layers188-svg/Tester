@@ -208,9 +208,18 @@ These need no action — noting them so they are not re-litigated:
 - Playwright: 95 journeys — 82 passing (public site, PWA installability,
   spoiler regression, auth gating on all five protected route groups),
   13 skipped. The skipped ones self-document why: each needs a live
-  Supabase project and an authenticated session. Unskipping them needs a
-  global setup that mints a real session, which is not written yet — the
-  schema now exists, but a session does not.
+  Supabase project and an authenticated session.
+- `tests/e2e/global-setup.ts` now mints those sessions — it asks the
+  admin API for the code that would have been emailed and types it into
+  the real `/join` form, so the session comes from the app's own auth
+  path rather than a forged cookie. **It has never run.** There is no
+  project to run it against, so treat it as written-not-proven until it
+  does; that is the whole of what stands between 82 passing journeys
+  and 95. What _is_ proven: it no-ops with no project configured (the
+  public suite is unchanged at 82), and it refuses outright to run
+  against a configured project unless `E2E_DESTRUCTIVE_OK=1` declares
+  it disposable — it creates members, and brief §18 forbids those in
+  production.
 - All public pages checked at a 390px viewport.
 - Form errors are announced and tied to the field that caused them
   (§16 accessibility rule 8). Fixing that turned up a real bug on the
