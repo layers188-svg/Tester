@@ -9,7 +9,17 @@ import { skipWithoutLiveSupabase } from "./helpers";
 // auth.admin API to read the OTP directly in a test-only branch) rather
 // than reimplementing this test from scratch.
 test.describe("email OTP sign in", () => {
-  test.beforeEach(() => skipWithoutLiveSupabase());
+  test.beforeEach(() => {
+    skipWithoutLiveSupabase();
+    // Step one asks Supabase to email a code, so this needs working
+    // SMTP. Stubbing the send would leave the test asserting against
+    // its own stub. Skipped until Resend is configured (item 2 of
+    // LAUNCH_CHECKLIST).
+    test.skip(
+      !process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith("not-yet"),
+      "Requires working SMTP — see LAUNCH_CHECKLIST item 2.",
+    );
+  });
 
   test("requesting a code shows the six digit entry step", async ({ page }) => {
     await page.goto("/join");

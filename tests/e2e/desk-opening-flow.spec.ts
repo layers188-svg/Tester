@@ -19,7 +19,10 @@ test.describe("Programming Desk: create and schedule an opening", () => {
     await expect(page).toHaveURL(/\/desk\/openings\/[0-9a-f-]+/);
 
     await page.setInputFiles('input[type="file"]', "tests/e2e/fixtures/sample-no-trailer.mp4");
-    await expect(page.getByText(/no trailer uploaded/i)).toBeVisible();
+    // The Desk names the stored object rather than announcing the act:
+    // "Uploaded: <uuid>.mp4". The uuid is the point — brief §12 rule 6
+    // requires the stored name to carry no meaning.
+    await expect(page.getByText(/uploaded:\s*[0-9a-f-]{36}\.mp4/i)).toBeVisible();
 
     await page.getByRole("button", { name: "Approve" }).click();
     await expect(page.getByText(/approved: yes/i)).toBeVisible();
