@@ -205,13 +205,23 @@ describe("processDueNotifications — sending", () => {
   });
 
   it("passes every known film title to the send guard", async () => {
-    // sendEmail refuses to send a payload containing any of these, so a
-    // title can never reach an inbox even if a template regresses.
+    // sendEmail refuses to send if any of these reach the template
+    // inputs, so a title cannot ride a queued payload into an inbox.
     db = new FakeSupabase([queueRow()], [{ title: "Whiplash" }, { title: "Another Film" }]);
     await processDueNotifications(NOW);
 
-    const [, forbidden] = sendEmail.mock.calls[0];
-    expect(forbidden).toEqual(["Whiplash", "Another Film"]);
+    const [, guard] = sendEmail.mock.calls[0];
+    expect(guard.forbiddenTerms).toEqual(["Whiplash", "Another Film"]);
+  });
+
+  it("guards the queued payload, not the rendered email", async () => {
+    // The distinction that keeps short titles ("It", "Up", "Us") from
+    // failing every send — see tests/unit/spoiler/short-titles.test.ts.
+    db = new FakeSupabase([queueRow()], [{ title: "Whiplash" }]);
+    await processDueNotifications(NOW);
+
+    const [, guard] = sendEmail.mock.calls[0];
+    expect(guard.data).toEqual({ to: "member@example.com", openingNumber: 1 });
   });
 
   it("leaves a not-yet-due notification alone", async () => {

@@ -20,7 +20,28 @@ function excerptAround(haystack: string, index: number, needleLength: number): s
   return haystack.slice(start, end);
 }
 
-function findInString(value: string, forbidden: string[], path: string): LeakMatch[] {
+export interface LeakScanOptions {
+  /**
+   * Require the term to sit on word boundaries rather than matching any
+   * substring. Off by default: when scanning rendered output the scan
+   * should over-trigger. Turn it on when scanning dynamic *data*, where
+   * a term embedded in a longer word is noise rather than signal — see
+   * `assertSafeEmailData`.
+   */
+  wholeWord?: boolean;
+}
+
+/** Letters, digits and underscore are "inside a word"; everything else is a boundary. */
+function isWordChar(char: string | undefined): boolean {
+  return char !== undefined && /[\p{L}\p{N}_]/u.test(char);
+}
+
+function findInString(
+  value: string,
+  forbidden: string[],
+  path: string,
+  options: LeakScanOptions,
+): LeakMatch[] {
   const matches: LeakMatch[] = [];
   const lowerValue = value.toLowerCase();
   for (const term of forbidden) {
@@ -28,7 +49,12 @@ function findInString(value: string, forbidden: string[], path: string): LeakMat
     const lowerTerm = term.toLowerCase();
     let index = lowerValue.indexOf(lowerTerm);
     while (index !== -1) {
-      matches.push({ path, forbidden: term, excerpt: excerptAround(value, index, term.length) });
+      const before = value[index - 1];
+      const after = value[index + term.length];
+      const onBoundary = !isWordChar(before) && !isWordChar(after);
+      if (!options.wholeWord || onBoundary) {
+        matches.push({ path, forbidden: term, excerpt: excerptAround(value, index, term.length) });
+      }
       index = lowerValue.indexOf(lowerTerm, index + 1);
     }
   }
@@ -43,51 +69,55 @@ function findInString(value: string, forbidden: string[], path: string): LeakMat
 export function findTitleLeaks(
   value: unknown,
   forbidden: string[],
-  path = "$",
-  seen: WeakSet<object> = new WeakSet(),
+  options: LeakScanOptions = {},
 ): LeakMatch[] {
-  if (value == null) return [];
+  const seen = new WeakSet<object>();
 
-  if (typeof value === "string") {
-    return findInString(value, forbidden, path);
-  }
+  function walk(item: unknown, path: string): LeakMatch[] {
+    if (item == null) return [];
 
-  if (typeof value === "number" || typeof value === "boolean") {
+    if (typeof item === "string") {
+      return findInString(item, forbidden, path, options);
+    }
+
+    if (typeof item === "number" || typeof item === "boolean") {
+      return [];
+    }
+
+    if (Array.isArray(item)) {
+      return item.flatMap((entry, index) => walk(entry, `${path}[${index}]`));
+    }
+
+    if (item instanceof Map) {
+      return Array.from(item.entries()).flatMap(([key, entry]) =>
+        walk(entry, `${path}.${String(key)}`),
+      );
+    }
+
+    if (item instanceof Set) {
+      return Array.from(item.values()).flatMap((entry, index) => walk(entry, `${path}[${index}]`));
+    }
+
+    if (typeof item === "object") {
+      const obj = item as Record<string, unknown>;
+      if (seen.has(obj)) return [];
+      seen.add(obj);
+      return Object.entries(obj).flatMap(([key, entry]) => walk(entry, `${path}.${key}`));
+    }
+
     return [];
   }
 
-  if (Array.isArray(value)) {
-    return value.flatMap((item, index) =>
-      findTitleLeaks(item, forbidden, `${path}[${index}]`, seen),
-    );
-  }
-
-  if (value instanceof Map) {
-    return Array.from(value.entries()).flatMap(([key, item]) =>
-      findTitleLeaks(item, forbidden, `${path}.${String(key)}`, seen),
-    );
-  }
-
-  if (value instanceof Set) {
-    return Array.from(value.values()).flatMap((item, index) =>
-      findTitleLeaks(item, forbidden, `${path}[${index}]`, seen),
-    );
-  }
-
-  if (typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-    if (seen.has(obj)) return [];
-    seen.add(obj);
-    return Object.entries(obj).flatMap(([key, item]) =>
-      findTitleLeaks(item, forbidden, `${path}.${key}`, seen),
-    );
-  }
-
-  return [];
+  return walk(value, "$");
 }
 
-export function assertNoTitleLeak(value: unknown, forbidden: string[], context: string): void {
-  const leaks = findTitleLeaks(value, forbidden);
+export function assertNoTitleLeak(
+  value: unknown,
+  forbidden: string[],
+  context: string,
+  options: LeakScanOptions = {},
+): void {
+  const leaks = findTitleLeaks(value, forbidden, options);
   if (leaks.length > 0) {
     const summary = leaks
       .slice(0, 5)

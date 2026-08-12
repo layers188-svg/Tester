@@ -133,6 +133,12 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
 
   if (error || !due) return result;
 
+  // Every title the house holds, not just the ones sealed for this
+  // recipient: a queued payload has no business carrying any film title,
+  // revealed or not, so the strictest list is also the simplest. The
+  // guard runs against each row's `payload` — the values the template
+  // is rendered from — never the rendered email itself. See
+  // assertSafeEmailData for why that distinction is load-bearing.
   const { data: films } = await supabase.from("films").select("title");
   const forbiddenTitles = (films ?? []).map((f) => f.title);
 
@@ -154,7 +160,7 @@ export async function processDueNotifications(now: Date = new Date()): Promise<P
         row.type as NotificationType,
         row.payload as Record<string, unknown>,
       );
-      await sendEmail(rendered, forbiddenTitles);
+      await sendEmail(rendered, { data: row.payload, forbiddenTerms: forbiddenTitles });
       await supabase
         .from("notification_queue")
         .update({ status: "sent", last_error: null })
