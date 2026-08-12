@@ -24,9 +24,10 @@
 with
 expected_tables(name) as (
   values
-    ('audit_log'), ('circle_members'), ('circles'), ('email_preferences'),
-    ('films'), ('notification_queue'), ('opening_cues'), ('opening_secrets'),
-    ('openings'), ('playback_destinations'), ('profiles'), ('reveals'),
+    ('analytics_events'), ('audit_log'), ('circle_members'), ('circles'),
+    ('email_preferences'), ('films'), ('notification_queue'),
+    ('opening_cues'), ('opening_secrets'), ('openings'),
+    ('playback_destinations'), ('profiles'), ('reveals'),
     ('screening_attendance'), ('screenings'), ('sealed_recommendation_cues'),
     ('sealed_recommendation_recipients'), ('sealed_recommendations'),
     ('six_word_reviews'), ('watches')
@@ -34,7 +35,8 @@ expected_tables(name) as (
 expected_functions(name) as (
   values
     ('can_view_six_word_review'), ('create_sealed_recommendation'),
-    ('current_profile_role'), ('get_circle_activity'),
+    ('current_profile_role'), ('get_analytics_summary'),
+    ('get_circle_activity'),
     ('get_circle_member_names'), ('get_house_openings'), ('get_house_words'),
     ('get_my_circles_activity'), ('get_my_library'),
     ('get_sealed_recommendation_safe'), ('guard_profile_role'),
@@ -44,16 +46,19 @@ expected_functions(name) as (
     ('reveal_opening'), ('reveal_sealed_recommendation'), ('set_updated_at'),
     ('shares_circle_with')
 ),
--- The three tables that must never be readable by a signed-in member.
+-- Tables that must never be readable by a signed-in member: the three
+-- that carry a film's identity, and analytics_events, which is house
+-- instrumentation rather than a member-facing feature (brief §15).
 protected(name) as (
-  values ('films'), ('opening_secrets'), ('playback_destinations')
+  values ('films'), ('opening_secrets'), ('playback_destinations'),
+         ('analytics_events')
 ),
 results(sort_key, check_name, status, detail) as (
 
   -- 1. Every table exists.
   select 1, 'tables present',
     case when count(*) filter (where c.relname is null) = 0 then 'PASS' else 'FAIL' end,
-    coalesce(string_agg(e.name, ', ') filter (where c.relname is null), 'all 19')
+    coalesce(string_agg(e.name, ', ') filter (where c.relname is null), 'all 20')
   from expected_tables e
   left join pg_class c
     on c.relname = e.name
@@ -69,7 +74,7 @@ results(sort_key, check_name, status, detail) as (
          then 'PASS' else 'FAIL' end,
     coalesce(
       string_agg(e.name, ', ') filter (where not coalesce(c.relrowsecurity, false)),
-      'all 19'
+      'all 20'
     )
   from expected_tables e
   left join pg_class c
@@ -80,11 +85,12 @@ results(sort_key, check_name, status, detail) as (
   union all
 
   -- 3. Policy count, counted per schema because they live in two
-  --    places: 43 on the public tables (0003_rls.sql) and 7 on
-  --    storage.objects (0008_storage.sql).
+  --    places: 44 on the public tables (0003_rls.sql, plus the owner
+  --    read on analytics_events from 0013) and 7 on storage.objects
+  --    (0008_storage.sql).
   select 3, 'table policies applied',
-    case when count(*) >= 43 then 'PASS' else 'FAIL' end,
-    count(*)::text || ' of 43 expected'
+    case when count(*) >= 44 then 'PASS' else 'FAIL' end,
+    count(*)::text || ' of 44 expected'
   from pg_policies
   where schemaname = 'public'
 
@@ -103,7 +109,7 @@ results(sort_key, check_name, status, detail) as (
   -- 4. Every function exists.
   select 5, 'functions present',
     case when count(*) filter (where p.proname is null) = 0 then 'PASS' else 'FAIL' end,
-    coalesce(string_agg(e.name, ', ') filter (where p.proname is null), 'all 23')
+    coalesce(string_agg(e.name, ', ') filter (where p.proname is null), 'all 24')
   from expected_functions e
   left join pg_proc p
     on p.proname = e.name
@@ -130,7 +136,7 @@ results(sort_key, check_name, status, detail) as (
   select 7, 'protected tables closed to the browser',
     case when count(*) = 0 then 'PASS' else 'FAIL' end,
     coalesce(string_agg(pol.tablename || '.' || pol.policyname, ', '),
-             'films, opening_secrets, playback_destinations all closed')
+             'films, opening_secrets, playback_destinations, analytics_events all closed')
   from pg_policies pol
   join protected pr on pr.name = pol.tablename
   where pol.schemaname = 'public'
