@@ -53,6 +53,21 @@ responses.
   route (`src/app/api/reveal/*`), which verifies the member, writes a
   `reveals` row, and only then returns title/year/providers.
 - Never prefetch or statically generate a reveal route.
+- Guard **data, not rendered output**. A rendered page or email is
+  `template(constant copy, dynamic data)`; only the data can acquire a
+  title at runtime. The detector matches case-insensitive substrings, so
+  scanning rendered output blocks any short title — a film called _It_
+  matches `initial-scale`, _Up_ matches `uppercase`, _Us_ matches
+  `House`. On a live path use `assertSafeEmailData` (word-boundary,
+  scans template inputs); keep `assertSafeEmailPayload` for the
+  regression suite, where over-triggering is the point.
+- A `TitleLeakError` message names **where** a leak is, never **what**
+  leaked. It is thrown when a title is somewhere sensitive and is the
+  thing most likely to be logged or persisted —
+  `notification_queue.last_error` is member-readable. Never persist,
+  log, or return `error.leaks`.
+- A spoiler rejection is permanent, not transient. Fail it on the first
+  attempt and surface it; never retry it.
 - Run `npm run test:spoiler` (title leak detector) whenever opening,
   reveal, email, or seed code changes.
 - Run `npm run test:rls` whenever anything under `supabase/migrations`
