@@ -183,9 +183,7 @@ decision from Logan.
 
 Resolved by the guidelines, no longer blocking:
 
-- **The HD ligature exists.** Still need the **vector source** (SVG or
-  AI) — a render is not enough to ship. `src/components/Wordmark.tsx`
-  is a typographic placeholder and is the only place to change.
+- **The HD ligature.** Supplied as vector and installed — see item 5.
 - **Domain candidate:** `housedark.club`, with `hello@housedark.club`
   and `@housedark.club`. Item 4 above has a name to buy.
 - **Palette.** The seven brief §8 colours were verified against the
@@ -242,7 +240,10 @@ cf:preview` serves it in workerd, and all 93 journeys pass against
   record into this project's own database and read back at
   `/desk/analytics`. Worth knowing for the privacy policy review in item
   7: there is no analytics cookie and no data leaves the project.
-- `POST /api/cron` rejects both a missing and an incorrect bearer token.
+- `POST /api/cron` was run through the Workers bundle against the real
+  project: 401 on a missing token, 401 on a wrong one, and a full report
+  on the correct one. That is the endpoint the scheduled worker calls,
+  so item 3's remaining risk is the deploy, not the job.
 - `/tonight`, `/circle`, `/library`, `/you`, `/desk` all redirect to
   `/join` when signed out.
 - The sender address in `.env.example` — `RESEND_FROM_EMAIL="House Dark
