@@ -1,9 +1,12 @@
 name: CI
 
-# Runs on GitHub's runners, which reach the wider internet freely. That
-# matters here: the agent session that wrote this repository is behind an
-# egress policy that blocks Supabase, Cloudflare and Resend outright, so
-# anything needing a third-party service has to be verified here instead.
+# Runs on GitHub's runners, which can pull container images. That is the
+# thing the agent sessions building this repository cannot do: the
+# Supabase, Resend and Cloudflare APIs are reachable from them, but
+# Docker Hub's blob CDN is refused by egress policy, so `supabase start`
+# and anything else needing an image has to be verified here instead.
+# Everything that runs on a native install — the unit suites, the build,
+# and the RLS tests against a local PostgreSQL — does run there too.
 
 on:
   push:

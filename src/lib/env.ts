@@ -9,13 +9,30 @@ import { z } from "zod";
  * §9 for the required variable list.
  */
 
+/**
+ * A sender address in either form Resend accepts: a bare
+ * `hello@example.com`, or `House Dark <hello@example.com>`. The second
+ * is what members actually see in an inbox, and it is the shape
+ * `.env.example` hands out — a plain `z.string().email()` rejects it,
+ * so following the documented setup would stop the app booting.
+ */
+export function parseSenderAddress(value: string): string | null {
+  const named = /^[^<>]*<([^<>]+)>$/.exec(value.trim());
+  const address = (named ? named[1] : value).trim();
+  return z.string().email().safeParse(address).success ? address : null;
+}
+
+const senderEmail = z.string().refine((value) => parseSenderAddress(value) !== null, {
+  message: 'must be an email address, optionally as "House Dark <hello@example.com>"',
+});
+
 const serverSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   RESEND_API_KEY: z.string().min(1),
-  RESEND_FROM_EMAIL: z.string().email(),
+  RESEND_FROM_EMAIL: senderEmail,
   ADMIN_EMAILS: z.string().min(1),
   CRON_SECRET: z.string().min(16),
 });

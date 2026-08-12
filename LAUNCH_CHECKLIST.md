@@ -16,10 +16,13 @@ waiting.
 **Do:** create a project at supabase.com, then from the repo root:
 
 ```bash
-supabase link --project-ref <ref>
+npx supabase link --project-ref <ref>
 npm run db:migrate
 npx supabase gen types typescript --linked > src/lib/supabase/types.ts
 ```
+
+The Supabase CLI is now a devDependency, so `npx supabase` works after
+`npm install` — nothing to install globally.
 
 **Then give me:** `NEXT_PUBLIC_SUPABASE_URL`,
 `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
@@ -27,6 +30,12 @@ npx supabase gen types typescript --linked > src/lib/supabase/types.ts
 > `src/lib/supabase/types.ts` is currently hand-written to match the
 > migrations exactly. Regenerating it against the real project is the
 > only way to guarantee it never drifts.
+>
+> Run that `gen types` line on a machine with Docker. The CLI generates
+> types by running `postgres-meta` as a container, which the build
+> environment here cannot pull (see "Environment constraints" below), so
+> it is the one step in this item I cannot do for you even once the
+> project exists.
 
 ---
 
@@ -83,16 +92,17 @@ Only two files reference the identity — `Wordmark.tsx` and
 
 ---
 
-## 6. The real No Trailer file and seed night photography
+## 6. Seed night photography
 
-`The Drummer's Solitary, Silent Prelude.mp4` was referenced in the brief
-but not supplied here, so:
+The seed No Trailer has been supplied and is committed as
+`tests/e2e/fixtures/sample-no-trailer.mp4` — deliberately renamed,
+because the original filename described the footage closely enough to
+point at the protected title. See that directory's README. What is left:
 
-- The seeded opening points at a placeholder storage path. Upload the
-  real file through the Programming Desk before running the opening.
-- `tests/e2e/fixtures/sample-no-trailer.mp4` is missing, so the Desk
-  upload journey cannot run end to end. Any short non-sensitive MP4
-  unblocks it.
+- The seeded opening still points at a placeholder storage path. Upload
+  the real file through the Programming Desk before running the opening;
+  the Desk rewrites it to a UUID object name so the stored path carries
+  no meaning.
 - The home page hero, the Circle product capture and the ritual section
   use empty, clearly named content slots. They contain **no** stock
   photography and **no** generated people, per brief §2 — they stay empty
@@ -187,7 +197,7 @@ Resolved by the guidelines, no longer blocking:
 
 These need no action — noting them so they are not re-litigated:
 
-- `npm run lint`, `npm run typecheck`, `npm run test` (129 unit tests),
+- `npm run lint`, `npm run typecheck`, `npm run test` (137 unit tests),
   `npm run build` and `npm run cf:build` all pass.
 - `npm run test:rls` — 107 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
@@ -205,3 +215,35 @@ These need no action — noting them so they are not re-litigated:
 - `POST /api/cron` rejects both a missing and an incorrect bearer token.
 - `/tonight`, `/circle`, `/library`, `/you`, `/desk` all redirect to
   `/join` when signed out.
+- The sender address in `.env.example` — `RESEND_FROM_EMAIL="House Dark
+<hello@yourdomain.com>"` — now actually boots the app. Validation used
+  to demand a bare address, so setting the documented value made the app
+  refuse to start with "missing or invalid environment variable(s):
+  RESEND_FROM_EMAIL". Both shapes are accepted and pinned by tests. This
+  would have bitten on item 2, at the exact moment you pasted the real
+  value in.
+
+---
+
+## Environment constraints on the build sessions
+
+Recorded so it is not re-derived every session, and because it changed:
+
+- The Supabase, Resend and Cloudflare **APIs are reachable** from the
+  build environment, along with GitHub and npm. An earlier session found
+  them blocked and said so in `.github/workflows/ci.yml`; that is no
+  longer true and the comment has been corrected.
+- **Container images cannot be pulled.** Docker Hub's blob CDN
+  (`production.cloudfront.docker.com`) and AWS ECR's
+  (`d2glxqk2uabbnd.cloudfront.net`) are both refused by egress policy —
+  manifests resolve, blobs return 403. The Docker daemon itself runs
+  fine. This rules out `supabase start` (the whole local stack) and
+  `supabase gen types`, which runs `postgres-meta` as a container.
+- What that costs: the 13 skipped Playwright journeys stay skipped. They
+  need a running auth server to mint a real session, and with no local
+  stack and no hosted project there is nowhere to get one. This is
+  waiting on item 1, not on code.
+- What still works natively, and was run: every migration applied to a
+  local PostgreSQL 16 with all 107 RLS assertions passing, the full unit
+  and spoiler suites, the production build, and the 79 Playwright
+  journeys that do not need a session.

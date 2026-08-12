@@ -60,31 +60,38 @@ ADMIN_EMAILS                   # promoted to the owner role on first sign in
 CRON_SECRET                    # bearer token for POST /api/cron
 ```
 
-> The `.env.local` currently committed to this working tree holds
-> obviously fake placeholders so the app builds and the public-site tests
-> run without a Supabase project. Replace them with real values — see
-> `LAUNCH_CHECKLIST.md`.
+> `.env.local` is gitignored and is not in the repository. Copy
+> `.env.example` to `.env.local` to get started: its placeholders are
+> obviously fake but well-formed, so the app builds and the public-site
+> tests run without a Supabase project. Replace them with real values —
+> see `LAUNCH_CHECKLIST.md`.
 
 ### Database
 
 ```bash
-supabase link --project-ref <your-project-ref>
+npx supabase link --project-ref <your-project-ref>
 npm run db:migrate        # applies supabase/migrations/*.sql
 ```
 
+The Supabase CLI is a devDependency, so `npx supabase` works straight
+after `npm install` — no global install needed.
+
 Migrations, in order:
 
-| File                                  | What it does                                                        |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `0001_init.sql`                       | Enums, all 19 tables, indexes, `updated_at` and role-guard triggers |
-| `0002_functions.sql`                  | Helper functions the RLS policies are built from                    |
-| `0003_rls.sql`                        | Row Level Security on every table, plus the review-edit guard       |
-| `0004_reveal.sql`                     | The reveal functions and safe projections                           |
-| `0005_sealed_recommendations_rpc.sql` | Member-safe path to create a sealed recommendation                  |
-| `0006_circle_helpers.sql`             | Circle member names and "my recommendations"                        |
-| `0007_library.sql`                    | Library queries that gate titles on personal reveal                 |
-| `0008_storage.sql`                    | The `no-trailer` and `avatars` buckets and their policies           |
-| `0009_captions.sql`                   | Caption track slot for a No Trailer that carries speech             |
+| File                                            | What it does                                                        |
+| ----------------------------------------------- | ------------------------------------------------------------------- |
+| `0001_init.sql`                                 | Enums, all 19 tables, indexes, `updated_at` and role-guard triggers |
+| `0002_functions.sql`                            | Helper functions the RLS policies are built from                    |
+| `0003_rls.sql`                                  | Row Level Security on every table, plus the review-edit guard       |
+| `0004_reveal.sql`                               | The reveal functions and safe projections                           |
+| `0005_sealed_recommendations_rpc.sql`           | Member-safe path to create a sealed recommendation                  |
+| `0006_circle_helpers.sql`                       | Circle member names and "my recommendations"                        |
+| `0007_library.sql`                              | Library queries that gate titles on personal reveal                 |
+| `0008_storage.sql`                              | The `no-trailer` and `avatars` buckets and their policies           |
+| `0009_captions.sql`                             | Caption track slot for a No Trailer that carries speech             |
+| `0010_fix_union_ordering.sql`                   | Corrects result ordering across a UNION in the Library queries      |
+| `0011_six_word_reviews_anon.sql`                | Closes anonymous read access to six-word reviews                    |
+| `0012_prevent_duplicate_cues_and_providers.sql` | Uniqueness for opening cues and per-territory providers             |
 
 For local development with seeded demo data (including the protected
 `Whiplash` example from brief §18):
