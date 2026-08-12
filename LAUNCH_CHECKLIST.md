@@ -199,13 +199,13 @@ These need no action — noting them so they are not re-litigated:
 
 - `npm run lint`, `npm run typecheck`, `npm run test` (148 unit tests),
   `npm run build` and `npm run cf:build` all pass.
-- `npm run test:rls` — 120 assertions against a throwaway Postgres with
+- `npm run test:rls` — 130 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
   title gating, and that no protected title reaches a member-readable
   column. This is what proves a policy holds; RLS filters rows rather
   than raising, so a test that only looked for an error would pass
   while leaking everything.
-- Playwright: 93 journeys — 80 passing (public site, PWA installability,
+- Playwright: 94 journeys — 81 passing (public site, PWA installability,
   spoiler regression, auth gating on all five protected route groups),
   13 skipped. The skipped ones self-document why: each needs a live
   Supabase project and an authenticated session. Unskipping them needs a

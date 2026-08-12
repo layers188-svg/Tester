@@ -40,6 +40,16 @@ test.describe("public site — mobile viewport", () => {
     await expect(page).toHaveURL("/");
   });
 
+  test("an unknown URL gets the house's own 404, not the framework's", async ({ page }) => {
+    // Brief §16 resilience rule 1. The same page serves every
+    // notFound() — a Circle you left, a recommendation that was never
+    // yours — so it must not distinguish "missing" from "not yours".
+    const response = await page.goto("/no-such-page");
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole("heading", { name: /nothing here/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /go to tonight/i })).toBeVisible();
+  });
+
   test("Join page explains the code flow without collecting a password", async ({ page }) => {
     await page.goto("/join");
     await expect(page.getByLabel("Email")).toBeVisible();

@@ -179,6 +179,7 @@ interface SealedRecommendationRow {
   personal_note: string | null;
   runtime_minutes: number;
   scheduled_for: string | null;
+  idempotency_key: string | null;
   created_at: string;
 }
 
@@ -258,6 +259,12 @@ interface AnalyticsEventRow {
   opening_number: number | null;
   detail: AnalyticsDetailValue | null;
   created_at: string;
+}
+
+export interface CreatedRecommendation {
+  recommendation_id: string;
+  /** False when an idempotency key replayed an earlier send (0014). */
+  created: boolean;
 }
 
 export interface AnalyticsSummaryRow {
@@ -465,8 +472,10 @@ export interface Database {
           p_cues: string[];
           p_scheduled_for?: string | null;
           p_circle_id?: string | null;
+          /** Repeat sends under one key return the first recommendation (0014). */
+          p_idempotency_key?: string | null;
         };
-        Returns: string;
+        Returns: CreatedRecommendation[];
       };
       get_house_words: { Args: { p_limit?: number }; Returns: { body: string }[] };
       get_circle_member_names: { Args: { p_circle_id: string }; Returns: CircleMemberName[] };

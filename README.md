@@ -93,6 +93,7 @@ Migrations, in order:
 | `0011_six_word_reviews_anon.sql`                | Closes anonymous read access to six-word reviews                    |
 | `0012_prevent_duplicate_cues_and_providers.sql` | Uniqueness for opening cues and per-territory providers             |
 | `0013_analytics.sql`                            | The brief §15 events table, owner-only policy, and its summary      |
+| `0014_recommendation_idempotency.sql`           | Idempotency key so a retried send does not send twice               |
 
 For local development with seeded demo data (including the protected
 `Whiplash` example from brief §18):

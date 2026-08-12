@@ -77,6 +77,10 @@ used instead (brief §2, §23) and the gap is logged in
 - Playwright critical journeys (brief §17).
 - Cloudflare adapter + deploy config, `README.md`, `OPERATIONS.md`,
   `LAUNCH_CHECKLIST.md`.
+- Resilience (brief §16): loading and error states for every screen, the
+  house's own 404, and idempotent sends. The error boundaries never
+  render `error.message` — §11 lists error messages among the places a
+  title must not appear.
 
 ## What is genuinely blocked on Logan
 

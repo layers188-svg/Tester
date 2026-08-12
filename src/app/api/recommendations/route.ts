@@ -14,6 +14,10 @@ const schema = z.object({
   cues: z.array(z.string().trim().max(24)).max(3).optional(),
   scheduledFor: z.string().datetime().nullable().optional(),
   circleId: z.string().uuid().nullable().optional(),
+  // Brief §16 rule 3. Minted per compose by the client; a repeat of the
+  // same key returns the recommendation already sent rather than
+  // sending a second one.
+  idempotencyKey: z.string().uuid().optional(),
 });
 
 /**
@@ -42,7 +46,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: cueValidation.error }, { status: 400 });
   }
 
-  const { data: recommendationId, error } = await supabase.rpc("create_sealed_recommendation", {
+  const { data, error } = await supabase.rpc("create_sealed_recommendation", {
     p_film_title: parsed.data.filmTitle,
     p_release_year: parsed.data.releaseYear ?? null,
     p_runtime_minutes: parsed.data.runtimeMinutes,
@@ -51,10 +55,23 @@ export async function POST(request: Request) {
     p_cues: cueValidation.cues,
     p_scheduled_for: parsed.data.scheduledFor ?? null,
     p_circle_id: parsed.data.circleId ?? null,
+    p_idempotency_key: parsed.data.idempotencyKey ?? null,
   });
 
-  if (error || !recommendationId) {
+  const [result] = data ?? [];
+  if (error || !result) {
     return NextResponse.json({ error: error?.message ?? "Could not send that." }, { status: 400 });
+  }
+  const recommendationId = result.recommendation_id;
+
+  // A replayed send is reported as success — the recommendation exists
+  // and the member's intent was honoured — but nothing after this point
+  // runs again: no second email, no second analytics event.
+  if (!result.created) {
+    return NextResponse.json(
+      { id: recommendationId },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   const { data: profile } = await supabase

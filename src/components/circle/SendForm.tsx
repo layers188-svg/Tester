@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { validateCues } from "@/lib/validation/cues";
@@ -37,6 +37,13 @@ export function SendForm({
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
+  // Brief §16 rule 3. One key per composed send, held in a ref so a
+  // re-render does not change it: if the first attempt reached the
+  // server but the response never came back, pressing send again
+  // returns that same recommendation instead of despatching a second
+  // one. The key is only replaced once a send has actually succeeded.
+  const idempotencyKey = useRef<string>(crypto.randomUUID());
+
   function toggleRecipient(userId: string) {
     setSelected((prev) =>
       prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
@@ -71,12 +78,14 @@ export function SendForm({
           cues: cueValidation.cues,
           scheduledFor: scheduledFor ? new Date(scheduledFor).toISOString() : null,
           circleId: circleId || null,
+          idempotencyKey: idempotencyKey.current,
         }),
       });
       if (!res.ok) {
         const payload = await res.json().catch(() => ({}));
         throw new Error(payload.error ?? "Could not send that.");
       }
+      idempotencyKey.current = crypto.randomUUID();
       setSent(true);
       setTimeout(() => {
         router.push("/circle");
