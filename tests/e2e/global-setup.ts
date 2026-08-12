@@ -31,6 +31,13 @@ export default async function globalSetup(config: FullConfig) {
   // the public suite runs exactly as before. Not an error.
   if (isPlaceholder || !serviceKey) return;
 
+  // Public-only: run the journeys that need no session against a real
+  // project, without inventing a single account. This is how the app
+  // gets exercised against production data paths — real PostgREST, real
+  // RLS — while brief §18 still forbids demonstration people from ever
+  // existing there.
+  if (process.env.E2E_PUBLIC_ONLY === "1") return;
+
   if (process.env.E2E_DESTRUCTIVE_OK !== "1") {
     throw new Error(
       "A live Supabase project is configured but E2E_DESTRUCTIVE_OK is not set to 1.\n" +

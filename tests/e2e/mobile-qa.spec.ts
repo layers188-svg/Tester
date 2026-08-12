@@ -90,11 +90,25 @@ test.describe("form errors reach assistive technology", () => {
   // Brief §16 accessibility rule 8. Join is the only form reachable
   // without a session, and it is the first one every member meets.
   test("a rejected email marks the input invalid and names the reason", async ({ page }) => {
-    await page.goto("/join");
+    // The rejection is forced rather than provoked. Submitting a
+    // deliberately bad address only produces an error if the backend
+    // refuses it — so against a placeholder project this passed because
+    // the request could not be made at all, and against a real one it
+    // failed, because Supabase accepts the address and sends a code.
+    // A test whose result depends on whether the backend is reachable
+    // is testing the backend, not this form. It also stopped the suite
+    // posting sign-in attempts at whatever project happens to be
+    // configured.
+    await page.route("**/auth/v1/otp**", (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "invalid_request", error_description: "Email not allowed." }),
+      }),
+    );
 
-    // An address the browser's own validation accepts, so the request
-    // is actually made and the server's rejection is what renders.
-    await page.getByLabel("Email").fill("not-a-real-mailbox@invalid");
+    await page.goto("/join");
+    await page.getByLabel("Email").fill("someone@example.com");
     await page.getByRole("button", { name: /send my code/i }).click();
 
     // Scoped to the form: Next mounts its own role="alert" route
