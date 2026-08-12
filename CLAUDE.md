@@ -108,7 +108,9 @@ npm run test:spoiler      # title leak regression suite
 npm run test:rls           # RLS policy tests (throwaway Postgres, needs a local server install)
 npm run test:e2e            # playwright critical journeys (needs a running app + Supabase)
 npm run db:migrate           # apply SQL migrations to the linked Supabase project
-npm run db:seed               # seed demo data incl. protected Whiplash mapping
+npm run db:reset:local        # DESTRUCTIVE: drops the LOCAL dev database, reapplies
+                              # migrations, then runs supabase/seed.sql. Never aim
+                              # this at a linked/remote project.
 ```
 
 See `README.md` for setup, `OPERATIONS.md` for the daily opening workflow,

@@ -90,8 +90,18 @@ For local development with seeded demo data (including the protected
 `Whiplash` example from brief §18):
 
 ```bash
-npm run db:seed           # supabase db reset — LOCAL ONLY, never production
+npm run db:reset:local    # LOCAL ONLY — never aim this at a linked project
 ```
+
+This drops the local database, reapplies every migration and then runs
+`supabase/seed.sql`. It is `supabase db reset` underneath, so it destroys
+whatever is in the database it points at. It was previously called
+`db:seed`, which read like an additive command and was the wrong name for
+something that wipes.
+
+There is no seed script for a hosted project on purpose: `seed.sql`
+creates clearly labelled demonstration members, and brief §18 forbids
+those from ever appearing in production.
 
 After linking a real project, regenerate the database types so they can
 never drift from the schema:
