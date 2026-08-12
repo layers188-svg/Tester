@@ -22,9 +22,15 @@ cat <<'HEADER'
 -- Regenerate with: bash scripts/build-combined-migration.sh
 --
 -- Paste into the Supabase SQL editor and run once, against an EMPTY
--- project. It creates tables, so a second run will fail on the first
--- `create table` — that is a safe failure, not a partial re-apply,
--- because the whole script runs in one implicit transaction.
+-- project.
+--
+-- A second run stops on the very first statement with
+--   ERROR: 42710: type "profile_role" already exists
+-- That is what success looks like the second time, not damage: the
+-- whole script is wrapped in the begin/commit below, so a failure at
+-- any point rolls the entire run back. It cannot half-apply. If you see
+-- that error, the schema is already in — run scripts/verify-remote.sql
+-- to confirm what is actually there rather than assuming either way.
 --
 -- It does NOT insert demonstration data. supabase/seed.sql creates
 -- clearly labelled demo members and brief §18 forbids those from
