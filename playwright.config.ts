@@ -38,12 +38,21 @@ export default defineConfig({
       },
     },
   ],
+  // Built output, not `next dev`.
+  //
+  // Turbopack's dev server panics while compiling /api/six-words — an
+  // internal turbo-tasks assertion in aggregation_update.rs, nothing to
+  // do with this code — and takes the server down mid-request. The
+  // journey that submits six words hung on "Saving…" until it timed
+  // out, which read exactly like an application bug and was not one.
+  // The production build compiles it without complaint, and is closer
+  // to what a member actually gets.
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: "npm run dev -- -p 3100",
+        command: "npm run build && npx next start -p 3100",
         url: "http://localhost:3100",
         reuseExistingServer: true,
-        timeout: 120_000,
+        timeout: 300_000,
       },
 });
