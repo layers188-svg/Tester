@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           preferences. We store only what the service needs to run (brief §14).
         </p>
         <p>
-          We also record a small set of usage events — that a sign in finished, that an opening was
+          We also record a small set of usage events: that a sign in finished, that an opening was
           viewed, dimmed, revealed, saved or marked watched, and so on. These are counted to
           understand how the beta is used. They are stored in our own database: there is no third
           party analytics service, no advertising network and no analytics cookie. An event never

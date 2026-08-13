@@ -20,9 +20,9 @@ export default function HowItWorksPage() {
         <h2>1. Receive the feeling</h2>
         <p>
           Each night House Dark presents one human chosen film. Before you know anything about it,
-          you see a short, original No Trailer &mdash; an emotional temperature, not a summary.
-          Alongside it: the running time, how many verified legal places you can watch it, and any
-          content notes, tucked behind their own tap.
+          you see a short, original No Trailer. An emotional temperature, not a summary. Alongside
+          it: the running time, how many verified legal places you can watch it, and any content
+          notes, tucked behind their own tap.
         </p>
       </section>
 
@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
       <section>
         <h2>3. Speak after the credits</h2>
         <p>
-          Once you mark the film watched, you write six words &mdash; before you can see anyone
+          Once you mark the film watched, you write six words, before you can see anyone
           else&rsquo;s. That is what unlocks the conversation: your six words open everyone
           else&rsquo;s.
         </p>
@@ -49,8 +49,8 @@ export default function HowItWorksPage() {
         <h2>Sending a film under seal</h2>
         <p>
           A friend can send you a film directly. You will see who sent it, a short personal note,
-          and up to three safe cues &mdash; never the title, never a poster. You choose when to
-          reveal it, exactly like a nightly opening.
+          and up to three safe cues. Never the title, never a poster. You choose when to reveal it,
+          exactly like a nightly opening.
         </p>
       </section>
 
@@ -59,7 +59,7 @@ export default function HowItWorksPage() {
         <p>
           Private groups of friends can hold a shared opening together. Thursday at 8pm is the
           starting ritual, though any Circle can change it. Circle activity shows what was watched
-          or sent &mdash; never a sealed title.
+          or sent. Never a sealed title.
         </p>
       </section>
 

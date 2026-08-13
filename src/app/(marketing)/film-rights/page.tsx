@@ -33,7 +33,7 @@ export default function FilmRightsPage() {
         <h2>Provider links</h2>
         <p>
           After you reveal a film, we may show the names of verified legal services where it is
-          available. These names identify availability only — they do not imply a partnership or
+          available. These names identify availability only. They do not imply a partnership or
           endorsement between House Dark and that service. If a link only reaches a provider detail
           page rather than direct playback, we say so.
         </p>

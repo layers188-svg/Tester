@@ -32,8 +32,8 @@ export default function WhyPage() {
         <h2>Choosing has become the work</h2>
         <p>
           An evening that was meant to be spent watching something is spent deciding what to watch
-          instead &mdash; scrolling a wall of artwork, reading half a synopsis, opening a second
-          service, giving up. The film was never the problem. The choosing was.
+          instead. Scrolling a wall of artwork, reading half a synopsis, opening a second service,
+          giving up. The film was never the problem. The choosing was.
         </p>
         <p>
           So House Dark makes exactly one choice a night, and a person makes it. Not a model, not a
@@ -51,8 +51,8 @@ export default function WhyPage() {
         <p>
           A No Trailer gives you a temperature instead of a summary: a short, original piece of film
           that carries how tonight will feel and nothing about what happens. No title, no poster, no
-          plot. You decide whether to reveal the name &mdash; and you can watch the whole thing
-          without ever doing so.
+          plot. You decide whether to reveal the name, and you can watch the whole thing without
+          ever doing so.
         </p>
       </section>
 
@@ -60,8 +60,8 @@ export default function WhyPage() {
         <h2>Nobody watches together any more</h2>
         <p>
           Everyone watches everything, separately, at a different time, and there is nothing left to
-          say about it afterwards. The shared evening &mdash; the one where the whole room saw the
-          same thing on the same night &mdash; quietly disappeared.
+          say about it afterwards. The shared evening, the one where the whole room saw the same
+          thing on the same night, quietly disappeared.
         </p>
         <p>
           Tonight&rsquo;s opening is the same film for everyone in the house. Your Circle can hold
@@ -82,9 +82,9 @@ export default function WhyPage() {
       <section>
         <h2>What this is not</h2>
         <p>
-          Not a streaming service &mdash; House Dark does not own or host a single frame, and never
-          will. Not a catalogue to browse, a ratings database, a recommendation engine, or a feed
-          that never ends. There is no algorithm here to feed and nothing to scroll.
+          Not a streaming service. House Dark does not own or host a single frame, and never will.
+          Not a catalogue to browse, a ratings database, a recommendation engine, or a feed that
+          never ends. There is no algorithm here to feed and nothing to scroll.
         </p>
         <p>
           If a night&rsquo;s film is not for you, the right answer is to close the app and go to
@@ -108,7 +108,7 @@ export default function WhyPage() {
         <p className={styles.links}>
           <Link href="/how-it-works">How it works</Link>
           <Link href="/film-rights">Film rights</Link>
-          <Link href="/you">Back to You</Link>
+          <Link href="/you">Back to Me</Link>
         </p>
       </section>
     </div>

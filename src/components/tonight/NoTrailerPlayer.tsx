@@ -121,7 +121,7 @@ export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoT
           muted
           controls={false}
           preload="auto"
-          aria-label="Tonight's No Trailer — an original, spoiler safe introduction"
+          aria-label="Tonight's No Trailer, an original, spoiler safe introduction"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
           onError={handleError}

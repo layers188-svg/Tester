@@ -34,7 +34,7 @@ export default function TermsPage() {
       <section>
         <h2>Your account</h2>
         <p>
-          You sign in with a one time email code. Keep access to your email secure — anyone with a
+          You sign in with a one time email code. Keep access to your email secure. Anyone with a
           valid code can sign in as you. You are responsible for what you send to your Circle.
         </p>
       </section>

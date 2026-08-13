@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     : undefined,
   title: {
     default: "House Dark",
-    template: "%s — House Dark",
+    template: "%s · House Dark",
   },
   description:
     "The best film experiences happen when you know nothing. House Dark presents one human chosen film each night, sealed until you choose to enter.",

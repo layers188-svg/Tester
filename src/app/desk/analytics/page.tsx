@@ -5,7 +5,7 @@ import { ANALYTICS_EVENT_LABEL } from "@/lib/labels";
 import styles from "../openings/page.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Analytics — Programming Desk" };
+export const metadata: Metadata = { title: "Analytics · Programming Desk" };
 
 /**
  * Brief §15. Aggregate counts only — how many times each event happened
@@ -26,7 +26,7 @@ export default async function AnalyticsPage() {
       <h1>Analytics</h1>
       <p>
         The twelve events brief §15 permits, over the last 30 days. First party, stored in this
-        project&rsquo;s own database — no third party analytics provider and no cookie. No film
+        project&rsquo;s own database. No third party analytics provider and no cookie. No film
         title, provider link, personal note or review body is ever recorded.
       </p>
 

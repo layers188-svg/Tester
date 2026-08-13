@@ -121,7 +121,7 @@ export function OpeningDetail({
       if (!isDurationInPreferredRange(meta.duration)) {
         setMessage("Uploaded. Note: outside the preferred 8-12 second duration.");
       } else if (payload.warnings?.length) {
-        setMessage("Uploaded, with a note — see below.");
+        setMessage("Uploaded, with a note. See below.");
       } else {
         setMessage("No Trailer uploaded.");
       }
@@ -534,7 +534,7 @@ export function OpeningDetail({
               <ul className={styles.cuesPreview}>
                 {providers.map((p) => (
                   <li key={p.id}>
-                    {p.provider_name} — {p.access_type}
+                    {p.provider_name}, {p.access_type}
                   </li>
                 ))}
               </ul>

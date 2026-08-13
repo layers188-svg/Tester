@@ -3,7 +3,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import styles from "../openings/page.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Audit log — Programming Desk" };
+export const metadata: Metadata = { title: "Audit log · Programming Desk" };
 
 export default async function AuditLogPage() {
   const supabase = await getServerSupabase();

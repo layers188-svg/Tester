@@ -165,7 +165,7 @@ export function JoinForm({ testKey }: { testKey: string | null }) {
           />
           <span>
             Send me occasional editorial notes from House Dark. Unrelated to sign in, and you can
-            withdraw any time from You.
+            withdraw any time from Me.
           </span>
         </label>
 

@@ -6,14 +6,14 @@ import styles from "./AppNav.module.css";
 
 const DESTINATIONS = [
   { href: "/tonight", label: "Tonight", icon: TonightIcon },
-  { href: "/circle", label: "Circle", icon: CircleIcon },
   { href: "/library", label: "Library", icon: LibraryIcon },
-  { href: "/you", label: "You", icon: YouIcon },
+  { href: "/circle", label: "Circle", icon: CircleIcon },
+  { href: "/you", label: "Me", icon: YouIcon },
 ] as const;
 
 /**
  * Exactly four persistent destinations (brief §5). Do not add a fifth —
- * the Programming Desk lives at /desk, reachable from You for owners,
+ * the Programming Desk lives at /desk, reachable from Me for owners,
  * not from this bar.
  */
 export function AppNav({ isOwner }: { isOwner: boolean }) {

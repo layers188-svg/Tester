@@ -10,12 +10,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <Link href="/" className={styles.brand} aria-label="House Dark home">
           <Wordmark />
         </Link>
+        {/* The entrance carries the calls to action now, so the header
+            only holds identity and a way back. "How it works" moved to
+            the footer with the other reading. */}
         <nav className={styles.nav} aria-label="Primary">
-          <Link href="/how-it-works" className={styles.navLink}>
-            How it works
-          </Link>
           <Button href="/join" variant="secondary">
-            Join or sign in
+            Sign in
           </Button>
         </nav>
       </header>
@@ -28,6 +28,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <p className={styles.footerNote}>One film. A few friends. Nobody knows.</p>
         </div>
         <nav className={styles.footerNav} aria-label="Legal">
+          <Link href="/how-it-works">How it works</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/film-rights">Film rights and service disclaimer</Link>

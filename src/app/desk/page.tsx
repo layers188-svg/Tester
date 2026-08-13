@@ -27,7 +27,7 @@ export default async function DeskHomePage() {
   return (
     <div>
       <h1>Programming Desk</h1>
-      <p className={styles.lead}>Logan operates House Dark from here — no code required.</p>
+      <p className={styles.lead}>Logan operates House Dark from here. No code required.</p>
 
       <div className={styles.grid}>
         <div className={styles.card}>

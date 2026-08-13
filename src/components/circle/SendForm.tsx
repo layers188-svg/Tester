@@ -113,7 +113,7 @@ export function SendForm({
         value={filmTitle}
         onChange={(e) => setFilmTitle(e.target.value)}
         required
-        placeholder="What you're sending — kept sealed from recipients"
+        placeholder="What you're sending. Kept sealed from recipients"
       />
 
       <div className={styles.row}>
@@ -154,7 +154,7 @@ export function SendForm({
         rows={3}
         value={personalNote}
         onChange={(e) => setPersonalNote(e.target.value)}
-        placeholder="Why you're sending it — no spoilers"
+        placeholder="Why you're sending it. No spoilers"
       />
 
       <span className={styles.label}>Safe cues (up to three)</span>
@@ -178,7 +178,7 @@ export function SendForm({
       <span className={styles.label}>Recipients</span>
       {recipients.length === 0 ? (
         <p className={styles.hint}>
-          Join or start a Circle first — recipients are chosen from people you share a Circle with.
+          Join or start a Circle first. Recipients are chosen from people you share a Circle with.
         </p>
       ) : (
         <ul className={styles.recipientList}>

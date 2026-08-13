@@ -48,7 +48,7 @@ export function NewOpeningForm() {
   return (
     <form className={styles.form} onSubmit={submit}>
       <label className={styles.label} htmlFor="filmTitle">
-        Film title (internal — never shown before reveal)
+        Film title (internal, never shown before reveal)
       </label>
       <input
         id="filmTitle"

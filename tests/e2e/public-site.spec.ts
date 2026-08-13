@@ -26,7 +26,7 @@ test.describe("public site — mobile viewport", () => {
 
   test("primary navigation reaches Join and back to Home", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: "Join or sign in" }).first().click();
+    await page.getByRole("link", { name: "Sign in" }).first().click();
     await expect(page).toHaveURL(/\/join/);
     await page.goBack();
     await expect(page).toHaveURL("/");

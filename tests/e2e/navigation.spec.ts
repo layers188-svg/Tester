@@ -14,15 +14,26 @@ test.describe("four-tab navigation, both directions", () => {
   }) => {
     await page.goto("/tonight");
 
-    for (const tab of ["Circle", "Library", "You"]) {
-      await page.getByRole("link", { name: tab }).click();
-      await expect(page).toHaveURL(new RegExp(`/${tab.toLowerCase()}$`));
+    // Label and route are not the same thing: the last tab reads "Me"
+    // but still lives at /you, because renaming the route would break
+    // bookmarks and the redirects that send signed-out visitors there.
+    // Deriving the path from the label assumed they matched.
+    const tabs = [
+      { label: "Library", path: /\/library$/ },
+      { label: "Circle", path: /\/circle$/ },
+      { label: "Me", path: /\/you$/ },
+    ];
+
+    for (const tab of tabs) {
+      await page.getByRole("link", { name: tab.label, exact: true }).click();
+      await expect(page).toHaveURL(tab.path);
     }
 
-    await page.goBack();
-    await expect(page).toHaveURL(/\/library$/);
+    // Back through the same history, in reverse.
     await page.goBack();
     await expect(page).toHaveURL(/\/circle$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/library$/);
     await page.goBack();
     await expect(page).toHaveURL(/\/tonight$/);
   });
@@ -34,7 +45,7 @@ test.describe("four-tab navigation, both directions", () => {
     // strict-mode violation that said nothing about touch targets. The
     // test is about the tab bar, so it should only ever look there.
     const nav = page.getByRole("navigation", { name: "Primary" });
-    for (const tab of ["Tonight", "Circle", "Library", "You"]) {
+    for (const tab of ["Tonight", "Library", "Circle", "Me"]) {
       const box = await nav.getByRole("link", { name: tab, exact: true }).boundingBox();
       expect(box?.height).toBeGreaterThanOrEqual(44);
     }

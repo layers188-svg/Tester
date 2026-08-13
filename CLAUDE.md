@@ -85,8 +85,19 @@ journeys).
 
 ## Signed-in navigation
 
-Exactly four tabs: **Tonight, Circle, Library, You.** Don't add a fifth
+Exactly four tabs: **Tonight, Library, Circle, Me.** Don't add a fifth
 unless a feature genuinely cannot live inside these.
+
+The last tab is labelled "Me" but still routes to `/you`. The label was
+changed by direction on 13 August; the route was not, because renaming
+it would break bookmarks and the signed-out redirects that point there.
+Tests must map label to route explicitly rather than lowercasing the
+label.
+
+## Interface copy
+
+No em dashes in anything a member reads. Recast the sentence rather
+than substituting a hyphen. Comments and docs are unaffected.
 
 ## Brand
 

@@ -281,8 +281,8 @@ export function YouForm({
       <section className={styles.section}>
         <h2>The house</h2>
         <p className={styles.sectionNote}>
-          <Link href="/why">Why House Dark exists</Link> &mdash; what it is for, and what it
-          deliberately is not.
+          <Link href="/why">Why House Dark exists</Link>. What it is for, and what it deliberately
+          is not.
         </p>
       </section>
 

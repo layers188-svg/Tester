@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "You" };
+export const metadata: Metadata = { title: "Me" };
 
 export default async function YouPage() {
   const supabase = await getServerSupabase();
@@ -26,7 +26,7 @@ export default async function YouPage() {
 
   return (
     <div className={styles.page}>
-      <h1>You</h1>
+      <h1>Me</h1>
       <YouForm
         email={user.email ?? ""}
         profile={{
