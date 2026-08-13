@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
+import { getClientEnv } from "@/lib/env";
 import { Button } from "@/components/Button";
 import styles from "./JoinForm.module.css";
 
@@ -20,7 +21,12 @@ export function JoinForm() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [skippedSend, setSkippedSend] = useState(false);
   const nextPath = useRef("/tonight");
+
+  // See NEXT_PUBLIC_TEST_CODE_ENTRY in src/lib/env.ts. Absent in any
+  // normal deployment, which makes every branch guarded by it dead code.
+  const allowCodeWithoutSend = getClientEnv().NEXT_PUBLIC_TEST_CODE_ENTRY === "1";
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -43,6 +49,7 @@ export function JoinForm() {
         options: { shouldCreateUser: true },
       });
       if (sendError) throw sendError;
+      setSkippedSend(false);
       setStep("code");
       setCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (err) {
@@ -132,6 +139,21 @@ export function JoinForm() {
           {busy ? "Sending…" : "Send my code"}
         </Button>
 
+        {allowCodeWithoutSend && (
+          <button
+            type="button"
+            className={styles.linkButton}
+            disabled={busy || !email}
+            onClick={() => {
+              setError(null);
+              setSkippedSend(true);
+              setStep("code");
+            }}
+          >
+            Testing: enter a code I already have
+          </button>
+        )}
+
         <p className={styles.fineprint}>
           We&rsquo;ll email a six digit code. It expires in 5 minutes. By continuing you agree to
           the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy</Link> pages.
@@ -143,7 +165,15 @@ export function JoinForm() {
   return (
     <form className={styles.form} onSubmit={verifyCode}>
       <p className={styles.sentTo}>
-        Code sent to <strong>{email}</strong>.{" "}
+        {skippedSend ? (
+          <>
+            Enter the code issued for <strong>{email}</strong>.
+          </>
+        ) : (
+          <>
+            Code sent to <strong>{email}</strong>.
+          </>
+        )}{" "}
         <button type="button" className={styles.linkButton} onClick={() => setStep("email")}>
           Use a different email
         </button>

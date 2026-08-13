@@ -35,12 +35,37 @@ const serverSchema = z.object({
   RESEND_FROM_EMAIL: senderEmail,
   ADMIN_EMAILS: z.string().min(1),
   CRON_SECRET: z.string().min(16),
+
+  /**
+   * Testing escape hatch for `/join`. Off unless it is exactly "1".
+   *
+   * Supabase refuses to edit the Magic Link template on a free-tier
+   * project using the built-in email provider, so the sign-in email
+   * still carries a link rather than `{{ .Token }}` — and the built-in
+   * provider rate-limits to a couple of messages an hour, returning
+   * `429 over_email_send_rate_limit`. `signInWithOtp` throws on that,
+   * which strands the form on the email step: the code screen cannot
+   * be reached at all, with or without a code in hand.
+   *
+   * With this set, `/join` offers a second action that goes straight to
+   * the code screen without sending. It does not weaken verification —
+   * the code is still a real Supabase OTP checked by `verifyOtp`, and
+   * skipping the send does not bring a token into existence. It only
+   * drops the requirement that *this browser* triggered the send.
+   *
+   * Remove it once Resend is wired up as custom SMTP.
+   *
+   * A literal rather than a boolean-ish string on purpose: "true" or
+   * "yes" should fail loudly at boot, not quietly leave the hatch shut.
+   */
+  NEXT_PUBLIC_TEST_CODE_ENTRY: z.literal("1").optional(),
 });
 
 const clientSchema = serverSchema.pick({
   NEXT_PUBLIC_APP_URL: true,
   NEXT_PUBLIC_SUPABASE_URL: true,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: true,
+  NEXT_PUBLIC_TEST_CODE_ENTRY: true,
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -79,6 +104,7 @@ export function getClientEnv(): ClientEnv {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_TEST_CODE_ENTRY: process.env.NEXT_PUBLIC_TEST_CODE_ENTRY,
   });
   if (!parsed.success) {
     const missing = parsed.error.issues.map((issue) => issue.path.join(".")).join(", ");

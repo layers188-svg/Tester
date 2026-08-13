@@ -82,3 +82,25 @@ describe("getServerEnv", () => {
     expect(() => getServerEnv()).toThrow(/CRON_SECRET/);
   });
 });
+
+describe("NEXT_PUBLIC_TEST_CODE_ENTRY", () => {
+  it("is shut unless it is set", async () => {
+    const { getServerEnv } = await loadEnvWith({});
+    expect(getServerEnv().NEXT_PUBLIC_TEST_CODE_ENTRY).toBeUndefined();
+  });
+
+  it('opens for exactly "1"', async () => {
+    const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_CODE_ENTRY: "1" });
+    expect(getServerEnv().NEXT_PUBLIC_TEST_CODE_ENTRY).toBe("1");
+  });
+
+  it("refuses to boot on a boolean-ish value", async () => {
+    // The failure this prevents: someone sets "true", gets no hatch, and
+    // hunts the bug in the form instead of in the environment. A test
+    // affordance that fails silently is worse than not having one.
+    for (const value of ["true", "yes", "0", "TRUE", "on"]) {
+      const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_CODE_ENTRY: value });
+      expect(() => getServerEnv()).toThrow(/NEXT_PUBLIC_TEST_CODE_ENTRY/);
+    }
+  });
+});
