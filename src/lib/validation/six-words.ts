@@ -62,3 +62,36 @@ export function withinEditWindow(createdAt: Date | string, now: Date = new Date(
   const created = typeof createdAt === "string" ? new Date(createdAt) : createdAt;
   return now.getTime() - created.getTime() <= SIX_WORD_EDIT_WINDOW_MS;
 }
+
+/**
+ * The private note that travels with a sealed recommendation.
+ *
+ * Six words or *fewer*, unlike a public review, which is exactly six.
+ * The difference is deliberate: a review is a form with a fixed shape,
+ * and this is one person telling another "trust me on this one". Three
+ * words is a complete thought there.
+ *
+ * Empty is allowed. Sending a film with nothing attached is its own
+ * kind of recommendation, and forcing words would produce filler.
+ */
+export function validateRecommendationNote(rawBody: string): SixWordValidation {
+  const normalized = rawBody.trim().replace(/\s+/g, " ");
+  const wordCount = countWords(normalized);
+
+  if (normalized.length === 0) {
+    return { valid: true, wordCount: 0, normalized: "" };
+  }
+  if (normalized.length > SIX_WORD_MAX_LENGTH) {
+    return { valid: false, wordCount, normalized, error: "That is too long." };
+  }
+  if (wordCount > SIX_WORD_REQUIRED_COUNT) {
+    const over = wordCount - SIX_WORD_REQUIRED_COUNT;
+    return {
+      valid: false,
+      wordCount,
+      normalized,
+      error: `${over} word${over === 1 ? "" : "s"} too many. Six or fewer.`,
+    };
+  }
+  return { valid: true, wordCount, normalized };
+}

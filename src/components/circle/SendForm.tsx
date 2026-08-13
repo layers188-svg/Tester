@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { validateCues } from "@/lib/validation/cues";
+import { validateRecommendationNote } from "@/lib/validation/six-words";
 import styles from "./SendForm.module.css";
 
 interface Recipient {
@@ -20,14 +21,17 @@ interface CircleOption {
 export function SendForm({
   recipients,
   circles,
+  prefill,
 }: {
   recipients: Recipient[];
   circles: CircleOption[];
+  /** Starting values when arriving from a Library row. */
+  prefill?: { title: string; releaseYear: string; runtimeMinutes: string };
 }) {
   const router = useRouter();
-  const [filmTitle, setFilmTitle] = useState("");
-  const [releaseYear, setReleaseYear] = useState("");
-  const [runtimeMinutes, setRuntimeMinutes] = useState("100");
+  const [filmTitle, setFilmTitle] = useState(prefill?.title ?? "");
+  const [releaseYear, setReleaseYear] = useState(prefill?.releaseYear ?? "");
+  const [runtimeMinutes, setRuntimeMinutes] = useState(prefill?.runtimeMinutes || "100");
   const [personalNote, setPersonalNote] = useState("");
   const [cues, setCues] = useState(["", "", ""]);
   const [selected, setSelected] = useState<string[]>([]);
@@ -36,6 +40,8 @@ export function SendForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+
+  const noteValidation = validateRecommendationNote(personalNote);
 
   // Brief §16 rule 3. One key per composed send, held in a ref so a
   // re-render does not change it: if the first attempt reached the
@@ -74,7 +80,7 @@ export function SendForm({
           releaseYear: releaseYear ? Number(releaseYear) : null,
           runtimeMinutes: Number(runtimeMinutes),
           recipientIds: selected,
-          personalNote: personalNote || null,
+          personalNote: noteValidation.normalized || null,
           cues: cueValidation.cues,
           scheduledFor: scheduledFor ? new Date(scheduledFor).toISOString() : null,
           circleId: circleId || null,
@@ -145,17 +151,35 @@ export function SendForm({
         </div>
       </div>
 
+      {/*
+        Six words or fewer, not exactly six. A public review is a form
+        with a fixed shape; this is one person telling another to trust
+        them, where three words is a complete thought. Empty is allowed
+        too — forcing words produces filler. The server checks the same
+        rule with the same function.
+      */}
       <label className={styles.label} htmlFor="personalNote">
-        Your note
+        Give them just enough
       </label>
       <textarea
         id="personalNote"
         className={styles.textarea}
-        rows={3}
+        rows={2}
         value={personalNote}
         onChange={(e) => setPersonalNote(e.target.value)}
-        placeholder="Why you're sending it. No spoilers"
+        placeholder="Trust me on this one"
+        aria-invalid={noteValidation.valid ? undefined : true}
+        aria-describedby="note-hint"
       />
+      <p
+        className={noteValidation.valid ? styles.hint : styles.noteError}
+        id="note-hint"
+        role={noteValidation.valid ? undefined : "alert"}
+      >
+        {noteValidation.valid
+          ? `Six words or fewer. ${noteValidation.wordCount} so far.`
+          : noteValidation.error}
+      </p>
 
       <span className={styles.label}>Safe cues (up to three)</span>
       <div className={styles.row}>
@@ -249,7 +273,7 @@ export function SendForm({
         type="submit"
         variant="primary"
         fullWidth
-        disabled={busy}
+        disabled={busy || !noteValidation.valid}
         aria-describedby={error ? "send-error" : undefined}
       >
         {busy ? "Sending…" : "Send under seal"}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { validateCues } from "@/lib/validation/cues";
+import { validateRecommendationNote } from "@/lib/validation/six-words";
 import { enqueueNotification } from "@/lib/email/queue";
 import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
@@ -10,7 +11,9 @@ const schema = z.object({
   releaseYear: z.number().int().min(1888).max(2100).nullable().optional(),
   runtimeMinutes: z.number().int().min(1).max(1000),
   recipientIds: z.array(z.string().uuid()).min(1),
-  personalNote: z.string().trim().max(500).nullable().optional(),
+  // Length is checked here only as a cheap upper bound; the word
+  // count is enforced below with the same function the form uses.
+  personalNote: z.string().trim().max(200).nullable().optional(),
   cues: z.array(z.string().trim().max(24)).max(3).optional(),
   scheduledFor: z.string().datetime().nullable().optional(),
   circleId: z.string().uuid().nullable().optional(),
@@ -41,6 +44,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Check the form and try again." }, { status: 400 });
   }
 
+  // Acceptance criterion 8: a private recommendation carries no more
+  // than six words. Enforced server-side regardless of the form.
+  const noteValidation = validateRecommendationNote(parsed.data.personalNote ?? "");
+  if (!noteValidation.valid) {
+    return NextResponse.json({ error: noteValidation.error }, { status: 422 });
+  }
+
   const cueValidation = validateCues(parsed.data.cues ?? []);
   if (!cueValidation.valid) {
     return NextResponse.json({ error: cueValidation.error }, { status: 400 });
@@ -51,7 +61,7 @@ export async function POST(request: Request) {
     p_release_year: parsed.data.releaseYear ?? null,
     p_runtime_minutes: parsed.data.runtimeMinutes,
     p_recipient_ids: parsed.data.recipientIds,
-    p_personal_note: parsed.data.personalNote ?? null,
+    p_personal_note: noteValidation.normalized || null,
     p_cues: cueValidation.cues,
     p_scheduled_for: parsed.data.scheduledFor ?? null,
     p_circle_id: parsed.data.circleId ?? null,

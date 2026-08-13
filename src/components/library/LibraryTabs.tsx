@@ -77,6 +77,16 @@ export function LibraryTabs({
                 {item.six_words && (
                   <p className={styles.sixWords}>&ldquo;{item.six_words}&rdquo;</p>
                 )}
+                {item.revealed && item.title && (
+                  <Link
+                    href={`/circle/send?title=${encodeURIComponent(item.title)}${
+                      item.release_year ? `&year=${item.release_year}` : ""
+                    }`}
+                    className={styles.link}
+                  >
+                    Send under seal
+                  </Link>
+                )}
                 {!item.revealed && item.kind === "opening" && (
                   <Link href="/tonight" className={styles.link}>
                     Open tonight&rsquo;s house
@@ -122,6 +132,16 @@ export function LibraryTabs({
                     })}
                   </span>
                 </div>
+                {opening.revealed && opening.title && (
+                  <Link
+                    href={`/circle/send?title=${encodeURIComponent(opening.title)}${
+                      opening.release_year ? `&year=${opening.release_year}` : ""
+                    }&runtime=${opening.runtime_minutes}`}
+                    className={styles.link}
+                  >
+                    Send under seal
+                  </Link>
+                )}
                 {!opening.revealed && <p className={styles.hint}>You never revealed this one.</p>}
               </div>
             </li>
