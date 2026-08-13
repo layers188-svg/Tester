@@ -15,9 +15,9 @@ body {
   margin: 0;
   background: var(--hd-bg);
   color: var(--hd-ink);
-  font-family: var(--hd-font-utility);
+  font-family: var(--hd-font-body);
   font-size: var(--hd-size-body);
-  line-height: 1.5;
+  line-height: 1.55;
   min-height: 100dvh;
 }
 

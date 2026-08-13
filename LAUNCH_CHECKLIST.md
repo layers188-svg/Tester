@@ -377,13 +377,21 @@ Recorded so it is not re-derived every session, and because it changed:
 
 ## 9. TESTING BYPASS IS LIVE — remove before the first real member
 
-`NEXT_PUBLIC_TEST_SIGNIN=1` is set on the deployed worker. While it is:
+`TEST_SIGNIN_KEY` is set on the deployed worker. While it is:
 
-- `/join` signs you in from an email address alone. No code, no
+- `/join?k=<key>` signs you in from an email address alone. No code, no
   verification, no proof the address is yours.
-- **Anyone who knows the URL can sign in as any address**, including
+- **Anyone who has that link can sign in as any address**, including
   `layers188@gmail.com` — which is in `ADMIN_EMAILS` and therefore
   carries the Programming Desk and protected title data.
+
+The 13 August review flagged the earlier version as a launch-safety
+failure, and it was right: the bypass was on for every visitor and
+`/join` printed "anyone can sign in as anyone" in public. It is now
+gated on a key that never enters the client bundle, so a visitor
+without the link sees an ordinary join page with nothing to suggest a
+bypass exists. That closes the public exposure. It does not close the
+bypass — the link still works for whoever holds it.
 
 It exists because no sign-in code can currently be delivered at all:
 Supabase's built-in email rate-limits to a couple of messages an hour
@@ -397,13 +405,17 @@ ordinary one.
 **Remove it** by deleting the variable, rebuilding and redeploying:
 
 ```bash
-npx wrangler secret delete NEXT_PUBLIC_TEST_SIGNIN
+npx wrangler secret delete TEST_SIGNIN_KEY
 # drop the line from .env.local, then
 npm run cf:build && npm run cf:deploy
 ```
 
-Verified: with the variable unset, `/api/test-signin` returns 404 and
-`/join` renders the ordinary code flow with no trace of the bypass.
+Verified against a production build: with no key in the URL, `/join`
+renders the ordinary code flow with no banner and no bypass control,
+and the key appears nowhere in `.next/static`. `/api/test-signin`
+returns 404 with no key and 404 with a wrong one — never 401, which
+would confirm to a prober that a bypass exists and only the key is
+missing.
 
 **Do this the same day item 2 (Resend custom SMTP) is done** — that is
 what makes real sign-in possible, and it is the only thing keeping this

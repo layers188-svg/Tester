@@ -74,6 +74,8 @@
 .checkbox input {
   width: 18px;
   height: 18px;
+  /* Otherwise the browser paints its own blue. See YouForm.module.css. */
+  accent-color: var(--hd-accent);
 }
 
 .circleTag {

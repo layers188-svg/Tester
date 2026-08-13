@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
-import { getClientEnv } from "@/lib/env";
 import { Button } from "@/components/Button";
 import styles from "./JoinForm.module.css";
 
@@ -12,7 +11,7 @@ type Step = "email" | "code";
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
-export function JoinForm() {
+export function JoinForm({ testKey }: { testKey: string | null }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
@@ -24,9 +23,15 @@ export function JoinForm() {
   const [skippedSend, setSkippedSend] = useState(false);
   const nextPath = useRef("/tonight");
 
-  // See NEXT_PUBLIC_TEST_SIGNIN in src/lib/env.ts. Absent in any normal
-  // deployment, which makes every branch guarded by it dead code.
-  const testSignIn = getClientEnv().NEXT_PUBLIC_TEST_SIGNIN === "1";
+  /**
+   * Whether to offer the bypass. `testKey` is whatever the visitor put
+   * in `?k=`, handed down from the server component so both renders
+   * agree — see the note in page.tsx. It is never checked here and
+   * never enters the bundle as a constant; /api/test-signin compares it
+   * against TEST_SIGNIN_KEY. A visitor with no link gets an ordinary
+   * join page with nothing to suggest a bypass exists.
+   */
+  const testSignIn = testKey !== null;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -60,7 +65,7 @@ export function JoinForm() {
   }
 
   /**
-   * TESTING ONLY — see NEXT_PUBLIC_TEST_SIGNIN. Skips the code entirely:
+   * TESTING ONLY — see TEST_SIGNIN_KEY. Skips the code entirely:
    * the server mints and redeems an OTP on this browser's behalf, so the
    * session that lands is an ordinary one. Only how it was obtained
    * differs.
@@ -72,7 +77,7 @@ export function JoinForm() {
       const response = await fetch("/api/test-signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, key: testKey }),
       });
       if (!response.ok) throw new Error("Could not sign in. Try again.");
 
@@ -197,9 +202,12 @@ export function JoinForm() {
 
         <p className={styles.fineprint}>
           {testSignIn ? (
+            // Only ever rendered for someone who arrived with the key,
+            // so it warns the person who can act on it rather than
+            // advertising the bypass to every visitor.
             <>
-              <strong>Testing mode.</strong> No code is sent and no address is verified. Anyone with
-              this link can sign in as anyone — switch it off before the first real member.
+              <strong>Testing link.</strong> This signs in without verifying the address. Remove
+              TEST_SIGNIN_KEY once sign-in codes can be delivered.
             </>
           ) : (
             <>

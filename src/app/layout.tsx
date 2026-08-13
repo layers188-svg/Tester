@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { newsreader, barlowCondensed } from "./fonts";
+import { newsreader, barlow, barlowCondensed } from "./fonts";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
@@ -46,7 +46,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${newsreader.variable} ${barlowCondensed.variable}`}>
+    <html
+      lang="en"
+      className={`${newsreader.variable} ${barlow.variable} ${barlowCondensed.variable}`}
+    >
       <body>
         <a href="#hd-main" className="hd-skip-link">
           Skip to content

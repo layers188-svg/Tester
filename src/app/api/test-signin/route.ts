@@ -32,16 +32,24 @@ export async function POST(request: Request) {
   const env = getServerEnv();
 
   // 404 rather than 403: a disabled bypass should not confirm it exists.
-  if (env.NEXT_PUBLIC_TEST_SIGNIN !== "1") {
+  if (!env.TEST_SIGNIN_KEY) {
     return new NextResponse("Not found", { status: 404 });
   }
 
   let email: string;
+  let key: string;
   try {
     const body = await request.json();
     email = typeof body?.email === "string" ? body.email.trim() : "";
+    key = typeof body?.key === "string" ? body.key : "";
   } catch {
     return NextResponse.json({ error: "Expected a JSON body." }, { status: 400 });
+  }
+
+  // Also 404 on a wrong key. A 401 here would confirm to anyone poking
+  // at the route that a bypass exists and only the key is missing.
+  if (key !== env.TEST_SIGNIN_KEY) {
+    return new NextResponse("Not found", { status: 404 });
   }
 
   if (!email || !email.includes("@")) {

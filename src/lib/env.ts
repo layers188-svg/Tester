@@ -37,40 +37,38 @@ const serverSchema = z.object({
   CRON_SECRET: z.string().min(16),
 
   /**
-   * TESTING ONLY — turns `/join` into email-and-you-are-in, with no
-   * code and no verification. Off unless it is exactly "1".
+   * TESTING ONLY — the key that unlocks the sign-in bypass. Absent in a
+   * normal deployment, and the bypass does not exist without it.
    *
-   * This is an authentication bypass, switched on deliberately because
-   * no sign-in code can currently be delivered at all: Supabase's free
-   * tier rate-limits its built-in email to a couple of messages an hour
-   * (`429 over_email_send_rate_limit`) and refuses to edit the Magic
-   * Link template while that provider is in use, so the email carries a
-   * link rather than the six-digit `{{ .Token }}` the form asks for.
-   * `signInWithOtp` throws on the 429, stranding the form on the email
-   * step — the code screen could not be reached even with a valid code
-   * in hand.
+   * It exists because no sign-in code can currently be delivered at
+   * all: Supabase's free tier rate-limits its built-in email to a
+   * couple of messages an hour (`429 over_email_send_rate_limit`) and
+   * refuses to edit the Magic Link template while that provider is in
+   * use, so the email carries a link rather than the six-digit
+   * `{{ .Token }}` the form asks for. `signInWithOtp` throws on the
+   * 429, stranding the form on its first step — the code screen could
+   * not be reached even with a valid code in hand.
    *
-   * While it is on, anyone who knows the URL can sign in as any
-   * address, including one in ADMIN_EMAILS — which carries the
-   * Programming Desk, and therefore protected title data. That is
-   * tolerable only while the project holds no real members and no
-   * programmed film. It stops being tolerable the moment either exists.
+   * Deliberately NOT `NEXT_PUBLIC_`. The key never enters the client
+   * bundle; `/join` decides whether to offer the bypass from a `?k=`
+   * query parameter, and `/api/test-signin` is what actually checks the
+   * value. So a visitor with no link sees an ordinary join page with no
+   * bypass, no banner, and nothing advertising that either exists —
+   * which is what the 13 August review calls for under launch safety.
    *
-   * Unset it and both `/api/test-signin` and the `/join` branch
-   * disappear. Do that as part of configuring custom SMTP —
-   * LAUNCH_CHECKLIST item 2.
-   *
-   * A literal rather than a boolean-ish string on purpose: "true" or
-   * "yes" should fail loudly at boot, not quietly leave it shut.
+   * It is still an authentication bypass for whoever holds the link:
+   * they can sign in as any address, including one in ADMIN_EMAILS,
+   * which carries the Programming Desk and protected title data.
+   * Tolerable only while the project holds no real members. Remove it
+   * when custom SMTP lands — LAUNCH_CHECKLIST item 2.
    */
-  NEXT_PUBLIC_TEST_SIGNIN: z.literal("1").optional(),
+  TEST_SIGNIN_KEY: z.string().min(16).optional(),
 });
 
 const clientSchema = serverSchema.pick({
   NEXT_PUBLIC_APP_URL: true,
   NEXT_PUBLIC_SUPABASE_URL: true,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: true,
-  NEXT_PUBLIC_TEST_SIGNIN: true,
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -109,7 +107,6 @@ export function getClientEnv(): ClientEnv {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_TEST_SIGNIN: process.env.NEXT_PUBLIC_TEST_SIGNIN,
   });
   if (!parsed.success) {
     const missing = parsed.error.issues.map((issue) => issue.path.join(".")).join(", ");

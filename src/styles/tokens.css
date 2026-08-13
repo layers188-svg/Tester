@@ -53,6 +53,14 @@
   /* Type */
   --hd-font-editorial:
     var(--font-newsreader), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  /*
+   * Three roles, not two. Body copy used to borrow --hd-font-utility,
+   * so every paragraph in the product was set in a condensed face —
+   * cramped to read, and it flattened the editorial quality the
+   * headlines were doing all the work to establish. Condensed is for
+   * navigation, labels, buttons, timings and opening numbers only.
+   */
+  --hd-font-body: var(--font-barlow), "Helvetica Neue", Helvetica, Arial, sans-serif;
   --hd-font-utility: var(--font-barlow-condensed), "Arial Narrow", Arial, sans-serif;
 
   --hd-size-display: clamp(2.25rem, 7vw, 3.75rem);

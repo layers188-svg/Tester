@@ -1,4 +1,4 @@
-import { Newsreader, Barlow_Condensed } from "next/font/google";
+import { Newsreader, Barlow, Barlow_Condensed } from "next/font/google";
 
 /**
  * Self-hosted via next/font — the font files are downloaded at build
@@ -22,4 +22,20 @@ export const barlowCondensed = Barlow_Condensed({
   variable: "--font-barlow-condensed",
   display: "swap",
   fallback: ["Arial Narrow", "Arial", "sans-serif"],
+});
+
+/**
+ * Body copy.
+ *
+ * Everything used to be set in Barlow Condensed, including paragraphs —
+ * `body { font-family: var(--hd-font-utility) }`. The 13 August review
+ * called it cramped and it was right: a condensed face is for labels,
+ * numbers and buttons, not for reading. Condensed keeps those jobs.
+ */
+export const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-barlow",
+  display: "swap",
+  fallback: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
 });

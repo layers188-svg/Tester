@@ -83,24 +83,31 @@ describe("getServerEnv", () => {
   });
 });
 
-describe("NEXT_PUBLIC_TEST_SIGNIN", () => {
-  it("is shut unless it is set", async () => {
+describe("TEST_SIGNIN_KEY", () => {
+  it("is absent unless it is set, which is what disables the bypass", async () => {
     const { getServerEnv } = await loadEnvWith({});
-    expect(getServerEnv().NEXT_PUBLIC_TEST_SIGNIN).toBeUndefined();
+    expect(getServerEnv().TEST_SIGNIN_KEY).toBeUndefined();
   });
 
-  it('opens for exactly "1"', async () => {
-    const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_SIGNIN: "1" });
-    expect(getServerEnv().NEXT_PUBLIC_TEST_SIGNIN).toBe("1");
+  it("accepts a key of a usable length", async () => {
+    const { getServerEnv } = await loadEnvWith({ TEST_SIGNIN_KEY: "FfGDYe65Ran3uWCFkEveWdLX" });
+    expect(getServerEnv().TEST_SIGNIN_KEY).toBe("FfGDYe65Ran3uWCFkEveWdLX");
   });
 
-  it("refuses to boot on a boolean-ish value", async () => {
-    // The failure this prevents: someone sets "true", gets no hatch, and
-    // hunts the bug in the form instead of in the environment. A test
-    // affordance that fails silently is worse than not having one.
-    for (const value of ["true", "yes", "0", "TRUE", "on"]) {
-      const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_SIGNIN: value });
-      expect(() => getServerEnv()).toThrow(/NEXT_PUBLIC_TEST_SIGNIN/);
+  it("refuses to boot on a guessable key", async () => {
+    // This gates an authentication bypass reachable from a URL. A short
+    // key is worse than no key, because it reads as protection while
+    // being brute-forceable — so it fails at boot rather than serving.
+    for (const value of ["1", "test", "letmein", "short-key"]) {
+      const { getServerEnv } = await loadEnvWith({ TEST_SIGNIN_KEY: value });
+      expect(() => getServerEnv()).toThrow(/TEST_SIGNIN_KEY/);
     }
+  });
+
+  it("is not exposed to the client", async () => {
+    // The whole design depends on this: the key decides whether a
+    // bypass exists, so it must never reach the browser bundle.
+    const { getClientEnv } = await loadEnvWith({ TEST_SIGNIN_KEY: "FfGDYe65Ran3uWCFkEveWdLX" });
+    expect(Object.keys(getClientEnv())).not.toContain("TEST_SIGNIN_KEY");
   });
 });
