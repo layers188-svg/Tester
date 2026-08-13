@@ -15,15 +15,15 @@ test.describe("Tonight: dim, play, reveal, provider handoff", () => {
 
   test("sealed opening dims, plays the No Trailer, and reveals on demand", async ({ page }) => {
     await page.goto("/tonight");
-    await expect(page.getByText(/tonight is sealed/i)).toBeVisible();
+    await expect(page.getByText(/tonight’s film is sealed/i)).toBeVisible();
 
     const html = await page.content();
     expect(html).not.toMatch(/whiplash/i);
 
-    await page.getByRole("button", { name: /dim the house/i }).click();
+    await page.getByRole("button", { name: /see tonight’s clue/i }).click();
     await expect(page.locator("video")).toBeVisible();
 
-    await page.getByRole("button", { name: /reveal the title/i }).click();
+    await page.getByRole("button", { name: /choose tonight’s film/i }).click();
     await expect(page.getByRole("heading", { name: /whiplash/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /example streaming service/i })).toBeVisible();
   });

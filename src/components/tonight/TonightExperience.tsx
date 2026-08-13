@@ -117,8 +117,11 @@ export function TonightExperience({
   if (phase === "sealed") {
     return (
       <div className={styles.sealedCard}>
-        <p className={styles.eyebrow}>Opening {opening.openingNumber}</p>
-        <h1>Tonight is sealed.</h1>
+        <p className={styles.eyebrow}>Tonight at House Dark</p>
+        <h1>Tonight&rsquo;s film is sealed.</h1>
+        <p className={styles.sealedLead}>
+          Ten seconds. A person, a world, a pressure. Nothing more.
+        </p>
         <dl className={styles.factList}>
           <div>
             <dt>Running time</dt>
@@ -167,7 +170,7 @@ export function TonightExperience({
             setPhase("dimming");
           }}
         >
-          Dim the house
+          See tonight&rsquo;s clue
         </Button>
       </div>
     );
@@ -185,6 +188,7 @@ export function TonightExperience({
           captionsSrc={
             opening.noTrailerCaptionsPath ? publicStorageUrl(opening.noTrailerCaptionsPath) : null
           }
+          fallbackCues={opening.cues}
           onComplete={() => {
             // Brief §15 event 4 — the No Trailer ran to the end, which
             // only the player can know.
@@ -192,8 +196,11 @@ export function TonightExperience({
             setPhase("revealing");
           }}
         />
+        {/* "The rest belongs to the film" is the beat after the clue,
+            so it lives in the post-playback state below rather than
+            competing with the film while it runs. */}
         <Button variant="secondary" fullWidth onClick={() => void doReveal(opening.id)}>
-          Reveal the title
+          Choose tonight&rsquo;s film
         </Button>
       </div>
     );

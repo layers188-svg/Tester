@@ -167,3 +167,11 @@
   margin-bottom: var(--hd-space-4);
   flex-wrap: wrap;
 }
+
+/* The line under the sealed headline. Sets expectation for the clue:
+   ten seconds, mood only. */
+.sealedLead {
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-6);
+  max-width: 32ch;
+}
