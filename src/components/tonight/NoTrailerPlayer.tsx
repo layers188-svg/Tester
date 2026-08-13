@@ -19,6 +19,11 @@ interface NoTrailerPlayerProps {
    * nothing new and cannot leak a title.
    */
   fallbackCues?: string[];
+  /**
+   * Whether the clue owns the viewport (FOCUS) rather than sitting in a
+   * column. Changes how the stage is sized, nothing else.
+   */
+  fill?: boolean;
   onComplete: () => void;
 }
 
@@ -42,6 +47,7 @@ export function NoTrailerPlayer({
   posterSrc,
   captionsSrc,
   fallbackCues = [],
+  fill = false,
   onComplete,
 }: NoTrailerPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -136,7 +142,7 @@ export function NoTrailerPlayer({
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} data-fill={fill}>
       <div className={styles.stage}>
         {/*
          * The monogram's own linework, separated into the frame around
@@ -235,7 +241,7 @@ export function NoTrailerPlayer({
         )}
       </div>
 
-      <div className={styles.controls}>
+      <div className={styles.controls} data-quiet={status === "playing"}>
         <button
           type="button"
           className={styles.control}

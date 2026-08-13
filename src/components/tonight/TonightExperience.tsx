@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import type { OpeningSafe, MemberOpeningProgress } from "@/lib/opening/queries";
 import type { RevealPayload } from "@/lib/reveal/payload";
 import { Button } from "@/components/Button";
+import { useHouseLights } from "@/components/HouseLights";
 import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
+import { MOTION, motionDuration } from "@/lib/motion";
 import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SixWordsPanel } from "./SixWordsPanel";
@@ -36,12 +38,39 @@ export function TonightExperience({
   const [hasPublished, setHasPublished] = useState(Boolean(progress?.hasSixWords));
   const [copyLabel, setCopyLabel] = useState("Copy title");
 
+  /**
+   * DIM reaches past this component. The masthead and the four tabs
+   * belong to the signed-in layout, so the clue borrows the house
+   * lights rather than painting a black sheet over them.
+   */
+  const { setDimmed } = useHouseLights();
+
+  /**
+   * DIM, then HOLD, then FOCUS.
+   *
+   * The pause is the point. The room takes --hd-motion-dim to go dark,
+   * and then nothing happens for a beat before the clue opens. Cutting
+   * straight from the sealed card to the film is the version that feels
+   * like a web page; this one feels like a light going down.
+   */
   useEffect(() => {
-    if (phase === "dimming") {
-      const timer = setTimeout(() => setPhase("trailer"), 360);
-      return () => clearTimeout(timer);
-    }
+    if (phase !== "dimming") return;
+    const timer = setTimeout(() => setPhase("trailer"), motionDuration(MOTION.dim + MOTION.hold));
+    return () => clearTimeout(timer);
   }, [phase]);
+
+  /**
+   * The house is dark from the moment the member asks for the clue
+   * until the title has arrived. Bringing the chrome back up is half of
+   * what makes REVEAL read as the page transforming rather than as a
+   * new screen.
+   */
+  useEffect(() => {
+    setDimmed(phase === "dimming" || phase === "trailer" || phase === "revealing");
+  }, [phase, setDimmed]);
+
+  // Leaving mid-clue must not leave the shell dark for the next screen.
+  useEffect(() => () => setDimmed(false), [setDimmed]);
 
   // Brief §15 event 2, once per mounted opening. The ref keeps React's
   // development double-invoke — and any later re-render — from counting
@@ -121,15 +150,25 @@ export function TonightExperience({
     );
   }
 
-  if (phase === "sealed") {
+  /*
+   * The sealed card stays mounted through DIM rather than being
+   * swapped for a black overlay. It is the thing going dark, so it has
+   * to be there to do it — and the member watches the room they were
+   * just reading fall away, which is the whole gesture.
+   */
+  if (phase === "sealed" || phase === "dimming") {
     return (
-      <div className={styles.sealedCard}>
-        <p className={styles.eyebrow}>Tonight at House Dark</p>
-        <h1>Tonight&rsquo;s film is sealed.</h1>
-        <p className={styles.sealedLead}>
+      <div className={styles.sealedCard} data-leaving={phase === "dimming"}>
+        <p className={`${styles.eyebrow} hd-stage`} style={stageIndex(0)}>
+          Tonight at House Dark
+        </p>
+        <h1 className="hd-stage" style={stageIndex(1)}>
+          Tonight&rsquo;s film is sealed.
+        </h1>
+        <p className={`${styles.sealedLead} hd-stage`} style={stageIndex(2)}>
           Ten seconds. A person, a world, a pressure. Nothing more.
         </p>
-        <dl className={styles.factList}>
+        <dl className={`${styles.factList} hd-stage`} style={stageIndex(3)}>
           <div>
             <dt>Running time</dt>
             <dd>{opening.runtimeMinutes} minutes</dd>
@@ -145,7 +184,7 @@ export function TonightExperience({
         </dl>
 
         {opening.cues.length > 0 && (
-          <ul className={styles.cues}>
+          <ul className={`${styles.cues} hd-stage`} style={stageIndex(4)}>
             {opening.cues.map((cue) => (
               <li key={cue}>{cue}</li>
             ))}
@@ -153,7 +192,7 @@ export function TonightExperience({
         )}
 
         {opening.contentNotes && (
-          <div className={styles.disclosure}>
+          <div className={`${styles.disclosure} hd-stage`} style={stageIndex(5)}>
             <button
               type="button"
               className={styles.disclosureButton}
@@ -168,25 +207,30 @@ export function TonightExperience({
 
         {revealError && <p className={styles.error}>{revealError}</p>}
 
-        <Button
-          variant="primary"
-          fullWidth
-          onClick={() => {
-            // Brief §15 event 3, recorded on the gesture itself.
-            reportAnalyticsEvent("dimming_started", opening.openingNumber);
-            setPhase("dimming");
-          }}
-        >
-          See tonight&rsquo;s clue
-        </Button>
+        <div className="hd-stage" style={stageIndex(6)}>
+          <Button
+            variant="primary"
+            fullWidth
+            disabled={phase === "dimming"}
+            onClick={() => {
+              // Brief §15 event 3, recorded on the gesture itself.
+              reportAnalyticsEvent("dimming_started", opening.openingNumber);
+              setPhase("dimming");
+            }}
+          >
+            {phase === "dimming" ? "Dimming the house…" : "See tonight’s clue"}
+          </Button>
+        </div>
       </div>
     );
   }
 
-  if (phase === "dimming") {
-    return <div className={styles.dimming} aria-live="polite" aria-label="Dimming the house" />;
-  }
-
+  /*
+   * FOCUS. The clue is not a video embedded in a page — it takes the
+   * viewport, and the page it came from is gone. The stage is fixed and
+   * full-bleed so there is nothing else on screen to look at, which is
+   * the difference between watching a clue and watching a widget.
+   */
   if (phase === "trailer") {
     return (
       <div className={styles.trailerStage}>
@@ -196,6 +240,7 @@ export function TonightExperience({
             opening.noTrailerCaptionsPath ? publicStorageUrl(opening.noTrailerCaptionsPath) : null
           }
           fallbackCues={opening.cues}
+          fill
           onComplete={() => {
             // Brief §15 event 4 — the No Trailer ran to the end, which
             // only the player can know.
@@ -205,30 +250,53 @@ export function TonightExperience({
         />
         {/* "The rest belongs to the film" is the beat after the clue,
             so it lives in the post-playback state below rather than
-            competing with the film while it runs. */}
-        <Button variant="secondary" fullWidth onClick={() => void doReveal(opening.id)}>
+            competing with the film while it runs.
+
+            Set as a quiet line rather than a filled button: while the
+            clue is running this is the way out, not the way on, and a
+            primary control under a playing film is exactly the chrome
+            FOCUS is trying to get rid of. */}
+        <button type="button" className={styles.skip} onClick={() => void doReveal(opening.id)}>
           Choose tonight&rsquo;s film
-        </Button>
+        </button>
       </div>
     );
   }
 
+  /*
+   * The beat before the answer. The room is still dark and the frame
+   * that held the clue is still on screen, empty — so the title lands
+   * in the space the film was in rather than on a fresh screen.
+   */
   if (phase === "revealing") {
     return (
-      <div className={styles.centeredCard}>
-        <p className={styles.eyebrow}>Opening {opening.openingNumber}</p>
-        <p>Opening the house…</p>
+      <div className={styles.openingStage} aria-live="polite">
+        <span className={styles.openingRule} aria-hidden="true" />
+        <p className={styles.openingWord}>Opening the house</p>
+        <span className={styles.openingRule} aria-hidden="true" />
       </div>
     );
   }
 
-  // phase === "revealed"
+  /*
+   * REVEAL. The page transforms into the answer.
+   *
+   * Three things move together and none of them is a page transition:
+   * the house lights come back up under the shell (the effect above),
+   * a brass rule draws itself across the width, and the title wipes in
+   * behind it. The wipe is a clip-path on the same text node the card
+   * has always rendered, so nothing about what the browser was told
+   * changes — the title still arrives only from /api/reveal.
+   */
   return (
     <div className={styles.revealedCard}>
-      <p className={styles.eyebrow}>Opening {opening.openingNumber}</p>
+      <p className={`${styles.eyebrow} hd-stage`} style={stageIndex(0)}>
+        Opening {opening.openingNumber}
+      </p>
       {reveal ? (
         <>
-          <h1>
+          <span className={styles.revealRule} aria-hidden="true" />
+          <h1 className={styles.revealTitle}>
             {reveal.title}
             {reveal.releaseYear ? (
               <span className={styles.year}> ({reveal.releaseYear})</span>
@@ -236,7 +304,7 @@ export function TonightExperience({
           </h1>
 
           {reveal.providers.length > 0 ? (
-            <ul className={styles.providers}>
+            <ul className={`${styles.providers} hd-stage`} style={stageIndex(4)}>
               {reveal.providers.map((p) => (
                 <li key={`${p.provider_name}-${p.territory}`}>
                   <a href={p.deep_link} target="_blank" rel="noreferrer">
@@ -250,10 +318,12 @@ export function TonightExperience({
               ))}
             </ul>
           ) : (
-            <p className={styles.hint}>No verified playback destination is on record yet.</p>
+            <p className={`${styles.hint} hd-stage`} style={stageIndex(4)}>
+              No verified playback destination is on record yet.
+            </p>
           )}
 
-          <div className={styles.actionsRow}>
+          <div className={`${styles.actionsRow} hd-stage`} style={stageIndex(5)}>
             <Button variant="secondary" onClick={copyTitle}>
               {copyLabel}
             </Button>
@@ -262,7 +332,7 @@ export function TonightExperience({
             </Button>
           </div>
 
-          <div className={styles.watchActions}>
+          <div className={`${styles.watchActions} hd-stage`} style={stageIndex(6)}>
             <Button
               variant={watchState === "saved" ? "primary" : "secondary"}
               onClick={() => setWatch("saved")}
@@ -306,6 +376,16 @@ export function TonightExperience({
       )}
     </div>
   );
+}
+
+/**
+ * Position in a staged entry, as the inline custom property `.hd-stage`
+ * reads. A plain object literal would be typed as `string`, which
+ * `CSSProperties` rejects for an unknown key, so the cast is confined
+ * to this one helper rather than repeated at every call site.
+ */
+function stageIndex(index: number): React.CSSProperties {
+  return { "--hd-stage-index": index } as React.CSSProperties;
 }
 
 /** `path` is the object name within the public "no-trailer" Storage bucket — never a descriptive filename (brief §12). */

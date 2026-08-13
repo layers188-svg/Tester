@@ -104,13 +104,71 @@
   --hd-motion-dim: 360ms;
   --hd-motion-reveal: 560ms;
   --hd-ease-standard: cubic-bezier(0.3, 0, 0.2, 1);
+
+  /*
+   * The House Dark motion vocabulary.
+   *
+   * Six verbs, and every moving thing in the product is one of them.
+   * The point is not to have more animation — it is that the same
+   * gesture means the same thing on every screen, so a member learns
+   * the house rather than learning six separate interfaces.
+   *
+   *   DIM     the room around the clue falls away
+   *   FOCUS   the clue frame becomes the dominant object
+   *   PLAY    ten seconds run with no player chrome
+   *   HOLD    a deliberate pause at a moment that deserves one
+   *   REVEAL  the page transforms into the answer
+   *   SEAL/UNSEAL  a thing moves between concealed and revealed
+   *
+   * The four timings above are the brief §8 originals and still drive
+   * buttons, panels and the dim. These are the longer beats the verbs
+   * need. Slow on purpose: the shortest of them is a third of a second
+   * and the reveal takes most of a second, because the product's whole
+   * argument is that the moment before you know is worth having.
+   *
+   * --hd-hold is not a transition. It is dead time between two things
+   * happening, spent by a timeout in the component, and it is the one
+   * that most needs to survive review: an interface that answers
+   * instantly everywhere has no significant moments in it.
+   */
+  --hd-motion-focus: 620ms;
+  --hd-motion-unseal: 720ms;
+  --hd-motion-transform: 900ms;
+  --hd-hold: 420ms;
+  --hd-hold-long: 900ms;
+
+  /*
+   * Two curves, deliberately not one. Standard is for things the member
+   * asked for and expects to land. Entering is for things arriving on
+   * their own — no overshoot anywhere, since the brief forbids bounce.
+   */
+  --hd-ease-entering: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* How far a staged element travels. Small: this is weight settling,
+     not a card flying in. */
+  --hd-stage-rise: 0.75rem;
+  /* Gap between one staged element and the next. */
+  --hd-stage-step: 90ms;
 }
 
+/*
+ * Reduced motion removes the movement, never the meaning. Durations
+ * collapse to zero so every state still arrives at its end value, and
+ * the holds collapse too — a member who has asked for less motion is
+ * not asking to be kept waiting by a pause they cannot see.
+ */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --hd-motion-button: 0ms;
     --hd-motion-panel: 0ms;
     --hd-motion-dim: 0ms;
     --hd-motion-reveal: 0ms;
+    --hd-motion-focus: 0ms;
+    --hd-motion-unseal: 0ms;
+    --hd-motion-transform: 0ms;
+    --hd-hold: 0ms;
+    --hd-hold-long: 0ms;
+    --hd-stage-rise: 0px;
+    --hd-stage-step: 0ms;
   }
 }

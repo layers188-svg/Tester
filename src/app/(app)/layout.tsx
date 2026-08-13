@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AppNav } from "@/components/AppNav";
+import { HouseLights, Dimmable } from "@/components/HouseLights";
 import { Wordmark } from "@/components/Wordmark";
 import styles from "./layout.module.css";
 
@@ -35,23 +36,29 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .maybeSingle();
 
   return (
-    <div className={styles.shell}>
-      {/*
-        The signed-in shell had no masthead at all, so once a member was
-        past /join the identity disappeared entirely. Kept deliberately
-        quiet: the wordmark, a hairline, and nothing else. The four tabs
-        are the navigation (brief §5), so this header carries no links
-        of its own beyond returning to Tonight.
-      */}
-      <header className={styles.header}>
-        <Link href="/tonight" className={styles.brand} aria-label="House Dark">
-          <Wordmark />
-        </Link>
-      </header>
-      <main id="hd-main" className={styles.main}>
-        {children}
-      </main>
-      <AppNav isOwner={profile?.role === "owner"} />
-    </div>
+    // HouseLights wraps the shell so that DIM, triggered inside
+    // Tonight, can take the masthead and the four tabs down with it.
+    // Everything below is still server rendered — the provider takes
+    // these as children rather than rendering them itself.
+    <HouseLights>
+      <div className={styles.shell}>
+        {/*
+          The signed-in shell had no masthead at all, so once a member was
+          past /join the identity disappeared entirely. Kept deliberately
+          quiet: the wordmark, a hairline, and nothing else. The four tabs
+          are the navigation (brief §5), so this header carries no links
+          of its own beyond returning to Tonight.
+        */}
+        <Dimmable as="header" className={styles.header}>
+          <Link href="/tonight" className={styles.brand} aria-label="House Dark">
+            <Wordmark />
+          </Link>
+        </Dimmable>
+        <main id="hd-main" className={styles.main}>
+          {children}
+        </main>
+        <AppNav isOwner={profile?.role === "owner"} />
+      </div>
+    </HouseLights>
   );
 }

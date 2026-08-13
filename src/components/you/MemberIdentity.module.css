@@ -1,0 +1,139 @@
+/*
+ * Who the member is in the house, above the switches that change it.
+ *
+ * /you opened on the word "Me" and then went straight into a settings
+ * form, so the one screen that is supposed to be about a person read as
+ * a preferences panel. This is the identity: a name set like a name, a
+ * standing, and what they have actually done here.
+ */
+/*
+ * No bottom rule here. The "Settings" divider below draws its own, and
+ * two rules with a band of space between them read as a gap in the
+ * page rather than as a change of subject.
+ */
+.identity {
+  margin-bottom: var(--hd-space-7);
+}
+
+.standing {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.standing::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hd-rule);
+}
+
+/*
+ * The member's name, set at display size in Newsreader. This is the
+ * only place in the product where a member's own name is the largest
+ * thing on the screen, and it should be.
+ */
+.name {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  line-height: 1.1;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-2);
+  text-wrap: balance;
+}
+
+.place {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-6);
+}
+
+/*
+ * A record, not a scoreboard.
+ *
+ * Set as a ruled list of counts with the number in editorial type and
+ * the label beneath in condensed caps, which reads as a record of
+ * attendance. Deliberately no streaks, no badges, no progress toward
+ * anything: the brief's product is not a game, and a member who missed
+ * four nights has not failed at anything.
+ */
+.record {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--hd-space-5) var(--hd-space-4);
+  margin: 0;
+}
+
+@media (min-width: 30rem) {
+  .record {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/*
+ * column-reverse, so the number reads above its label while the markup
+ * keeps dt before dd. Inverting the DOM instead would be invalid HTML
+ * and would read out backwards.
+ */
+.record > div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: var(--hd-space-2);
+  border-top: 1px solid var(--hd-rule);
+  padding-top: var(--hd-space-3);
+}
+
+.count {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--hd-ink);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.countLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+}
+
+/* Nothing done yet is a fact, not an empty state to apologise for. */
+.first {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-5) 0 0;
+  max-width: 42ch;
+}
+
+.settingsHead {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+}
+
+.settingsHead::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hd-rule);
+}

@@ -1,0 +1,47 @@
+/*
+ * The seal, and the act of breaking it.
+ *
+ * Everything moves on --hd-motion-unseal so the two arcs and the rule
+ * are one gesture rather than three animations that happen to overlap.
+ * transform-box keeps each path's origin on its own geometry, without
+ * which the arcs would rotate about the corner of the SVG and fly off.
+ */
+.seal {
+  color: var(--hd-accent);
+  overflow: visible;
+}
+
+.seal path {
+  stroke-width: 1.25;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform var(--hd-motion-unseal) var(--hd-ease-entering),
+    opacity var(--hd-motion-unseal) var(--hd-ease-entering);
+}
+
+/* Closed: the rule is the seal line, barely there. */
+.rule {
+  opacity: 0.25;
+  transform: scaleX(0.86);
+}
+
+/*
+ * Broken. The arcs part along the seal line and the rule draws out
+ * through the gap they leave. Small distances on purpose: a seal gives
+ * a little when it breaks, it does not burst.
+ */
+.seal[data-broken="true"] .arcTop {
+  transform: translateY(-3px) rotate(-4deg);
+  opacity: 0.55;
+}
+
+.seal[data-broken="true"] .arcBottom {
+  transform: translateY(3px) rotate(4deg);
+  opacity: 0.55;
+}
+
+.seal[data-broken="true"] .rule {
+  opacity: 1;
+  transform: scaleX(1.12);
+}

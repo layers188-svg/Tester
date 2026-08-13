@@ -13,6 +13,18 @@
   gap: var(--hd-space-2);
 }
 
+/*
+ * The rule between sections, not above the first one. The page now
+ * opens with the member's identity and a "Settings" divider that
+ * carries its own rule, so a second rule here drew two lines with a
+ * band of dead space between them.
+ */
+.wrap > .section:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .label {
   font-family: var(--hd-font-utility);
   font-size: var(--hd-size-small);

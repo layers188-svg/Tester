@@ -106,6 +106,54 @@ fixed in `src/styles/tokens.css` — see the brief §8. Brass is a minor
 registration colour, not a luxury effect. No glassmorphism, neon,
 gradients, generic component styling, or stock/generated people.
 
+## Imagery (copyright, non-negotiable)
+
+Never introduce film posters, screenshots, stills, promotional or actor
+photography, or studio artwork. House Dark makes its own visual
+interpretation of every film: original abstract imagery, bespoke No
+Trailer frames, light, texture, typography, spoiler-safe objects,
+material studies, original graphic composition.
+
+Before the title is known, House Dark owns the visual. After the
+reveal a film may influence the visual language, but only through
+original House Dark assets. A Library entry gets a flat palette spine
+(`EntryField`), never a thumbnail; a sealed one gets an empty frame,
+because the colour is derived from the row id and giving a sealed row
+one would mean the page knew something it may not know.
+
+## Motion vocabulary
+
+Six verbs, defined in `src/styles/tokens.css` and mirrored in
+`src/lib/motion.ts`. Everything that moves is one of them; if a new
+animation is none of them, it is decoration and does not belong.
+
+- **DIM** — the room around the clue goes dark. The shell obeys it via
+  `HouseLights` + `.hd-dimmable`, and dimmed chrome is also `inert`.
+- **FOCUS** — the clue frame expands to become the dominant object.
+- **PLAY** — ten seconds, no conventional player chrome. The sound and
+  reduced-motion controls stay: they are accessibility, not transport.
+- **HOLD** — a deliberate pause at a moment that earns one.
+- **REVEAL** — the page transforms into the answer; a brass rule draws
+  and the title wipes in behind it. Never a navigation to a results
+  screen.
+- **SEAL / UNSEAL** — `SealMark` moves between closed and broken. The
+  same object in both states, never two graphics swapped.
+
+Slow, confident, restrained. No fade-up-on-scroll, parallax, floating
+cards, bouncing UI, or WebGL spectacle.
+
+Two rules that are easy to get wrong:
+
+1. Timings live in **both** `tokens.css` and `motion.ts` because a
+   sequence is half CSS transition and half `setTimeout`.
+   `tests/unit/motion.test.ts` fails if they drift.
+2. Staged entry uses `animation-fill-mode: backwards`, never `both`.
+   With `both` the resting state before the animation starts is the
+   `from` keyframe, so anything that stops the animation running leaves
+   the content permanently invisible. Any `setTimeout` in a sequence
+   goes through `motionDuration()` so reduced motion drops the pause as
+   well as the movement.
+
 ## Commands
 
 ```

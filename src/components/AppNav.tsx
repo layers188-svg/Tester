@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useHouseLights } from "./HouseLights";
 import styles from "./AppNav.module.css";
 
 const DESTINATIONS = [
@@ -18,9 +19,17 @@ const DESTINATIONS = [
  */
 export function AppNav({ isOwner }: { isOwner: boolean }) {
   const pathname = usePathname();
+  // The tabs go dark with the room. `inert` matters as much as the
+  // opacity: an invisible tab bar that is still tabbable is not dark.
+  const { dimmed } = useHouseLights();
 
   return (
-    <nav className={styles.nav} aria-label="Primary">
+    <nav
+      className={`${styles.nav} hd-dimmable`}
+      aria-label="Primary"
+      data-dimmed={dimmed}
+      inert={dimmed}
+    >
       {DESTINATIONS.map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
         return (

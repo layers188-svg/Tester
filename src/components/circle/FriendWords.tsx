@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CircleSixWords } from "@/lib/supabase/types";
+import { SealMark } from "./SealMark";
 import styles from "./FriendWords.module.css";
 
 /**
@@ -28,9 +29,20 @@ export function FriendWords({ words }: { words: CircleSixWords[] }) {
 
   return (
     <ul className={styles.list}>
-      {words.map((word) => (
-        <li key={word.review_id} className={styles.row} data-unlocked={word.unlocked}>
+      {words.map((word, index) => (
+        <li
+          key={word.review_id}
+          className={`${styles.row} hd-stage`}
+          data-unlocked={word.unlocked}
+          // Capped: past the sixth row the stagger is only delay, and a
+          // long Circle would leave the last rows arriving seconds late.
+          style={{ "--hd-stage-index": Math.min(index, 6) } as React.CSSProperties}
+        >
           <p className={styles.film}>
+            {/* The same seal as a sealed recommendation, in the same two
+                states. Six words a member cannot read yet are held back
+                by the same object that holds back a film. */}
+            <SealMark broken={word.unlocked} className={styles.seal} />
             {word.title ?? `Opening ${word.opening_number}`}
             {!word.title && <span className={styles.sealedTag}>Sealed</span>}
           </p>

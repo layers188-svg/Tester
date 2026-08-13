@@ -4,6 +4,72 @@
   margin: 0 auto;
 }
 
+/*
+ * UNSEAL. While the seal is breaking, the sealed copy steps back so the
+ * seal is briefly the only thing with any weight on the screen. It does
+ * not fade out entirely: this card is not leaving, it is opening, and
+ * the member should still recognise it as the same card afterwards.
+ */
+.card[data-state="breaking"] > *:not(.sealHead) {
+  opacity: 0.25;
+  transition: opacity var(--hd-motion-unseal) var(--hd-ease-standard);
+}
+
+.sealHead {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+  margin-bottom: var(--hd-space-4);
+}
+
+.sealHead .eyebrow {
+  margin: 0;
+}
+
+/*
+ * The title is uncovered rather than placed, the same gesture Tonight
+ * uses (TonightExperience.module.css) so a reveal means one thing in
+ * this product wherever it happens.
+ */
+.revealRule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: left;
+  margin-bottom: var(--hd-space-4);
+  /* Matches the keyframe's resting value; with `backwards` fill the
+     element returns to its own styles once the animation ends. */
+  opacity: 0.7;
+  animation: draw-rule var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+}
+
+.revealTitle {
+  animation: reveal-title var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 2);
+}
+
+@keyframes draw-rule {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes reveal-title {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
 .eyebrow {
   font-family: var(--hd-font-utility);
   font-size: var(--hd-size-micro);

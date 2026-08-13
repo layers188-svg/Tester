@@ -99,30 +99,142 @@
   margin-bottom: var(--hd-space-4);
 }
 
-.dimming {
-  position: fixed;
-  inset: 0;
-  background: var(--hd-projection-black);
-  animation: dim var(--hd-motion-dim) var(--hd-ease-standard);
-  z-index: 30;
+/*
+ * DIM, on the card itself. The shell's half of the same gesture is
+ * `.hd-dimmable` in globals.css; both run on --hd-motion-dim so the
+ * masthead, the tabs and the card go out together rather than in
+ * sequence.
+ *
+ * The transition lives on the card and the staged entry animations
+ * live on its children, deliberately: a running animation pins its own
+ * opacity, so a fade-out declared on the same element would lose to it
+ * for as long as it lasted.
+ */
+.sealedCard {
+  transition: opacity var(--hd-motion-dim) var(--hd-ease-standard);
 }
 
-@keyframes dim {
+.sealedCard[data-leaving="true"] {
+  opacity: 0;
+}
+
+/*
+ * FOCUS. The clue takes the viewport.
+ *
+ * It was a 26rem column in the middle of the page with the masthead
+ * above it and the tab bar below — a video in a layout. Fixed and
+ * full-bleed, with the shell dimmed out behind it, there is nothing
+ * else on screen, which is the entire point of dimming the house
+ * first.
+ */
+.trailerStage {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  /* The clue takes everything left over; the way out takes only what
+     it needs. `minmax(0, 1fr)` rather than `1fr` so the film can
+     actually shrink on a short viewport instead of pushing the control
+     off the bottom of the screen. */
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--hd-space-3);
+  padding: var(--hd-space-4);
+  padding-bottom: calc(var(--hd-space-4) + env(safe-area-inset-bottom, 0px));
+  background: var(--hd-projection-black);
+  animation: focus-in var(--hd-motion-focus) var(--hd-ease-entering) backwards;
+}
+
+/*
+ * The way out of the clue. A quiet line, centred, at the bottom of the
+ * dark: present for anyone who wants it and invisible to anyone who
+ * does not. Full touch target despite reading as text (§16).
+ */
+.skip {
+  justify-self: center;
+  background: none;
+  border: none;
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-4);
+  cursor: pointer;
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.skip:hover {
+  color: var(--hd-ink);
+}
+
+/*
+ * The frame opens rather than the video appearing. Scale only, from
+ * near-full: anything more reads as a modal popping, which is the
+ * "floating card" motion the brief rules out.
+ */
+@keyframes focus-in {
   from {
     opacity: 0;
+    transform: scale(0.965);
   }
   to {
     opacity: 1;
+    transform: none;
   }
 }
 
-.trailerStage {
+/*
+ * HOLD, made visible. The room is dark, the clue has gone, and for a
+ * beat there is one line of type between two rules that draw
+ * themselves outward. Nothing here is a spinner: a progress indicator
+ * would make this feel like waiting rather than like a pause.
+ */
+.openingStage {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: var(--hd-space-4);
-  padding: var(--hd-space-4);
-  max-width: 26rem;
-  margin: 0 auto;
+  background: var(--hd-projection-black);
+  padding: var(--hd-space-6);
+}
+
+.openingWord {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: 0;
+  padding-left: 0.28em; /* the tracking's trailing space, recentred */
+}
+
+.openingRule {
+  display: block;
+  width: min(14rem, 60vw);
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: center;
+  /* The keyframe's resting value, declared here too: with `backwards`
+     the element returns to its own styles when the animation ends, so
+     the two have to agree or the rule brightens as it finishes. */
+  opacity: 0.7;
+  animation: draw-rule var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+}
+
+@keyframes draw-rule {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
 }
 
 .year {
@@ -166,6 +278,47 @@
   gap: var(--hd-space-3);
   margin-bottom: var(--hd-space-4);
   flex-wrap: wrap;
+}
+
+/*
+ * REVEAL. The title is not placed on the page, it is uncovered on it.
+ *
+ * A brass rule draws across the measure first, and the title wipes in
+ * from the same edge just behind it, so the rule reads as the thing
+ * doing the uncovering. Both are slow — --hd-motion-transform is
+ * nearly a second — because this is the moment the whole product is
+ * built around and it should be allowed to take its time.
+ *
+ * The wipe is clip-path on the existing text node. It changes nothing
+ * about what reaches the browser: the title still arrives only in the
+ * /api/reveal response, and a member who cannot see the animation sees
+ * the finished title, never a missing one.
+ */
+.revealRule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: left;
+  margin-bottom: var(--hd-space-4);
+  opacity: 0.7; /* see .openingRule */
+  animation: draw-rule var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-stage-step);
+}
+
+.revealTitle {
+  animation: reveal-title var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 2);
+}
+
+@keyframes reveal-title {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
 }
 
 /* The line under the sealed headline. Sets expectation for the clue:

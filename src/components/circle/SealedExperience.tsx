@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import type { RevealPayload } from "@/lib/reveal/payload";
 import { PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
+import { MOTION, motionDuration } from "@/lib/motion";
 import { SixWordsPanel } from "@/components/tonight/SixWordsPanel";
 import type { SealedProgress } from "@/lib/sealed/queries";
+import { SealMark } from "./SealMark";
 import styles from "./SealedExperience.module.css";
 
 export function SealedExperience({
@@ -29,23 +31,81 @@ export function SealedExperience({
   const [watchState, setWatchState] = useState(progress.watchState);
   const [copyLabel, setCopyLabel] = useState("Copy title");
 
-  async function doReveal() {
+  /**
+   * UNSEAL, as a state of its own.
+   *
+   * Without it the seal broke and the title landed in the same frame,
+   * which read as a page swap rather than as something opening. Here
+   * the seal parts first and the card underneath only starts arriving
+   * once it has: `breaking` is set the moment the payload lands, and
+   * `revealed` follows a beat later.
+   *
+   * A member who arrives on an already-revealed recommendation skips
+   * all of it — the seal was broken on some other evening, and
+   * re-enacting it every visit would turn a moment into a mannerism.
+   */
+  const [breaking, setBreaking] = useState(false);
+
+  useEffect(() => {
+    if (!breaking) return;
+    const timer = setTimeout(() => setRevealed(true), motionDuration(MOTION.unseal));
+    return () => clearTimeout(timer);
+  }, [breaking]);
+
+  /**
+   * The one place the title is asked for. Every path here goes through
+   * the server reveal route: the title is not in the page, in the
+   * props, or in any earlier response, so there is nothing to read
+   * back from and no faster way to get it.
+   */
+  const fetchReveal = useCallback(async (): Promise<RevealPayload> => {
+    const res = await fetch(`/api/reveal/recommendation/${recommendation.id}`, { method: "POST" });
+    if (!res.ok) {
+      const payload = await res.json().catch(() => ({}));
+      throw new Error(payload.error ?? "Could not reveal this.");
+    }
+    return (await res.json()) as RevealPayload;
+  }, [recommendation.id]);
+
+  /** Breaking the seal, on the member's gesture. This one animates. */
+  async function breakSeal() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/reveal/recommendation/${recommendation.id}`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error((await res.json()).error ?? "Could not reveal this.");
-      const data = (await res.json()) as RevealPayload;
-      setReveal(data);
-      setRevealed(true);
+      setReveal(await fetchReveal());
+      setBreaking(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setBusy(false);
     }
   }
+
+  /**
+   * A recommendation revealed on an earlier visit arrives with
+   * `revealedAt` set and no payload, because the title is never in the
+   * page. Without this the member met "Opening…" above a Try again
+   * button, with nothing opening and nothing to try again — the state
+   * announced work that no one had started.
+   *
+   * No UNSEAL here. The seal was broken on some other evening, and
+   * re-enacting it on every visit would turn a moment into a mannerism.
+   */
+  useEffect(() => {
+    if (!revealed || reveal || error) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const data = await fetchReveal();
+        if (!cancelled) setReveal(data);
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Something went wrong.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [revealed, reveal, error, fetchReveal]);
 
   async function setWatch(state: "saved" | "opened_service" | "watched") {
     setWatchState(state);
@@ -69,8 +129,11 @@ export function SealedExperience({
 
   if (!revealed) {
     return (
-      <div className={styles.card}>
-        <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
+      <div className={styles.card} data-state={breaking ? "breaking" : "sealed"}>
+        <div className={styles.sealHead}>
+          <SealMark broken={breaking} />
+          <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
+        </div>
         <h1>A film under seal.</h1>
         {recommendation.personalNote && (
           <p className={styles.note}>&ldquo;{recommendation.personalNote}&rdquo;</p>
@@ -89,28 +152,52 @@ export function SealedExperience({
           </ul>
         )}
         {error && <p className={styles.error}>{error}</p>}
-        <Button variant="primary" fullWidth onClick={doReveal} disabled={busy}>
-          {busy ? "Opening…" : "Reveal the title"}
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={() => void breakSeal()}
+          disabled={busy || breaking}
+        >
+          {busy || breaking ? "Breaking the seal…" : "Reveal the title"}
         </Button>
       </div>
     );
   }
 
+  /*
+   * Revealed on a previous visit, so there is no payload in memory and
+   * no seal to break. Fetching it is the only way to see the title
+   * again — it is never in the page — and this is the honest version of
+   * that: a beat, and a way back if the request fails.
+   */
   if (!reveal) {
     return (
       <div className={styles.card}>
-        <p>Opening…</p>
-        <Button variant="secondary" onClick={doReveal}>
-          Try again
-        </Button>
+        <div className={styles.sealHead}>
+          <SealMark broken />
+          <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
+        </div>
+        <p>{error ? "The house could not open this one." : "Opening…"}</p>
+        {error && <p className={styles.error}>{error}</p>}
+        {/* Clearing the error is what retries: the effect above holds
+            off while one is set and fetches again the moment it goes. */}
+        {error && (
+          <Button variant="secondary" onClick={() => setError(null)}>
+            Try again
+          </Button>
+        )}
       </div>
     );
   }
 
   return (
-    <div className={styles.card}>
-      <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
-      <h1>
+    <div className={styles.card} data-state="revealed">
+      <div className={styles.sealHead}>
+        <SealMark broken />
+        <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
+      </div>
+      <span className={styles.revealRule} aria-hidden="true" />
+      <h1 className={styles.revealTitle}>
         {reveal.title}
         {reveal.releaseYear ? <span className={styles.year}> ({reveal.releaseYear})</span> : null}
       </h1>

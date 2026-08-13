@@ -17,6 +17,7 @@
   padding: var(--hd-space-3) var(--hd-space-2);
   cursor: pointer;
   min-height: var(--hd-touch-min);
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
 }
 
 .tab[data-active="true"] {
@@ -41,74 +42,122 @@
 }
 
 /*
- * A collection, not a content row.
+ * The catalogue's line about itself: how many, and how many still
+ * sealed. Set as furniture rather than as a sentence, so it reads as
+ * part of the index rather than as a paragraph about it.
+ */
+.tally {
+  display: flex;
+  align-items: baseline;
+  gap: var(--hd-space-4);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-6) 0 var(--hd-space-3);
+}
+
+.tallySealed {
+  color: var(--hd-accent);
+}
+
+.tallySealed::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  vertical-align: middle;
+  margin-right: var(--hd-space-3);
+  background: var(--hd-rule-strong);
+}
+
+/*
+ * An index, not a grid of cards.
  *
- * The entries were a thin flush-left list with a small colour chip,
- * which read as a table. They are now typographic covers: the colour
- * field is the whole left edge, full card height, and the title is set
- * in Newsreader at a size that carries. On anything wider than a phone
- * they lay out two up, so the column has some air without becoming a
- * poster wall.
+ * The entries were bordered boxes on a surface fill, two up — which is
+ * the shape of a shop, and every product that sells things looks like
+ * it. A collection of films someone has actually watched should look
+ * like the back of a catalogue instead: numbered, ruled, one entry per
+ * line, with nothing drawn around anything.
+ *
+ * Two columns from 48rem so a desktop reads as a spread rather than as
+ * one thin column down the middle. The rules do the work at both
+ * sizes, which is why there are no boxes to reflow.
  */
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: var(--hd-space-4);
+  border-top: 1px solid var(--hd-rule);
 }
 
-@media (min-width: 40rem) {
+@media (min-width: 48rem) {
   .list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--hd-space-5);
+    column-gap: var(--hd-space-7);
   }
 }
 
-/*
- * A fine rule between entries rather than a boxed card — the field
- * block carries the weight, so a border around it as well reads as
- * clutter (guidelines: square edges, fine rules, avoid heavy cards).
- */
-.card {
-  display: flex;
-  align-items: stretch;
+.entry {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: start;
   gap: var(--hd-space-4);
-  padding: var(--hd-space-4);
-  border: 1px solid var(--hd-rule);
-  background: var(--hd-surface);
-  transition: border-color var(--hd-motion-button) var(--hd-ease-standard);
+  padding: var(--hd-space-5) 0;
+  border-bottom: 1px solid var(--hd-rule);
 }
 
-.card:hover {
-  border-color: var(--hd-rule-strong);
+/*
+ * The catalogue number. The single thing that turns a list into an
+ * index. Tabular figures so the column stays straight past nine.
+ */
+.index {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--hd-ink-muted);
+  padding-top: 0.35rem;
+  opacity: 0.7;
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
 }
 
-.cardBody {
-  flex: 1;
+.entry:hover .index {
+  color: var(--hd-accent);
+  opacity: 1;
+}
+
+.entryBody {
   min-width: 0;
 }
 
-/*
- * The badge sits above the title, not beside it. Beside it, on a
- * two-up grid, it took enough width that "Portrait of a Lady on Fire"
- * wrapped to four lines and the card read as broken rather than as a
- * collection.
- */
-.cardHead {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: flex-start;
-  gap: var(--hd-space-2);
-}
-
-/* The title is the object. Everything else on the card is a caption. */
+/* The title is the object. Everything else on the entry is a caption. */
 .title {
+  display: block;
   font-family: var(--hd-font-editorial);
-  font-size: 1.25rem;
+  font-size: 1.3125rem;
   line-height: 1.2;
   color: var(--hd-ink);
   text-wrap: balance;
+}
+
+/* A sealed entry is quieter, and says so through weight rather than
+   through a lock icon it would have to explain. */
+.entry[data-revealed="false"] .title {
+  color: var(--hd-ink-muted);
+  font-style: italic;
+}
+
+.badge {
+  display: block;
+  font-family: var(--hd-font-utility);
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-2);
 }
 
 .meta {
@@ -118,16 +167,6 @@
   font-size: 0.68rem;
   color: var(--hd-ink-muted);
   margin: var(--hd-space-2) 0 0;
-}
-
-.badge {
-  font-family: var(--hd-font-utility);
-  letter-spacing: 0.14em;
-  font-size: var(--hd-size-micro);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--hd-ink-muted);
-  flex-shrink: 0;
 }
 
 .sixWords {
@@ -140,12 +179,28 @@
   padding-left: var(--hd-space-3);
 }
 
+.sealedNote {
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-2) 0 0;
+}
+
 .link {
   display: inline-block;
-  margin-top: var(--hd-space-2);
+  margin-top: var(--hd-space-3);
   color: var(--hd-accent);
   font-family: var(--hd-font-utility);
   font-size: var(--hd-size-small);
+  letter-spacing: 0.06em;
+}
+
+.activityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-3);
 }
 
 .activityRow {

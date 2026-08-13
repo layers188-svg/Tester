@@ -115,3 +115,74 @@ ol {
 .hd-skip-link:focus {
   top: var(--hd-space-3);
 }
+
+/*
+ * ---------------------------------------------------------------------
+ * The motion vocabulary — shared behaviours
+ *
+ * Only the parts that must be identical across screens live here. The
+ * verbs that belong to one screen (FOCUS on the clue stage, REVEAL on
+ * the title) stay in that screen's module, because sharing them would
+ * invite them to be used somewhere they do not mean anything.
+ * ---------------------------------------------------------------------
+ */
+
+/*
+ * Staged entry. A composition arrives in reading order rather than all
+ * at once, which is what makes a screen feel composed instead of
+ * loaded. Set --hd-stage-index on each child to order it.
+ *
+ * This is deliberately NOT scroll-triggered. The brief rules out
+ * fade-up-on-scroll, and it is right to: content that animates every
+ * time it re-enters the viewport is decoration. This plays once, when
+ * the screen arrives, and then the page is still.
+ */
+@keyframes hd-stage-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--hd-stage-rise), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * `backwards`, never `both`.
+ *
+ * `both` holds the final keyframe after the animation ends, which
+ * sounds harmless and is not: it also means the element's resting
+ * state, before the animation has started or if it never starts at
+ * all, is the `from` keyframe — opacity 0. Anything that stops the
+ * animation running leaves the content permanently invisible while
+ * still present in the DOM, which is the worst possible failure for a
+ * decorative effect.
+ *
+ * `backwards` applies `from` during the delay only. After that the
+ * element falls back to its own styles, so the finished state is
+ * "normal", not "whatever the keyframe said".
+ */
+.hd-stage {
+  animation: hd-stage-in var(--hd-motion-reveal) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-index, 0) * var(--hd-stage-step));
+}
+
+/*
+ * DIM. The house around the clue goes dark.
+ *
+ * The old dim painted a black sheet over everything at z-index 30,
+ * which covered the shell rather than dimming it — the masthead and the
+ * four tabs were still there underneath, still focusable, waiting to
+ * come back. This takes the chrome itself down, and `inert` (set by the
+ * component, not by CSS) takes it out of the tab order and the
+ * accessibility tree while it is gone. Darkness a screen reader still
+ * reads out is not darkness.
+ */
+.hd-dimmable {
+  transition: opacity var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+.hd-dimmable[data-dimmed="true"] {
+  opacity: 0;
+}

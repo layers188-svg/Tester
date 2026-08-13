@@ -8,13 +8,44 @@
   width: 100%;
   aspect-ratio: 9 / 16;
   max-height: 76dvh;
+  margin: 0 auto;
   background: var(--hd-projection-black);
   overflow: hidden;
 }
 
 /*
+ * The filled variant, used when the clue owns the viewport (FOCUS).
+ *
+ * A 9:16 box inside a full-screen stage cannot also be full height —
+ * on a 390x844 phone the ratio wants 693px of a viewport that has
+ * around 760 usable, and every phone answers differently. So in this
+ * variant the stage simply takes the space it is given and the film
+ * covers it, which is how a projected image behaves anyway.
+ */
+.wrap[data-fill="true"] {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wrap[data-fill="true"] .stage {
+  flex: 1;
+  aspect-ratio: auto;
+  max-height: none;
+  min-height: 0;
+}
+
+/*
  * Sound and motion are member decisions, not preferences buried in an
  * OS panel — brief §7 rule 10 and §16 rule 7.
+ *
+ * PLAY asks for no conventional player chrome, and these are the only
+ * two controls that survive that: they are not transport controls, they
+ * are accessibility. While the ten seconds are running they drop back
+ * so the film is the only lit thing, and they return the moment it
+ * ends. Opacity only, never display — a control that disappears from
+ * the tab order mid-playback would be worse than a visible one.
  */
 .controls {
   display: flex;
@@ -22,6 +53,16 @@
   justify-content: center;
   gap: var(--hd-space-4);
   padding: var(--hd-space-3) var(--hd-space-2) 0;
+  transition: opacity var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+.controls[data-quiet="true"] {
+  opacity: 0.35;
+}
+
+.controls[data-quiet="true"]:hover,
+.controls[data-quiet="true"]:focus-within {
+  opacity: 1;
 }
 
 .control {
@@ -138,6 +179,28 @@
   pointer-events: none;
   color: var(--hd-accent);
   opacity: 0.5;
+  /*
+   * FOCUS, on the frame itself: the monogram's two stems open from the
+   * centre line outward as the clue takes the screen, so the frame
+   * reads as a house light widening rather than a border that was
+   * always there. transform-box keeps the origin on the SVG's own box
+   * rather than the nearest positioned ancestor.
+   */
+  transform-box: view-box;
+  transform-origin: center;
+  animation: open-frame var(--hd-motion-focus) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-stage-step);
+}
+
+@keyframes open-frame {
+  from {
+    transform: scaleY(0.12);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 0.5;
+  }
 }
 
 /* The fallback clue, shown only when the film itself cannot play. */

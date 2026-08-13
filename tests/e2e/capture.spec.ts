@@ -27,6 +27,10 @@ test.describe("capture", () => {
   });
 
   async function shot(page: import("@playwright/test").Page, name: string) {
+    // Let the staged entry finish. Every screen now arrives in reading
+    // order over about a second, and a shot taken the instant the DOM
+    // is ready photographs the first line and six invisible ones.
+    await page.waitForTimeout(1400);
     await page.screenshot({
       path: path.join(CAPTURE_DIR, `${name}.jpg`),
       type: "jpeg",
@@ -53,12 +57,14 @@ test.describe("capture", () => {
 
     test("the member's four tabs, sealed", async ({ page }) => {
       await page.goto("/tonight");
-      await expect(page.getByText(/tonight is sealed/i)).toBeVisible();
+      await expect(page.getByText(/tonight’s film is sealed/i)).toBeVisible();
       await shot(page, "04-tonight-sealed");
 
       // Mid-ritual: the No Trailer playing, before any title exists.
-      await page.getByRole("button", { name: /dim the house/i }).click();
-      await page.waitForTimeout(1200);
+      // Long enough to be past DIM, the hold and FOCUS, so the shot is
+      // the clue on screen rather than the room going dark.
+      await page.getByRole("button", { name: /see tonight’s clue/i }).click();
+      await page.waitForTimeout(2000);
       await shot(page, "05-no-trailer");
 
       for (const [name, url] of [

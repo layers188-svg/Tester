@@ -40,6 +40,13 @@
   letter-spacing: 0.2em;
 }
 
+/* Small enough to be a mark on a line of type rather than an icon. */
+.seal {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .words {
   font-family: var(--hd-font-editorial);
   font-size: 1.25rem;
