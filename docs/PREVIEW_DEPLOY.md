@@ -8,6 +8,16 @@ This is not a demo mode or a mock. It is the same Workers bundle, the
 same Supabase project, the same code that goes live later. The only
 difference is the address.
 
+> **Already done — this is now a record, not a plan.**
+> The app is deployed at **https://house-dark.layers188.workers.dev**,
+> with all eight secrets set, and `house-dark-cron` running the `*/5`
+> schedule against it. Steps 1–3 and 6 below are complete. Step 4
+> (the Supabase `{{ .Token }}` email template) still gates sign-in,
+> and step 5 (Resend) still gates every email the product itself
+> sends — `RESEND_API_KEY` is deployed as the placeholder `not-yet`.
+> Keep the rest as the reference for redeploying or moving to a real
+> domain.
+
 ---
 
 ## What replaces the domain

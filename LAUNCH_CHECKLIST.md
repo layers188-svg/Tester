@@ -54,11 +54,32 @@ SMTP".
 
 ---
 
-## 3. Cloudflare account
+## 3. Cloudflare account — done, and deployed
 
-The build already produces a working Workers bundle (`npm run cf:build`
-succeeds). It has not been deployed because there is no account to
-deploy to.
+Logan created the account and supplied a scoped API token. Both workers
+are live on the free `workers.dev` hostname, no domain purchased:
+
+|             |                                                                    |
+| ----------- | ------------------------------------------------------------------ |
+| App         | `https://house-dark.layers188.workers.dev`                         |
+| Cron worker | `house-dark-cron`, schedule `*/5 * * * *`                          |
+| Account     | `8821d10d5ea2e65f91305374fe0d6e20`                                 |
+| Secrets set | all eight on the app, `APP_URL` + `CRON_SECRET` on the cron worker |
+
+Two things that follow from this:
+
+- **The deploy token is in the session transcript. Delete it**
+  (My Profile → API Tokens → `house-dark-deploy`) once there is a
+  reason to deploy again, and make the next one with a TTL.
+- **The build environment cannot reach `*.workers.dev`** — egress policy
+  refuses the CONNECT with a 403. So the platform state below was
+  verified through the Cloudflare API, and whether a page actually
+  renders can only be confirmed from a browser outside this
+  environment. Not a deployment fault, but it does mean I cannot run
+  the Playwright suite against the live URL the way I ran it against
+  the local build.
+
+For reference, the original instructions:
 
 **Do:** create/provide access to the Cloudflare account, then:
 
