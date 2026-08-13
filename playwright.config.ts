@@ -7,6 +7,17 @@ import { defineConfig, devices } from "@playwright/test";
  * configured — see LAUNCH_CHECKLIST.md. The public-site and PWA checks
  * always run.
  */
+/**
+ * An externally hosted app to test against, or undefined to start one.
+ *
+ * Normalised through `||` rather than read twice: with `??`, an exported
+ * but empty `PLAYWRIGHT_BASE_URL` set `baseURL` to `""` while the
+ * webServer block still started a server, and setup died on
+ * `new URL("")` — "TypeError: Invalid URL" pointing at a cookie domain,
+ * which says nothing about the actual cause. Empty now means unset.
+ */
+const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL || undefined;
+
 export default defineConfig({
   testDir: "./tests/e2e",
   // Mints a real session per persona when a live project is configured,
@@ -21,7 +32,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: [["list"]],
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100",
+    baseURL: externalBaseURL ?? "http://localhost:3100",
     trace: "on-first-retry",
   },
   projects: [
@@ -47,7 +58,7 @@ export default defineConfig({
   // out, which read exactly like an application bug and was not one.
   // The production build compiles it without complaint, and is closer
   // to what a member actually gets.
-  webServer: process.env.PLAYWRIGHT_BASE_URL
+  webServer: externalBaseURL
     ? undefined
     : {
         command: "npm run build && npx next start -p 3100",

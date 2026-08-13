@@ -44,7 +44,7 @@ describe("operational email templates never carry a title", () => {
       heading: "The house is open",
       body: "A new opening is ready for you tonight.",
       actionLabel: "Enter tonight",
-      actionHref: "https://housedark.app/tonight",
+      actionHref: "http://localhost:3000/tonight",
     });
     expect(findTitleLeaks(email, FORBIDDEN)).toHaveLength(0);
   });

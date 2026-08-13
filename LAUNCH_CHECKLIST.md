@@ -68,14 +68,39 @@ npm run cf:build && npm run cf:deploy
 cd workers/cron && npx wrangler deploy    # after setting its two secrets
 ```
 
+The account is free and needs no domain and no card — see
+`docs/PREVIEW_DEPLOY.md`, which walks the whole deploy on a free
+`workers.dev` address. One caveat recorded there rather than discovered
+later: the Workers **free** plan allows 10 ms of CPU per request, which
+server-rendering a dynamic route may exceed. If it does, the symptom is
+"Worker exceeded CPU time limit" and the fix is the $5/month Workers
+Paid plan. Free is the right place to start; it is just not guaranteed
+to be the place you stay.
+
 ---
 
-## 4. Domain
+## 4. Domain — deferrable, and worth deferring
 
-The likely first unavoidable cost. Needed for the Resend sending domain
-(item 2) and for `NEXT_PUBLIC_APP_URL`.
+Not needed to run the product. Cloudflare gives every account a free
+HTTPS hostname (`house-dark.<your-subdomain>.workers.dev`), and the app
+has no hardcoded origin: the manifest is fully relative, `metadataBase`
+and every email link derive from `NEXT_PUBLIC_APP_URL`, and sign-in is a
+six-digit code with no redirect URL to allowlist. So the whole signed-in
+product runs on a free address, phone install included.
 
-**Do:** purchase it and connect it to the Cloudflare Worker.
+`docs/PREVIEW_DEPLOY.md` is the exact sequence.
+
+What the domain **is** needed for is item 2: Resend will not deliver to
+arbitrary recipients from an unverified domain. Testing alone works
+without it (Supabase's built-in email, or Resend's
+`onboarding@resend.dev`, both of which reach your own address only).
+
+**So the trigger for buying is inviting a second person, not
+deploying.** Candidate name in "Open design decisions" below.
+
+**Do, when that moment comes:** purchase it, connect it to the
+Cloudflare Worker, and change the four values listed at the end of
+`docs/PREVIEW_DEPLOY.md`. No code change.
 
 ---
 
@@ -210,11 +235,22 @@ These need no action — noting them so they are not re-litigated:
   13 skipped. The skipped ones self-document why: each needs a live
   Supabase project and an authenticated session.
 - The signed-in product has now been run against the real project.
-  93 of 95 journeys pass, including Tonight sealed/dim/reveal, the
+  93 of 99 journeys pass, including Tonight sealed/dim/reveal, the
   provider handoff, six words, After Credits, Circle creation and
   joining, sending under seal, account deletion, and a Desk upload that
-  put a real file into Supabase Storage. Two are skipped: one needs
-  working SMTP (item 2), the other is a `test.fixme` for a live inbox.
+  put a real file into Supabase Storage. Six are skipped: two need
+  working SMTP (item 2), four are the screenshot captures, which only
+  run with `CAPTURE=1`.
+- Two faults in the test suite itself, found by running it rather than
+  reading it, are fixed:
+  - The two account-deletion journeys shared one persona and ran in
+    parallel, so the account-deletion test could delete the account the
+    review-deletion test was using. It passed or failed on worker
+    scheduling. That describe block is now `mode: "serial"`.
+  - An exported-but-empty `PLAYWRIGHT_BASE_URL` set `baseURL` to `""`
+    while still starting a local server, and setup died with
+    "TypeError: Invalid URL" pointing at a cookie domain — a message
+    that named nothing relevant. Empty now means unset.
 - Those runs create member accounts and content, which brief §18
   forbids in production, so they only run with `E2E_DESTRUCTIVE_OK=1`
   and the teardown removes everything and verifies it afterwards.
@@ -246,6 +282,13 @@ cf:preview` serves it in workerd, and all 93 journeys pass against
   so item 3's remaining risk is the deploy, not the job.
 - `/tonight`, `/circle`, `/library`, `/you`, `/desk` all redirect to
   `/join` when signed out.
+- Nothing in the app hardcodes a domain, so it runs on a free
+  `workers.dev` address with no purchase — see item 4 and
+  `docs/PREVIEW_DEPLOY.md`. The one exception has been removed: email
+  links fell back to `https://housedark.app`, a domain this project does
+  not own, read once at module load. A missing `NEXT_PUBLIC_APP_URL`
+  would have sent members to a stranger's website rather than failing.
+  It now has no fallback and is read per render.
 - The sender address in `.env.example` — `RESEND_FROM_EMAIL="House Dark
 <hello@yourdomain.com>"` — now actually boots the app. Validation used
   to demand a bare address, so setting the documented value made the app

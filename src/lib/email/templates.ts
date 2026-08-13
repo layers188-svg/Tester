@@ -1,6 +1,24 @@
+import { getServerEnv } from "@/lib/env";
 import type { EmailPayload } from "./types";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://housedark.app";
+/**
+ * The deployment's own origin, read per render.
+ *
+ * Every link in every email is built from this — including the
+ * unsubscribe link and the film-rights disclaimer, both of which have
+ * to be right. It used to be a module-level constant falling back to
+ * `https://housedark.app`, a domain this project does not own, so a
+ * missing variable would have sent members to a stranger's website
+ * rather than failing. Reading it at module load was its own hazard in
+ * the Workers bundle, where the runtime environment is not necessarily
+ * populated when a module is first evaluated.
+ *
+ * No fallback now: `getServerEnv` already refuses to start without a
+ * valid URL, so there is nothing sensible left to guess.
+ */
+function appUrl(): string {
+  return getServerEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+}
 
 /**
  * Shared wrapper — "a short note from the house, not a newsletter
@@ -50,8 +68,8 @@ function wrapper(opts: {
               <td style="padding-top:32px;">
                 <p style="font-family:Arial,sans-serif;font-size:12px;color:rgba(216,204,184,0.6);line-height:1.6;">${
                   opts.footerNote ??
-                  `House Dark does not own or host the films it introduces. <a href="${APP_URL}/film-rights" style="color:rgba(216,204,184,0.8);">Film rights and service disclaimer</a>.`
-                } &middot; <a href="${APP_URL}/you" style="color:rgba(216,204,184,0.8);">Manage email preferences</a></p>
+                  `House Dark does not own or host the films it introduces. <a href="${appUrl()}/film-rights" style="color:rgba(216,204,184,0.8);">Film rights and service disclaimer</a>.`
+                } &middot; <a href="${appUrl()}/you" style="color:rgba(216,204,184,0.8);">Manage email preferences</a></p>
               </td>
             </tr>
           </table>
@@ -72,14 +90,14 @@ function escapeHtml(value: string): string {
 }
 
 function toText(heading: string, body: string, actionLabel: string, actionHref: string): string {
-  return `${heading}\n\n${body}\n\n${actionLabel}: ${actionHref}\n\nManage email preferences: ${APP_URL}/you`;
+  return `${heading}\n\n${body}\n\n${actionLabel}: ${actionHref}\n\nManage email preferences: ${appUrl()}/you`;
 }
 
 export function nightlyOpeningEmail(opts: { to: string; openingNumber: number }): EmailPayload {
   const heading = "Tonight's opening is ready.";
   const body = `Opening ${opts.openingNumber} is sealed and waiting. You will not know what it is until you choose to enter.`;
   const actionLabel = "Enter tonight";
-  const actionHref = `${APP_URL}/tonight`;
+  const actionHref = `${appUrl()}/tonight`;
   return {
     to: opts.to,
     subject: "Tonight's opening is ready",
@@ -102,7 +120,7 @@ export function sealedRecommendationEmail(opts: {
   const heading = "A friend sent you a film under seal.";
   const body = `${escapeHtml(opts.senderDisplayName)} sent you something to watch. The title stays sealed until you choose to reveal it.`;
   const actionLabel = "Open the seal";
-  const actionHref = `${APP_URL}/circle`;
+  const actionHref = `${appUrl()}/circle`;
   return {
     to: opts.to,
     subject: `${opts.senderDisplayName} sent you a film under seal`,
@@ -131,7 +149,7 @@ export function screeningReminderEmail(opts: {
   const heading = "Your Circle screening is approaching.";
   const body = `${escapeHtml(opts.circleName)} is gathering ${escapeHtml(opts.scheduledForLabel)}. Lights down soon.`;
   const actionLabel = "See the Circle";
-  const actionHref = `${APP_URL}/circle`;
+  const actionHref = `${appUrl()}/circle`;
   return {
     to: opts.to,
     subject: "Your Circle screening is approaching",
@@ -150,7 +168,7 @@ export function afterCreditsEmail(opts: { to: string }): EmailPayload {
   const heading = "The conversation is open.";
   const body = "You left your six words. Now you can see what everyone else said.";
   const actionLabel = "Read after credits";
-  const actionHref = `${APP_URL}/library`;
+  const actionHref = `${appUrl()}/library`;
   return {
     to: opts.to,
     subject: "The conversation is open",
@@ -183,7 +201,7 @@ export function editorialEmail(opts: {
       body: opts.body,
       actionLabel: opts.actionLabel,
       actionHref: opts.actionHref,
-      footerNote: `You are receiving this because you opted in to House Dark editorial notes. <a href="${APP_URL}/you" style="color:rgba(216,204,184,0.8);">Unsubscribe</a>.`,
+      footerNote: `You are receiving this because you opted in to House Dark editorial notes. <a href="${appUrl()}/you" style="color:rgba(216,204,184,0.8);">Unsubscribe</a>.`,
     }),
     text: toText(opts.heading, opts.body, opts.actionLabel, opts.actionHref),
   };

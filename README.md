@@ -219,5 +219,11 @@ npx wrangler secret put CRON_SECRET     # must match the app's value
 npx wrangler deploy
 ```
 
+To do the above with no domain purchase — on Cloudflare's free
+`workers.dev` hostname — follow
+[`docs/PREVIEW_DEPLOY.md`](docs/PREVIEW_DEPLOY.md). Nothing in the app
+assumes a particular origin, so it is the same bundle at a different
+address.
+
 Full launch sequence and the daily programming workflow are in
 [`OPERATIONS.md`](OPERATIONS.md).

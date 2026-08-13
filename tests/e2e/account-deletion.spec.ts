@@ -4,6 +4,16 @@ import { PERSONAS } from "./auth-state";
 
 // Brief §17 item 9: "Delete review and account."
 test.describe("delete review and account", () => {
+  // These two are genuinely ordered, not merely grouped: the second one
+  // deletes the expendable persona's account, and the first needs that
+  // account signed in with its seeded six-word review still present.
+  // Under the config's `fullyParallel` they raced, and the review test
+  // failed with "waiting for getByRole('button', { name: 'Delete' })" —
+  // the account had already been deleted underneath it, so /tonight had
+  // bounced to /join. It passed or failed on worker scheduling alone,
+  // which is the worst kind of test. Serial mode pins the order.
+  test.describe.configure({ mode: "serial" });
+
   test.beforeEach(() => skipWithoutLiveSupabase());
   signedInAs(PERSONAS.expendable);
 
