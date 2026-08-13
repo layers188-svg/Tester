@@ -237,6 +237,24 @@ interface NotificationQueueRow {
   updated_at: string;
 }
 
+/**
+ * A film the member added themselves — see migration 0018. Deliberately
+ * not `films`: that table is the protected side of the spoiler
+ * boundary, and these rows are member-written.
+ */
+interface LibraryEntryRow {
+  id: string;
+  user_id: string;
+  title: string;
+  release_year: number | null;
+  runtime_minutes: number | null;
+  state: WatchState;
+  watched_at: string | null;
+  six_words: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuditLogRow {
   id: string;
   actor_id: string | null;
@@ -442,6 +460,10 @@ export interface Database {
           send_at: string;
           payload: Record<string, unknown>;
         }
+      >;
+      library_entries: Table<
+        LibraryEntryRow,
+        Pick<LibraryEntryRow, "user_id" | "title"> & Partial<LibraryEntryRow>
       >;
       audit_log: Table<AuditLogRow, Partial<AuditLogRow> & { action: string; target_type: string }>;
       analytics_events: Table<

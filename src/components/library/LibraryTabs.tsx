@@ -5,18 +5,31 @@ import Link from "next/link";
 import type { CirclesActivityRow, HouseOpening, LibraryItem } from "@/lib/supabase/types";
 import { WATCH_STATE_LABEL } from "@/lib/labels";
 import { EntryField } from "./EntryField";
+import { AddFilmForm } from "./AddFilmForm";
 import styles from "./LibraryTabs.module.css";
 
 type Tab = "yours" | "circle" | "house";
+
+export interface OwnEntry {
+  id: string;
+  title: string;
+  release_year: number | null;
+  runtime_minutes: number | null;
+  state: string;
+  six_words: string | null;
+  created_at: string;
+}
 
 export function LibraryTabs({
   mine,
   circleActivity,
   house,
+  entries,
 }: {
   mine: LibraryItem[];
   circleActivity: CirclesActivityRow[];
   house: HouseOpening[];
+  entries: OwnEntry[];
 }) {
   const [tab, setTab] = useState<Tab>("yours");
   const [query, setQuery] = useState("");
@@ -25,6 +38,12 @@ export function LibraryTabs({
   // safe RPCs behind this page only populate `title` for rows the
   // member has personally revealed — so this filter cannot surface a
   // sealed title (brief §7 Library rule 4-5).
+  const filteredEntries = useMemo(() => {
+    if (!query.trim()) return entries;
+    const q = query.trim().toLowerCase();
+    return entries.filter((e) => e.title.toLowerCase().includes(q));
+  }, [entries, query]);
+
   const filteredMine = useMemo(() => {
     if (!query.trim()) return mine;
     const q = query.trim().toLowerCase();
@@ -63,15 +82,55 @@ export function LibraryTabs({
         />
       )}
 
+      {tab === "yours" && <AddFilmForm />}
+
       {tab === "yours" && (
         <ul className={styles.list}>
-          {filteredMine.length === 0 && <p className={styles.hint}>Nothing here yet.</p>}
+          {filteredMine.length === 0 && filteredEntries.length === 0 && (
+            <p className={styles.hint}>
+              Nothing here yet. Tonight&rsquo;s opening lands here once you have watched it, and you
+              can add anything else you have seen.
+            </p>
+          )}
+
+          {/* The member's own additions, alongside what the house
+              programmed rather than in a separate list: it is one
+              collection, and splitting it would make the house the
+              main thing again. */}
+          {filteredEntries.map((entry) => (
+            <li key={`entry-${entry.id}`} className={styles.card}>
+              <EntryField id={entry.id} revealed />
+              <div className={styles.cardBody}>
+                <div className={styles.cardHead}>
+                  <span className={styles.title}>{entry.title}</span>
+                  <span className={styles.badge}>Yours</span>
+                </div>
+                <p className={styles.meta}>
+                  {[
+                    entry.release_year,
+                    entry.runtime_minutes ? `${entry.runtime_minutes} min` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || "Added by you"}
+                </p>
+                {entry.six_words && <p className={styles.sixWords}>{entry.six_words}</p>}
+                <Link
+                  href={`/circle/send?title=${encodeURIComponent(entry.title)}${
+                    entry.release_year ? `&year=${entry.release_year}` : ""
+                  }${entry.runtime_minutes ? `&runtime=${entry.runtime_minutes}` : ""}`}
+                  className={styles.link}
+                >
+                  Send under seal
+                </Link>
+              </div>
+            </li>
+          ))}
           {filteredMine.map((item) => (
             <li key={`${item.kind}-${item.target_id}`} className={styles.card}>
               <EntryField id={item.target_id} revealed={item.revealed} />
               <div className={styles.cardBody}>
                 <div className={styles.cardHead}>
-                  <span>{item.title ?? "Sealed"}</span>
+                  <span className={styles.title}>{item.title ?? "Sealed"}</span>
                   <span className={styles.badge}>{WATCH_STATE_LABEL[item.watch_state]}</span>
                 </div>
                 {item.six_words && (
@@ -124,7 +183,9 @@ export function LibraryTabs({
               <EntryField id={opening.id} revealed={opening.revealed} />
               <div className={styles.cardBody}>
                 <div className={styles.cardHead}>
-                  <span>{opening.title ?? `Opening ${opening.opening_number}`}</span>
+                  <span className={styles.title}>
+                    {opening.title ?? `Opening ${opening.opening_number}`}
+                  </span>
                   <span className={styles.badge}>
                     {new Date(opening.opens_at).toLocaleDateString(undefined, {
                       month: "short",

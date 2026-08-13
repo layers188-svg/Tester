@@ -40,13 +40,29 @@
   color: var(--hd-ink-muted);
 }
 
+/*
+ * A collection, not a content row.
+ *
+ * The entries were a thin flush-left list with a small colour chip,
+ * which read as a table. They are now typographic covers: the colour
+ * field is the whole left edge, full card height, and the title is set
+ * in Newsreader at a size that carries. On anything wider than a phone
+ * they lay out two up, so the column has some air without becoming a
+ * poster wall.
+ */
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--hd-space-3);
+  display: grid;
+  gap: var(--hd-space-4);
+}
+
+@media (min-width: 40rem) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hd-space-5);
+  }
 }
 
 /*
@@ -56,10 +72,16 @@
  */
 .card {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: var(--hd-space-4);
-  padding: var(--hd-space-4) 0;
-  border-bottom: 1px solid var(--hd-rule);
+  padding: var(--hd-space-4);
+  border: 1px solid var(--hd-rule);
+  background: var(--hd-surface);
+  transition: border-color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.card:hover {
+  border-color: var(--hd-rule-strong);
 }
 
 .cardBody {
@@ -67,16 +89,40 @@
   min-width: 0;
 }
 
+/*
+ * The badge sits above the title, not beside it. Beside it, on a
+ * two-up grid, it took enough width that "Portrait of a Lady on Fire"
+ * wrapped to four lines and the card read as broken rather than as a
+ * collection.
+ */
 .cardHead {
   display: flex;
-  justify-content: space-between;
-  gap: var(--hd-space-3);
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: var(--hd-space-2);
+}
+
+/* The title is the object. Everything else on the card is a caption. */
+.title {
   font-family: var(--hd-font-editorial);
-  font-size: 1.0625rem;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--hd-ink);
+  text-wrap: balance;
+}
+
+.meta {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-2) 0 0;
 }
 
 .badge {
   font-family: var(--hd-font-utility);
+  letter-spacing: 0.14em;
   font-size: var(--hd-size-micro);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -85,8 +131,13 @@
 }
 
 .sixWords {
+  font-family: var(--hd-font-editorial);
   font-style: italic;
-  margin: var(--hd-space-2) 0 0;
+  font-size: 1.0625rem;
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-3) 0 0;
+  border-left: 1px solid var(--hd-accent);
+  padding-left: var(--hd-space-3);
 }
 
 .link {

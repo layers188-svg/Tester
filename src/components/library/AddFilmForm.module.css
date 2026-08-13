@@ -1,0 +1,130 @@
+/* Adding a film. Collapsed to one line until wanted, so the Library
+   reads as a collection rather than a data-entry screen. */
+
+.opener {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hd-touch-min);
+  padding: var(--hd-space-2) var(--hd-space-5);
+  margin-bottom: var(--hd-space-5);
+  background: transparent;
+  border: 1px dashed var(--hd-rule-strong);
+  border-radius: 2px;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+}
+
+.opener:hover {
+  border-color: var(--hd-accent);
+  color: var(--hd-accent);
+}
+
+.opener:focus-visible,
+.close:focus-visible,
+.submit:focus-visible,
+.input:focus-visible {
+  outline: 2px solid var(--hd-focus);
+  outline-offset: 2px;
+}
+
+.form {
+  border: 1px solid var(--hd-rule);
+  background: var(--hd-surface);
+  padding: var(--hd-space-5);
+  margin-bottom: var(--hd-space-6);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--hd-space-4);
+  margin-bottom: var(--hd-space-4);
+}
+
+.heading {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.close {
+  background: transparent;
+  border: 0;
+  padding: var(--hd-space-2);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+}
+
+.label {
+  display: block;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-2);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--hd-touch-min);
+  padding: var(--hd-space-3);
+  margin-bottom: var(--hd-space-4);
+  background: var(--hd-bg);
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: 2px;
+  color: var(--hd-ink);
+  font-family: var(--hd-font-body);
+  font-size: 1rem;
+}
+
+.row {
+  display: flex;
+  gap: var(--hd-space-4);
+}
+
+.half {
+  flex: 1;
+}
+
+.hint,
+.error {
+  font-size: var(--hd-size-small);
+  margin: calc(var(--hd-space-3) * -1) 0 var(--hd-space-4);
+}
+
+.hint {
+  color: var(--hd-ink-muted);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+}
+
+.submit {
+  width: 100%;
+  min-height: var(--hd-touch-min);
+  background: var(--hd-accent);
+  border: 1px solid var(--hd-accent);
+  border-radius: 2px;
+  color: var(--hd-house-black);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

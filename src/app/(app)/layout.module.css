@@ -13,7 +13,13 @@
   display: flex;
   align-items: center;
   padding: var(--hd-space-4) var(--hd-space-4) var(--hd-space-3);
-  max-width: var(--hd-max-width);
+  /*
+   * The wide container, not the reading column. Library uses the wide
+   * one, and a masthead centred on 30rem sat visibly off to the right
+   * of its content. Aligning to the widest page keeps the wordmark at
+   * the same left edge everywhere.
+   */
+  max-width: var(--hd-max-width-wide);
   width: 100%;
   margin: 0 auto;
   border-bottom: 1px solid var(--hd-rule);
