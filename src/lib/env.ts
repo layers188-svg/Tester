@@ -37,35 +37,40 @@ const serverSchema = z.object({
   CRON_SECRET: z.string().min(16),
 
   /**
-   * Testing escape hatch for `/join`. Off unless it is exactly "1".
+   * TESTING ONLY — turns `/join` into email-and-you-are-in, with no
+   * code and no verification. Off unless it is exactly "1".
    *
-   * Supabase refuses to edit the Magic Link template on a free-tier
-   * project using the built-in email provider, so the sign-in email
-   * still carries a link rather than `{{ .Token }}` — and the built-in
-   * provider rate-limits to a couple of messages an hour, returning
-   * `429 over_email_send_rate_limit`. `signInWithOtp` throws on that,
-   * which strands the form on the email step: the code screen cannot
-   * be reached at all, with or without a code in hand.
+   * This is an authentication bypass, switched on deliberately because
+   * no sign-in code can currently be delivered at all: Supabase's free
+   * tier rate-limits its built-in email to a couple of messages an hour
+   * (`429 over_email_send_rate_limit`) and refuses to edit the Magic
+   * Link template while that provider is in use, so the email carries a
+   * link rather than the six-digit `{{ .Token }}` the form asks for.
+   * `signInWithOtp` throws on the 429, stranding the form on the email
+   * step — the code screen could not be reached even with a valid code
+   * in hand.
    *
-   * With this set, `/join` offers a second action that goes straight to
-   * the code screen without sending. It does not weaken verification —
-   * the code is still a real Supabase OTP checked by `verifyOtp`, and
-   * skipping the send does not bring a token into existence. It only
-   * drops the requirement that *this browser* triggered the send.
+   * While it is on, anyone who knows the URL can sign in as any
+   * address, including one in ADMIN_EMAILS — which carries the
+   * Programming Desk, and therefore protected title data. That is
+   * tolerable only while the project holds no real members and no
+   * programmed film. It stops being tolerable the moment either exists.
    *
-   * Remove it once Resend is wired up as custom SMTP.
+   * Unset it and both `/api/test-signin` and the `/join` branch
+   * disappear. Do that as part of configuring custom SMTP —
+   * LAUNCH_CHECKLIST item 2.
    *
    * A literal rather than a boolean-ish string on purpose: "true" or
-   * "yes" should fail loudly at boot, not quietly leave the hatch shut.
+   * "yes" should fail loudly at boot, not quietly leave it shut.
    */
-  NEXT_PUBLIC_TEST_CODE_ENTRY: z.literal("1").optional(),
+  NEXT_PUBLIC_TEST_SIGNIN: z.literal("1").optional(),
 });
 
 const clientSchema = serverSchema.pick({
   NEXT_PUBLIC_APP_URL: true,
   NEXT_PUBLIC_SUPABASE_URL: true,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: true,
-  NEXT_PUBLIC_TEST_CODE_ENTRY: true,
+  NEXT_PUBLIC_TEST_SIGNIN: true,
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -104,7 +109,7 @@ export function getClientEnv(): ClientEnv {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_TEST_CODE_ENTRY: process.env.NEXT_PUBLIC_TEST_CODE_ENTRY,
+    NEXT_PUBLIC_TEST_SIGNIN: process.env.NEXT_PUBLIC_TEST_SIGNIN,
   });
   if (!parsed.success) {
     const missing = parsed.error.issues.map((issue) => issue.path.join(".")).join(", ");

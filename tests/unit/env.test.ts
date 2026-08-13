@@ -83,15 +83,15 @@ describe("getServerEnv", () => {
   });
 });
 
-describe("NEXT_PUBLIC_TEST_CODE_ENTRY", () => {
+describe("NEXT_PUBLIC_TEST_SIGNIN", () => {
   it("is shut unless it is set", async () => {
     const { getServerEnv } = await loadEnvWith({});
-    expect(getServerEnv().NEXT_PUBLIC_TEST_CODE_ENTRY).toBeUndefined();
+    expect(getServerEnv().NEXT_PUBLIC_TEST_SIGNIN).toBeUndefined();
   });
 
   it('opens for exactly "1"', async () => {
-    const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_CODE_ENTRY: "1" });
-    expect(getServerEnv().NEXT_PUBLIC_TEST_CODE_ENTRY).toBe("1");
+    const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_SIGNIN: "1" });
+    expect(getServerEnv().NEXT_PUBLIC_TEST_SIGNIN).toBe("1");
   });
 
   it("refuses to boot on a boolean-ish value", async () => {
@@ -99,8 +99,8 @@ describe("NEXT_PUBLIC_TEST_CODE_ENTRY", () => {
     // hunts the bug in the form instead of in the environment. A test
     // affordance that fails silently is worse than not having one.
     for (const value of ["true", "yes", "0", "TRUE", "on"]) {
-      const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_CODE_ENTRY: value });
-      expect(() => getServerEnv()).toThrow(/NEXT_PUBLIC_TEST_CODE_ENTRY/);
+      const { getServerEnv } = await loadEnvWith({ NEXT_PUBLIC_TEST_SIGNIN: value });
+      expect(() => getServerEnv()).toThrow(/NEXT_PUBLIC_TEST_SIGNIN/);
     }
   });
 });

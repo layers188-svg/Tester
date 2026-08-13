@@ -24,9 +24,9 @@ export function JoinForm() {
   const [skippedSend, setSkippedSend] = useState(false);
   const nextPath = useRef("/tonight");
 
-  // See NEXT_PUBLIC_TEST_CODE_ENTRY in src/lib/env.ts. Absent in any
-  // normal deployment, which makes every branch guarded by it dead code.
-  const allowCodeWithoutSend = getClientEnv().NEXT_PUBLIC_TEST_CODE_ENTRY === "1";
+  // See NEXT_PUBLIC_TEST_SIGNIN in src/lib/env.ts. Absent in any normal
+  // deployment, which makes every branch guarded by it dead code.
+  const testSignIn = getClientEnv().NEXT_PUBLIC_TEST_SIGNIN === "1";
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -59,8 +59,43 @@ export function JoinForm() {
     }
   }
 
+  /**
+   * TESTING ONLY — see NEXT_PUBLIC_TEST_SIGNIN. Skips the code entirely:
+   * the server mints and redeems an OTP on this browser's behalf, so the
+   * session that lands is an ordinary one. Only how it was obtained
+   * differs.
+   */
+  async function testEnter() {
+    setError(null);
+    setBusy(true);
+    try {
+      const response = await fetch("/api/test-signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) throw new Error("Could not sign in. Try again.");
+
+      await fetch("/api/auth/ensure-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ marketingConsent }),
+      });
+
+      router.push(nextPath.current);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not sign in. Try again.");
+      setBusy(false);
+    }
+  }
+
   function requestCode(e: React.FormEvent) {
     e.preventDefault();
+    if (testSignIn) {
+      void testEnter();
+      return;
+    }
     void sendCode();
   }
 
@@ -136,10 +171,16 @@ export function JoinForm() {
         )}
 
         <Button type="submit" variant="primary" fullWidth disabled={busy}>
-          {busy ? "Sending…" : "Send my code"}
+          {testSignIn
+            ? busy
+              ? "Entering…"
+              : "Enter House Dark"
+            : busy
+              ? "Sending…"
+              : "Send my code"}
         </Button>
 
-        {allowCodeWithoutSend && (
+        {testSignIn && (
           <button
             type="button"
             className={styles.linkButton}
@@ -150,13 +191,23 @@ export function JoinForm() {
               setStep("code");
             }}
           >
-            Testing: enter a code I already have
+            Enter a code instead
           </button>
         )}
 
         <p className={styles.fineprint}>
-          We&rsquo;ll email a six digit code. It expires in 5 minutes. By continuing you agree to
-          the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy</Link> pages.
+          {testSignIn ? (
+            <>
+              <strong>Testing mode.</strong> No code is sent and no address is verified. Anyone with
+              this link can sign in as anyone — switch it off before the first real member.
+            </>
+          ) : (
+            <>
+              We&rsquo;ll email a six digit code. It expires in 5 minutes. By continuing you agree
+              to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy</Link>{" "}
+              pages.
+            </>
+          )}
         </p>
       </form>
     );

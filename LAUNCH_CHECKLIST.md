@@ -372,3 +372,39 @@ Recorded so it is not re-derived every session, and because it changed:
   local PostgreSQL 16 with all 107 RLS assertions passing, the full unit
   and spoiler suites, the production build, and the 79 Playwright
   journeys that do not need a session.
+
+---
+
+## 9. TESTING BYPASS IS LIVE — remove before the first real member
+
+`NEXT_PUBLIC_TEST_SIGNIN=1` is set on the deployed worker. While it is:
+
+- `/join` signs you in from an email address alone. No code, no
+  verification, no proof the address is yours.
+- **Anyone who knows the URL can sign in as any address**, including
+  `layers188@gmail.com` — which is in `ADMIN_EMAILS` and therefore
+  carries the Programming Desk and protected title data.
+
+It exists because no sign-in code can currently be delivered at all:
+Supabase's built-in email rate-limits to a couple of messages an hour
+and its Magic Link template cannot be edited on the free tier, so the
+email carries a link where the form asks for a six-digit code.
+
+Everything else still holds while it is on — RLS is untouched, signed
+-out visitors are still redirected, and the session it creates is an
+ordinary one.
+
+**Remove it** by deleting the variable, rebuilding and redeploying:
+
+```bash
+npx wrangler secret delete NEXT_PUBLIC_TEST_SIGNIN
+# drop the line from .env.local, then
+npm run cf:build && npm run cf:deploy
+```
+
+Verified: with the variable unset, `/api/test-signin` returns 404 and
+`/join` renders the ordinary code flow with no trace of the bypass.
+
+**Do this the same day item 2 (Resend custom SMTP) is done** — that is
+what makes real sign-in possible, and it is the only thing keeping this
+item open.
