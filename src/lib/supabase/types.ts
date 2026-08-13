@@ -376,6 +376,24 @@ export interface CircleSixWords {
   unlocked: boolean;
 }
 
+/**
+ * The Room's header — see migration 0020. `title` and `release_year`
+ * are null until this member has personally revealed the opening, which
+ * is the same rule every other title-bearing projection follows.
+ *
+ * `has_revealed` and `has_published` are separate because the two come
+ * apart: a member can know what the film was and still not have said
+ * anything about it, and that is exactly the state the Room exists to
+ * push them out of.
+ */
+export interface RoomOpening {
+  opening_number: number;
+  title: string | null;
+  release_year: number | null;
+  has_revealed: boolean;
+  has_published: boolean;
+}
+
 export interface MySealedRecommendation {
   id: string;
   sender_id: string;
@@ -548,6 +566,7 @@ export interface Database {
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
       get_circle_six_words: { Args: Record<string, never>; Returns: CircleSixWords[] };
+      get_room_opening: { Args: { p_opening_id: string }; Returns: RoomOpening[] };
       get_analytics_summary: { Args: { p_days?: number }; Returns: AnalyticsSummaryRow[] };
     };
   };

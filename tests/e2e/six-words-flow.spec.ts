@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
 import { PERSONAS } from "./auth-state";
+import { FIXTURE } from "./fixtures";
 
 // Brief §17 item 4: "Mark watched and submit six words."
 test.describe("mark watched and leave six words", () => {
@@ -9,19 +10,35 @@ test.describe("mark watched and leave six words", () => {
   // Tonight and the spoiler journey.
   signedInAs(PERSONAS.friend);
 
-  test("watching unlocks the six words form, and After Credits opens once submitted", async ({
-    page,
-  }) => {
+  test("watching asks for six words, and the room opens once they are in", async ({ page }) => {
     await page.goto("/tonight");
     await page.getByRole("button", { name: /mark watched/i }).click();
-    await expect(page.getByPlaceholder("Exactly six words")).toBeVisible();
 
-    await page.getByPlaceholder("Exactly six words").fill("I did not see that coming");
-    await page.getByRole("button", { name: /publish six words/i }).click();
+    await expect(page.getByText(/six words after the picture/i)).toBeVisible();
 
+    // Nobody else's words are on this screen. That is the product rule,
+    // not a layout preference, so it is asserted rather than assumed.
+    await expect(page.getByText(/from the room/i)).toHaveCount(0);
+
+    const field = page.getByLabel("Your six words");
+    await field.fill("I did not see that coming");
+    await page.getByRole("button", { name: /leave my six words/i }).click();
+
+    // The submission moment: the words hold, then the room opens.
+    await expect(page.getByText(/your words are in/i)).toBeVisible();
+    await expect(page.getByText(/the room is open/i)).toBeVisible();
+
+    await page.getByRole("link", { name: /enter the room/i }).click();
+    await expect(page).toHaveURL(/\/room\//);
+    await expect(page.getByText(/what stayed with everyone else/i)).toBeVisible();
     await expect(page.getByText(/i did not see that coming/i)).toBeVisible();
-    await expect(page.getByRole("heading", { name: /after credits/i })).toBeVisible();
   });
+
+  // The seventh-word cap is asserted in tests/unit/word-slots.test.tsx.
+  // It belonged there rather than here: as a second journey in this
+  // file it shared the friend persona with the one above, which
+  // publishes, so it raced for a "Mark watched" button that the first
+  // test had already spent.
 
   test("the server rejects a review that is not exactly six words", async ({ request }) => {
     const response = await request.post("/api/six-words", {
@@ -34,5 +51,41 @@ test.describe("mark watched and leave six words", () => {
     // The copy counts up rather than restating the rule: "4 more
     // words needed." Better wording than the assertion I first wrote.
     expect((await response.json()).error).toMatch(/more words? needed/i);
+  });
+});
+
+/**
+ * The core rule, tested from the outside.
+ *
+ * Now that the form no longer lists anyone else's words, /room is the
+ * only route to them, which makes it the thing worth attacking. The
+ * member persona has never revealed this opening and never written
+ * anything about it, which is exactly the state the route has to hold
+ * against — including for someone who types the URL rather than
+ * following a link to it.
+ */
+test.describe("the room is shut until you have spoken", () => {
+  test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.member);
+
+  test("a member who has not spoken is sent back, and gets no title on the way", async ({
+    page,
+  }) => {
+    await page.goto(`/room/${FIXTURE.openingId}`);
+
+    await expect(page).toHaveURL(/\/tonight/);
+    expect(await page.content()).not.toMatch(new RegExp(FIXTURE.filmTitle, "i"));
+  });
+
+  test("the after-credits API tells them nothing either", async ({ request }) => {
+    const response = await request.get(`/api/after-credits/${FIXTURE.openingId}`);
+    expect(response.ok()).toBe(true);
+
+    const payload = await response.json();
+    // Zero rows is the contract: the caller cannot tell a shut room from
+    // an empty one, and neither can anybody reading this response.
+    expect(payload.open).toBe(false);
+    expect(payload.reviews).toEqual([]);
+    expect(await response.text()).not.toMatch(new RegExp(FIXTURE.filmTitle, "i"));
   });
 });

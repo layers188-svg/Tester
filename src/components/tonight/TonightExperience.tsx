@@ -10,7 +10,6 @@ import { MOTION, motionDuration } from "@/lib/motion";
 import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SixWordsPanel } from "./SixWordsPanel";
-import { AfterCredits } from "./AfterCredits";
 import styles from "./TonightExperience.module.css";
 
 type Phase = "not_available" | "sealed" | "dimming" | "trailer" | "revealing" | "revealed";
@@ -30,12 +29,6 @@ export function TonightExperience({
   const [reveal, setReveal] = useState<RevealPayload | null>(null);
   const [revealError, setRevealError] = useState<string | null>(null);
   const [watchState, setWatchState] = useState(progress?.watchState ?? null);
-  /**
-   * Whether this member has published their six words for tonight. It
-   * is what opens After Credits, so it starts from what the server
-   * already knew and flips the moment they publish, without a reload.
-   */
-  const [hasPublished, setHasPublished] = useState(Boolean(progress?.hasSixWords));
   const [copyLabel, setCopyLabel] = useState("Copy title");
 
   /**
@@ -303,49 +296,58 @@ export function TonightExperience({
             ) : null}
           </h1>
 
-          {reveal.providers.length > 0 ? (
-            <ul className={`${styles.providers} hd-stage`} style={stageIndex(4)}>
-              {reveal.providers.map((p) => (
-                <li key={`${p.provider_name}-${p.territory}`}>
-                  <a href={p.deep_link} target="_blank" rel="noreferrer">
-                    {p.provider_name}
-                  </a>
-                  <span className={styles.providerMeta}>
-                    {" "}
-                    · {PLAYBACK_ACCESS_LABEL[p.access_type]} · {p.territory}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={`${styles.hint} hd-stage`} style={stageIndex(4)}>
-              No verified playback destination is on record yet.
-            </p>
+          {/*
+            Once the member has marked it watched, the page is about
+            their response and nothing else. Where to watch it, the
+            title on the clipboard and the watch controls have all done
+            their job by then, and leaving them on screen underneath the
+            six-word field is the difference between "answer this" and
+            "here are nine things, one of which is a form".
+          */}
+          {watchState !== "watched" && (
+            <>
+              {reveal.providers.length > 0 ? (
+                <ul className={`${styles.providers} hd-stage`} style={stageIndex(4)}>
+                  {reveal.providers.map((p) => (
+                    <li key={`${p.provider_name}-${p.territory}`}>
+                      <a href={p.deep_link} target="_blank" rel="noreferrer">
+                        {p.provider_name}
+                      </a>
+                      <span className={styles.providerMeta}>
+                        {" "}
+                        · {PLAYBACK_ACCESS_LABEL[p.access_type]} · {p.territory}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={`${styles.hint} hd-stage`} style={stageIndex(4)}>
+                  No verified playback destination is on record yet.
+                </p>
+              )}
+
+              <div className={`${styles.actionsRow} hd-stage`} style={stageIndex(5)}>
+                <Button variant="secondary" onClick={copyTitle}>
+                  {copyLabel}
+                </Button>
+                <Button variant="ghost" href="/tonight">
+                  Stay in the house
+                </Button>
+              </div>
+
+              <div className={`${styles.watchActions} hd-stage`} style={stageIndex(6)}>
+                <Button
+                  variant={watchState === "saved" ? "primary" : "secondary"}
+                  onClick={() => setWatch("saved")}
+                >
+                  Save for later
+                </Button>
+                <Button variant="secondary" onClick={() => setWatch("watched")}>
+                  Mark watched
+                </Button>
+              </div>
+            </>
           )}
-
-          <div className={`${styles.actionsRow} hd-stage`} style={stageIndex(5)}>
-            <Button variant="secondary" onClick={copyTitle}>
-              {copyLabel}
-            </Button>
-            <Button variant="ghost" href="/tonight">
-              Stay in the house
-            </Button>
-          </div>
-
-          <div className={`${styles.watchActions} hd-stage`} style={stageIndex(6)}>
-            <Button
-              variant={watchState === "saved" ? "primary" : "secondary"}
-              onClick={() => setWatch("saved")}
-            >
-              Save for later
-            </Button>
-            <Button
-              variant={watchState === "watched" ? "primary" : "secondary"}
-              onClick={() => setWatch("watched")}
-            >
-              Mark watched
-            </Button>
-          </div>
 
           {watchState === "watched" && (
             <SixWordsPanel
@@ -362,14 +364,8 @@ export function TonightExperience({
                     }
                   : null
               }
-              onPublished={() => setHasPublished(true)}
             />
           )}
-
-          {/* The room opens only once the member has spoken in it. The
-              database enforces the same rule; this just avoids asking
-              for a result that would come back empty. */}
-          {watchState === "watched" && hasPublished && <AfterCredits openingId={opening.id} />}
         </>
       ) : (
         <p className={styles.error}>{revealError ?? "Loading…"}</p>

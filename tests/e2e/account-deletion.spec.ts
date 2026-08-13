@@ -20,7 +20,11 @@ test.describe("delete review and account", () => {
   test("member deletes their own six-word review", async ({ page }) => {
     await page.goto("/tonight");
     await page.getByRole("button", { name: "Delete" }).click();
-    await expect(page.getByPlaceholder("Exactly six words")).toBeVisible();
+    // Deleting returns the member to the empty field, ready to write
+    // again. Asserted on the heading rather than on the field's
+    // placeholder, which the six-slot input does not have.
+    await expect(page.getByText(/six words after the picture/i)).toBeVisible();
+    await expect(page.getByLabel("Your six words")).toHaveValue("");
   });
 
   test("member deletes their account from You", async ({ page }) => {

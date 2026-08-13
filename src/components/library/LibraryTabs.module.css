@@ -169,12 +169,22 @@
   margin: var(--hd-space-2) 0 0;
 }
 
+.sixWordsLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-4) 0 var(--hd-space-2);
+}
+
 .sixWords {
   font-family: var(--hd-font-editorial);
   font-style: italic;
   font-size: 1.0625rem;
-  color: var(--hd-ink-muted);
-  margin: var(--hd-space-3) 0 0;
+  line-height: 1.35;
+  color: var(--hd-ink);
+  margin: 0;
   border-left: 1px solid var(--hd-accent);
   padding-left: var(--hd-space-3);
 }
@@ -185,13 +195,27 @@
   margin: var(--hd-space-2) 0 0;
 }
 
+/*
+ * An entry can carry two ways on now (into the room, and passing the
+ * film to someone), so they sit in a row that wraps rather than
+ * stacking as two stray links each with their own top margin.
+ */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--hd-space-5);
+}
+
 .link {
-  display: inline-block;
-  margin-top: var(--hd-space-3);
   color: var(--hd-accent);
   font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
-  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: var(--hd-size-micro);
+  /* Reads as a small label and still meets the touch minimum (§16). */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hd-touch-min);
 }
 
 .activityList {

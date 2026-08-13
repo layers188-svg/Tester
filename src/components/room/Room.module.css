@@ -1,0 +1,198 @@
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.lead {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.25rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-7);
+}
+
+/*
+ * The member's own words, first and unmistakably theirs. Set larger
+ * than anyone else's on the page — not as a ranking, but because this
+ * is the one response they already know they agree with, and the page
+ * is arranged around it.
+ */
+.mine {
+  margin-bottom: var(--hd-space-7);
+}
+
+.mineLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.mineBody {
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(1.625rem, 5.5vw, 2.125rem);
+  line-height: 1.2;
+  color: var(--hd-ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.rule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  opacity: 0.7;
+  transform-origin: left;
+  margin-bottom: var(--hd-space-6);
+  animation: expand var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+}
+
+@keyframes expand {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
+}
+
+.fromLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-4);
+}
+
+/*
+ * Two views, set as type rather than as a segmented control. A pill
+ * switch would be the one piece of stock app furniture on the page.
+ */
+.views {
+  display: flex;
+  gap: var(--hd-space-5);
+  margin-bottom: var(--hd-space-6);
+}
+
+.view {
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: var(--hd-space-2) 0;
+  min-height: var(--hd-touch-min);
+  cursor: pointer;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.view[data-active="true"] {
+  color: var(--hd-ink);
+  border-bottom-color: var(--hd-accent);
+}
+
+.view:hover {
+  color: var(--hd-ink);
+}
+
+/*
+ * The responses.
+ *
+ * No cards, no borders around anything, no avatars. A page of
+ * quotations: the words carry, the name is a credit line underneath in
+ * the smallest type on the screen, and the space between entries is
+ * what makes each one land separately.
+ */
+.responses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.response {
+  padding: var(--hd-space-6) 0;
+}
+
+/*
+ * A controlled rhythm, not random variation.
+ *
+ * Two rules, both by position and both stable for a given room: every
+ * third response closes with a hairline, and the first of every four is
+ * set a step larger. The page reads as composed rather than as a list,
+ * and the same response is the same size every time it is loaded —
+ * randomising per render would make the page flicker between shapes on
+ * every visit.
+ */
+.response:nth-child(3n)::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 1px;
+  background: var(--hd-rule);
+  margin-top: var(--hd-space-6);
+}
+
+.body {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.375rem;
+  line-height: 1.35;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-3);
+  text-wrap: pretty;
+}
+
+.response:nth-child(4n + 1) .body {
+  font-size: 1.625rem;
+  line-height: 1.25;
+}
+
+@media (min-width: 30rem) {
+  .body {
+    font-size: 1.5rem;
+  }
+
+  .response:nth-child(4n + 1) .body {
+    font-size: 1.875rem;
+  }
+}
+
+/* The credit, and it stays a credit. */
+.who {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.66rem;
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+.quiet {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--hd-ink-muted);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.loading {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  color: var(--hd-ink-muted);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+}

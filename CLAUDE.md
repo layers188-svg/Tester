@@ -83,6 +83,29 @@ RLS) · Resend (custom SMTP + operational/editorial email) · Cloudflare
 (Pages/Workers deploy target) · Vitest (unit) · Playwright (critical
 journeys).
 
+## The Room (the sequence is the product)
+
+Watch → Mark watched → leave your six words → submit → the room opens
+→ read everyone else. **A member must never see another member's
+response before their own is on record.** The product exists so someone
+can meet a film before outside opinion reshapes it.
+
+- Enforced three times over, deliberately: `can_view_six_word_review`
+  (RLS), `get_after_credits` (0017, returns zero rows to a member who
+  has not published), and `/room/[openingId]` redirecting on
+  `has_published`. The UI never decides this on its own.
+- `get_after_credits` returning nothing is ambiguous by design (shut
+  room or empty room). `get_room_opening` (0020) exists because the
+  Room page has to tell those apart, and it reads the title without
+  writing a reveal the way `/api/reveal/*` does.
+- The response screen shows **nobody else's words**. Anything that
+  lists other members belongs behind the submit.
+- The Room has no likes, hearts, scores, stars, replies, sorting,
+  rankings, trending, avatars or follower counts, and never will. Those
+  mechanics manufacture consensus, which is the thing House Dark is
+  built to resist. Response scale varies only by position
+  (`:nth-child`), never randomly.
+
 ## Signed-in navigation
 
 Exactly four tabs: **Tonight, Library, Circle, Me.** Don't add a fifth

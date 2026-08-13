@@ -1,0 +1,36 @@
+/*
+ * The Room reads like a page of quotations in a film journal, so it
+ * keeps an editorial measure rather than widening into a grid. The
+ * responses are the only content; everything above them is a masthead.
+ */
+.page {
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-8);
+  max-width: 38rem;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.title {
+  font-size: var(--hd-size-display);
+  margin: 0 0 var(--hd-space-7);
+  text-wrap: balance;
+}
+
+.year {
+  font-style: italic;
+  color: var(--hd-ink-muted);
+  font-size: 0.5em;
+  /* Sits on the title's baseline rather than beside it as a parenthesis:
+     the year is a caption on the film, not part of its name. */
+  display: block;
+  margin-top: var(--hd-space-2);
+  letter-spacing: 0.04em;
+}

@@ -139,8 +139,20 @@ export function LibraryTabs({
                 revealed={item.revealed}
                 title={item.title ?? "Sealed"}
                 badge={WATCH_STATE_LABEL[item.watch_state]}
-                sixWords={item.six_words ? `“${item.six_words}”` : null}
+                sixWords={item.six_words}
               >
+                {/*
+                  A film the member has actually spoken about is a
+                  record of what they felt, so the entry carries the way
+                  back into the room as well as the way to pass it on.
+                  Only for openings: a sealed recommendation is between
+                  two people and has no room.
+                */}
+                {item.six_words && item.kind === "opening" && (
+                  <Link href={`/room/${item.target_id}`} className={styles.link}>
+                    Enter the room
+                  </Link>
+                )}
                 {item.revealed && item.title && (
                   <Link
                     href={`/circle/send?title=${encodeURIComponent(item.title)}${
@@ -288,8 +300,17 @@ function Entry({
         <span className={styles.badge}>{badge}</span>
         <span className={styles.title}>{title}</span>
         {meta && <p className={styles.meta}>{meta}</p>}
-        {sixWords && <p className={styles.sixWords}>{sixWords}</p>}
-        {children}
+
+        {/* What the member felt, not just that they watched it. This is
+            the difference between a list of films and a record. */}
+        {sixWords && (
+          <>
+            <p className={styles.sixWordsLabel}>Your six words</p>
+            <p className={styles.sixWords}>{sixWords}</p>
+          </>
+        )}
+
+        <div className={styles.actions}>{children}</div>
       </div>
     </li>
   );
