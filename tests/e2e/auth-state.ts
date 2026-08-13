@@ -38,6 +38,18 @@ export type Persona = (typeof PERSONAS)[keyof typeof PERSONAS];
  */
 export const PERSONA_IDS_FILE = path.join(AUTH_DIR, "persona-ids.json");
 
+/**
+ * Row counts taken before the run, for the teardown to compare against.
+ *
+ * Counting every audit_log row and calling any of them residue only
+ * works while the project is empty. The moment Logan approves an
+ * opening the count is legitimately non-zero, and a check that cannot
+ * tell his rows from the suite's would cry wolf forever. A baseline
+ * can: what matters is whether the run left *more* behind than it
+ * found.
+ */
+export const BASELINE_FILE = path.join(AUTH_DIR, "baseline.json");
+
 export function storageStateFor(persona: Persona): string {
   return path.join(AUTH_DIR, `${persona}.json`);
 }

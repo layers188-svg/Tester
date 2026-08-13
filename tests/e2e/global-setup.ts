@@ -4,6 +4,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import {
   AUTH_DIR,
+  BASELINE_FILE,
   PERSONA_IDS_FILE,
   PERSONAS,
   emailFor,
@@ -201,6 +202,15 @@ export default async function globalSetup(config: FullConfig) {
   }
 
   await seedFixtures(admin);
+
+  // Taken after seeding, so the fixtures themselves are part of the
+  // baseline and only what the journeys add can look like residue.
+  const counts: Record<string, number> = {};
+  for (const table of ["audit_log", "films", "openings", "analytics_events"]) {
+    const { count } = await admin.from(table).select("*", { count: "exact", head: true });
+    counts[table] = count ?? 0;
+  }
+  fs.writeFileSync(BASELINE_FILE, JSON.stringify(counts));
 }
 
 /**

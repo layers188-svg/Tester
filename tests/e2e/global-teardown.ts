@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import fs from "node:fs";
-import { PERSONA_IDS_FILE, PERSONAS, emailFor, type Persona } from "./auth-state";
+import { BASELINE_FILE, PERSONA_IDS_FILE, PERSONAS, emailFor, type Persona } from "./auth-state";
 import { FIXTURE, TEARDOWN_ORDER } from "./fixtures";
 import { loadEnvLocal } from "./load-env";
 
@@ -118,23 +118,28 @@ export default async function globalTeardown() {
     .select("id")
     .eq("id", FIXTURE.openingId);
   const { data: prefixLeft } = await admin.from("films").select("id").like("title", "E2E %");
-  // audit_log was missing from this list, so a surviving row was
+  // audit_log was missing from this list, so a surviving row was once
   // reported as a clean project — the exact failure a verification step
-  // exists to prevent.
-  const { count: auditLeft } = await admin
-    .from("audit_log")
-    .select("*", { count: "exact", head: true });
-  const { count: openingsLeft } = await admin
-    .from("openings")
-    .select("*", { count: "exact", head: true });
+  // exists to prevent. Compared against the baseline rather than
+  // against zero: rows that were already there are not this run's.
+  const baseline: Record<string, number> = fs.existsSync(BASELINE_FILE)
+    ? JSON.parse(fs.readFileSync(BASELINE_FILE, "utf8"))
+    : {};
+  const grew: string[] = [];
+  for (const table of ["audit_log", "films", "openings", "analytics_events"]) {
+    const { count } = await admin.from(table).select("*", { count: "exact", head: true });
+    const before = baseline[table] ?? 0;
+    // The fixtures are in the baseline and have just been deleted, so
+    // only growth beyond it is residue.
+    if ((count ?? 0) > before) grew.push(`${table}: ${before} before, ${count} after`);
+  }
   const { data: after } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
   const survivors = (after?.users ?? []).filter((u) => u.email && personaEmails.has(u.email));
 
   if (filmLeft?.length) problems.push("the fixture film is still present");
   if (openingLeft?.length) problems.push("the fixture opening is still present");
   if (prefixLeft?.length) problems.push(`${prefixLeft.length} Desk-created film(s) still present`);
-  if (auditLeft) problems.push(`${auditLeft} audit_log row(s) still present`);
-  if (openingsLeft) problems.push(`${openingsLeft} opening(s) still present`);
+  for (const line of grew) problems.push(`more rows than the run started with — ${line}`);
   if (survivors.length) {
     problems.push(`accounts left behind: ${survivors.map((u) => u.email).join(", ")}`);
   }
