@@ -44,7 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         of its own beyond returning to Tonight.
       */}
       <header className={styles.header}>
-        <Link href="/tonight" className={styles.brand} aria-label="House Dark, tonight">
+        <Link href="/tonight" className={styles.brand} aria-label="House Dark">
           <Wordmark />
         </Link>
       </header>

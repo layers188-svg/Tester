@@ -1,122 +1,358 @@
-.hero {
-  position: relative;
-  padding: var(--hd-space-8) var(--hd-space-4) var(--hd-space-7);
-  overflow: hidden;
-}
+/*
+ * Home page composition.
+ *
+ * The 13 August review's structural note: every section used the same
+ * centred 30rem column, so the page had one rhythm and no scale on
+ * desktop. Three things change that here — a split hero, a paper
+ * chapter that breaks the black, and an oxblood field for the Circle
+ * moment. Narrative text stays between 30rem and 38rem regardless of
+ * how wide the container gets, because measure is what makes it
+ * readable, not width.
+ */
 
-.heroField {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(120% 90% at 50% 0%, #101010 0%, var(--hd-projection-black) 70%);
-  z-index: -1;
-}
-
-.heroContent {
-  max-width: var(--hd-max-width);
+.scene {
+  max-width: var(--hd-site-width);
   margin: 0 auto;
+  padding: var(--hd-space-8) var(--hd-space-4);
+}
+
+/* ---- Scene 1: the sealed opening ---------------------------------- */
+
+.hero {
+  display: grid;
+  gap: var(--hd-space-7);
+  align-items: center;
+}
+
+@media (min-width: 60rem) {
+  .hero {
+    grid-template-columns: 1fr minmax(20rem, 26rem);
+    gap: var(--hd-space-8);
+    padding-top: var(--hd-space-8);
+  }
+}
+
+.heroCopy {
+  max-width: 34rem;
+}
+
+.programmeLine {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.72rem;
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-5);
 }
 
 .hero h1 {
-  max-width: 18ch;
+  font-size: var(--hd-size-display);
+  line-height: 1.05;
+  margin: 0 0 var(--hd-space-5);
+  text-wrap: balance;
 }
 
 .heroSub {
   font-size: 1.0625rem;
-  max-width: 34ch;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-6);
+  max-width: 32rem;
 }
 
 .heroActions {
   display: flex;
-  flex-direction: column;
-  gap: var(--hd-space-3);
-  margin-top: var(--hd-space-6);
+  flex-wrap: wrap;
+  gap: var(--hd-space-4);
 }
 
-@media (min-width: 480px) {
-  .heroActions {
-    flex-direction: row;
-  }
+.heroDemo {
+  width: 100%;
+  max-width: 26rem;
 }
 
-.section {
-  max-width: var(--hd-max-width);
+/* ---- Scene 2: three beats, on paper -------------------------------- */
+
+/*
+ * Programme Paper. The one chapter that inverts the field, so the page
+ * has a middle rather than an unbroken run of black. Ink is Projection
+ * Black on Stock Cream — 16.6:1, well past AA.
+ */
+.paper {
+  background: var(--hd-stock-cream);
+  color: var(--hd-projection-black);
+  padding: var(--hd-space-8) var(--hd-space-4);
+  margin: var(--hd-space-7) 0;
+}
+
+.paperInner {
+  max-width: var(--hd-site-width);
   margin: 0 auto;
-  padding: var(--hd-space-7) var(--hd-space-4);
-  border-top: 1px solid var(--hd-rule);
 }
 
-.sectionLead {
-  max-width: 42ch;
+.paperStatement {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  line-height: 1.15;
+  margin: 0 0 var(--hd-space-7);
+  max-width: 24ch;
+  text-wrap: balance;
+  color: var(--hd-projection-black);
 }
 
-.ritual {
+.beats {
   list-style: none;
-  margin: var(--hd-space-5) 0 0;
+  margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--hd-space-6);
 }
 
-.ritual li {
-  display: flex;
-  gap: var(--hd-space-4);
-  align-items: flex-start;
+@media (min-width: 48rem) {
+  .beats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--hd-space-6);
+  }
 }
 
-.ritualNumber {
-  font-family: var(--hd-font-editorial);
-  font-style: italic;
-  color: var(--hd-accent);
-  font-size: 1.125rem;
-  line-height: 1.5;
-  flex-shrink: 0;
+.beats li {
+  border-top: 1px solid rgba(3, 3, 3, 0.28);
+  padding-top: var(--hd-space-4);
 }
 
-.captureSlot {
-  margin-top: var(--hd-space-5);
-  aspect-ratio: 4 / 5;
-  max-width: 20rem;
-  border: 1px solid var(--hd-rule);
-  background: var(--hd-surface);
-}
-
-.demoLabel {
+.beatLabel {
+  display: block;
   font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-micro);
-  letter-spacing: 0.04em;
   text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+  color: var(--hd-oxblood);
+  margin-bottom: var(--hd-space-3);
+}
+
+.beatBody {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.25rem;
+  line-height: 1.35;
+  margin: 0;
+  color: var(--hd-projection-black);
+  max-width: 22ch;
+}
+
+/* ---- Scene 3: send under seal -------------------------------------- */
+
+.seal {
+  display: grid;
+  gap: var(--hd-space-7);
+  align-items: center;
+  background: linear-gradient(0deg, var(--hd-house-black), var(--hd-house-black));
+  border-top: 1px solid var(--hd-rule);
+  border-bottom: 1px solid var(--hd-rule);
+  max-width: none;
+  padding-left: var(--hd-space-4);
+  padding-right: var(--hd-space-4);
+}
+
+@media (min-width: 60rem) {
+  .seal {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--hd-space-8);
+    padding-left: max(var(--hd-space-4), calc((100vw - var(--hd-site-width)) / 2));
+    padding-right: max(var(--hd-space-4), calc((100vw - var(--hd-site-width)) / 2));
+  }
+}
+
+.sealCopy {
+  max-width: 34rem;
+}
+
+.sealCopy h2 {
+  font-size: var(--hd-size-title);
+  line-height: 1.15;
+  margin: 0 0 var(--hd-space-4);
+  text-wrap: balance;
+}
+
+.sealCopy p {
   color: var(--hd-ink-muted);
-  margin-top: calc(var(--hd-space-3) * -1);
-  margin-bottom: var(--hd-space-4);
+  margin: 0 0 var(--hd-space-6);
+  max-width: 34rem;
+}
+
+/* The sealed recommendation, as the product actually renders it. */
+.sealCard {
+  border: 1px solid var(--hd-oxblood);
+  background: color-mix(in srgb, var(--hd-oxblood) 14%, var(--hd-projection-black));
+  padding: var(--hd-space-6) var(--hd-space-5);
+  max-width: 24rem;
+  width: 100%;
+  justify-self: center;
+  text-align: center;
+}
+
+.sealFrom {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  color: var(--hd-dust-rose);
+  margin: 0 0 var(--hd-space-5);
+}
+
+.sealNote {
+  border: 1px solid rgba(233, 224, 208, 0.22);
+  padding: var(--hd-space-4);
+  margin-bottom: var(--hd-space-5);
+  text-align: left;
+}
+
+.sealNoteLabel {
+  display: block;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.66rem;
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-2);
+}
+
+.sealNoteBody {
+  font-family: var(--hd-font-editorial);
+  color: var(--hd-ink-muted);
+  font-style: italic;
+}
+
+.cues {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--hd-space-2);
+  margin: 0 0 var(--hd-space-6);
+  padding: 0;
+}
+
+.cues li {
+  border: 1px solid rgba(233, 224, 208, 0.3);
+  border-radius: 999px;
+  padding: var(--hd-space-2) var(--hd-space-4);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: rgba(233, 224, 208, 0.45);
+}
+
+.sealSeal {
+  font-family: var(--hd-font-editorial);
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+  color: var(--hd-oxblood-raised);
+  margin: 0 0 var(--hd-space-4);
+}
+
+.sealAction {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  color: var(--hd-accent);
+  margin: 0;
+}
+
+/* ---- Scene 4: six words -------------------------------------------- */
+
+.sixWords h2 {
+  font-size: var(--hd-size-title);
+  line-height: 1.15;
+  margin: 0 0 var(--hd-space-4);
+  max-width: 20ch;
+  text-wrap: balance;
+}
+
+.sixLead {
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-7);
 }
 
 .words {
   list-style: none;
-  margin: var(--hd-space-4) 0 0;
+  margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--hd-space-4);
+  display: grid;
+  gap: var(--hd-space-5);
+}
+
+@media (min-width: 48rem) {
+  .words {
+    grid-template-columns: repeat(2, minmax(0, 30rem));
+  }
 }
 
 .words li {
   font-family: var(--hd-font-editorial);
-  font-style: italic;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
+  line-height: 1.4;
   color: var(--hd-ink);
-  border-left: 2px solid var(--hd-accent);
+  border-left: 1px solid var(--hd-accent);
   padding-left: var(--hd-space-4);
 }
 
+/* Six empty positions. Not a placeholder for missing content — the
+   positions are the point, and they stay until real members write.
+   A fixed six-column grid rather than a wrapping flex row: as flex they
+   broke five-and-one, which reads as a layout fault rather than as six
+   deliberate positions. */
+.slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--hd-space-4) var(--hd-space-3);
+  max-width: 34rem;
+}
+
+@media (min-width: 30rem) {
+  .slots {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.slotRule {
+  display: block;
+  height: 1px;
+  background: var(--hd-rule-strong);
+}
+
+/* ---- Scene 6: the invitation ---------------------------------------- */
+
 .invitation {
-  max-width: var(--hd-max-width);
+  max-width: var(--hd-site-width);
   margin: 0 auto;
   padding: var(--hd-space-8) var(--hd-space-4);
-  border-top: 1px solid var(--hd-rule);
   text-align: center;
 }
 
+/*
+ * The HD monogram, large and quiet, like a blind emboss. Set in ink at
+ * low contrast against the ground rather than in brass — brass is a
+ * registration colour, not a decorative one.
+ */
+.houseSeal {
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(3.5rem, 14vw, 6rem);
+  letter-spacing: 0.06em;
+  color: rgba(233, 224, 208, 0.09);
+  margin: 0 0 var(--hd-space-5);
+  line-height: 1;
+}
+
 .invitation h2 {
-  margin-bottom: var(--hd-space-5);
+  font-size: var(--hd-size-title);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.invitationSub {
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-6);
 }

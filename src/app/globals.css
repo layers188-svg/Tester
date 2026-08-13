@@ -21,6 +21,14 @@ body {
   min-height: 100dvh;
 }
 
+/* See --hd-size-body-desktop. Mobile is untouched: the product is
+   phone first, and 16px is already the right size in the hand. */
+@media (min-width: 48rem) {
+  body {
+    font-size: var(--hd-size-body-desktop);
+  }
+}
+
 h1,
 h2,
 h3,

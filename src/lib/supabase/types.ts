@@ -478,6 +478,13 @@ export interface Database {
         Returns: CreatedRecommendation[];
       };
       get_house_words: { Args: { p_limit?: number }; Returns: { body: string }[] };
+      /**
+       * Tonight's opening ordinal for the public home page — see
+       * migration 0016. Returns a bare integer, and null when nothing
+       * is open. Deliberately returns no other column: everything else
+       * on `openings` either is protected or narrows down the film.
+       */
+      get_public_opening_number: { Args: Record<string, never>; Returns: number | null };
       get_circle_member_names: { Args: { p_circle_id: string }; Returns: CircleMemberName[] };
       list_my_sealed_recommendations: {
         Args: Record<string, never>;

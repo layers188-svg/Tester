@@ -29,8 +29,13 @@ test.describe("four-tab navigation, both directions", () => {
 
   test("all four tabs have a 44px minimum touch target", async ({ page }) => {
     await page.goto("/tonight");
+    // Scoped to the primary nav on purpose. Unscoped, this matched the
+    // masthead's link to /tonight as well as the tab, and failed on a
+    // strict-mode violation that said nothing about touch targets. The
+    // test is about the tab bar, so it should only ever look there.
+    const nav = page.getByRole("navigation", { name: "Primary" });
     for (const tab of ["Tonight", "Circle", "Library", "You"]) {
-      const box = await page.getByRole("link", { name: tab }).boundingBox();
+      const box = await nav.getByRole("link", { name: tab, exact: true }).boundingBox();
       expect(box?.height).toBeGreaterThanOrEqual(44);
     }
   });

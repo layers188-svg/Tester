@@ -68,6 +68,9 @@
   --hd-size-heading: 1.25rem;
   --hd-size-body: 1rem;
   --hd-size-small: 0.875rem;
+  /* Desktop reads at arm's length, not a phone's. 18px from 768px up,
+     per the 13 August review's type note; mobile stays at 16. */
+  --hd-size-body-desktop: 1.125rem;
   --hd-size-micro: 0.75rem;
 
   /* Space — 4px rhythm */
@@ -86,6 +89,14 @@
   --hd-touch-min: 44px;
   --hd-max-width: 30rem; /* editorial phone-first column, widens per breakpoint */
   --hd-max-width-wide: 68rem;
+  /*
+   * The public site's outer container. The 13 August review's layout
+   * note: capping every public section at --hd-max-width meant a 1440px
+   * desktop showed one 30rem column down the middle with the rest of
+   * the canvas unused. This is the frame; measure is still held by each
+   * text block (30–38rem), not by the container.
+   */
+  --hd-site-width: 74rem;
 
   /* Motion — brief §8 timings */
   --hd-motion-button: 100ms;

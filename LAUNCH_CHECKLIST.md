@@ -420,3 +420,36 @@ missing.
 **Do this the same day item 2 (Resend custom SMTP) is done** — that is
 what makes real sign-in possible, and it is the only thing keeping this
 item open.
+
+---
+
+## 10. Two things in the supplied artwork need a decision
+
+Found while acting on the 13 August review's instruction to "use the
+approved House Dark wordmark SVG exactly".
+
+**The wordmark SVG's coordinates overlap in its own typeface.**
+`public/brand/wordmark.svg` sets HOUSE at `x="70"` and DARK at
+`x="910"`, both Newsreader 260px. In real Newsreader, HOUSE ends at
+x≈980 — so DARK begins 70 units _inside_ the E, and the file renders as
+overlapping letterforms. It only looks correct when the font is missing
+and a narrower fallback serif is substituted, which is how the file was
+presumably checked.
+
+`public/brand/wordmark-outlined.svg` (and `-inverse`) are generated
+from the same Newsreader 400 with the type converted to paths, using
+the font's own space advance instead of the hardcoded `x`. They render
+identically everywhere, with no font dependency. **Confirm the corrected
+spacing is acceptable**, or supply artwork whose coordinates match the
+typeface.
+
+**The self-hosted Newsreader is the 16pt optical size, the artwork asks
+for 72pt.** The SVG specifies `font-variation-settings: 'opsz' 72`;
+`next/font` serves the 16pt instance. At wordmark scale the 72pt cut has
+finer hairlines. Worth deciding whether to load the display optical size
+for the wordmark specifically.
+
+Until then the live wordmark stays as HTML text against the self-hosted
+face, which is the only way the real letterforms appear at all — an SVG
+carries no font, so the supplied file renders in whatever serif the
+viewer happens to have.
