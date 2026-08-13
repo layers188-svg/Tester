@@ -42,6 +42,18 @@ export function SendForm({
   const [sent, setSent] = useState(false);
 
   const noteValidation = validateRecommendationNote(personalNote);
+  /**
+   * A sealed send cannot be taken back, and the whole point is that the
+   * recipient sees very little. Showing the sender that little, exactly
+   * as it will arrive, is the last chance to notice that a cue gives
+   * the film away.
+   */
+  const [previewing, setPreviewing] = useState(false);
+
+  // Hoisted out of the submit handler so the preview shows exactly the
+  // cues that will be sent, rather than a second reading of the same
+  // inputs that could drift from it.
+  const cueValidation = validateCues(cues);
 
   // Brief §16 rule 3. One key per composed send, held in a ref so a
   // re-render does not change it: if the first attempt reached the
@@ -60,7 +72,6 @@ export function SendForm({
     e.preventDefault();
     setError(null);
 
-    const cueValidation = validateCues(cues);
     if (!cueValidation.valid) {
       setError(cueValidation.error ?? "Check your cues.");
       return;
@@ -269,15 +280,64 @@ export function SendForm({
         </p>
       )}
 
-      <Button
-        type="submit"
-        variant="primary"
-        fullWidth
-        disabled={busy || !noteValidation.valid}
-        aria-describedby={error ? "send-error" : undefined}
-      >
-        {busy ? "Sending…" : "Send under seal"}
-      </Button>
+      {/*
+        Preview before sending. A sealed send cannot be taken back, and
+        the sender never otherwise sees what the recipient will get —
+        which is the one place a cue that gives the film away would
+        become obvious.
+      */}
+      {previewing && (
+        <div className={styles.preview} aria-live="polite">
+          <p className={styles.previewLabel}>As it arrives</p>
+          <p className={styles.previewFrom}>You sent them a film under seal.</p>
+          {noteValidation.normalized && (
+            <p className={styles.previewNote}>{noteValidation.normalized}</p>
+          )}
+          <ul className={styles.previewCues}>
+            {cueValidation.cues.length > 0 ? (
+              cueValidation.cues.map((cue) => <li key={cue}>{cue}</li>)
+            ) : (
+              <li data-empty="true">No cues</li>
+            )}
+          </ul>
+          <p className={styles.previewSeal}>Reveal the film</p>
+          <p className={styles.previewNothing}>
+            No title, no poster, no runtime until they choose to reveal it.
+          </p>
+        </div>
+      )}
+
+      {!previewing ? (
+        <Button
+          type="button"
+          variant="secondary"
+          fullWidth
+          disabled={!noteValidation.valid || selected.length === 0 || !filmTitle.trim()}
+          onClick={() => setPreviewing(true)}
+        >
+          Preview the seal
+        </Button>
+      ) : (
+        <>
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            disabled={busy || !noteValidation.valid}
+            aria-describedby={error ? "send-error" : undefined}
+          >
+            {busy ? "Sending…" : "Send under seal"}
+          </Button>
+          <button
+            type="button"
+            className={styles.linkButton}
+            onClick={() => setPreviewing(false)}
+            disabled={busy}
+          >
+            Keep editing
+          </button>
+        </>
+      )}
     </form>
   );
 }

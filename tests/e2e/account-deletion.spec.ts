@@ -20,7 +20,7 @@ test.describe("delete review and account", () => {
   test("member deletes their own six-word review", async ({ page }) => {
     await page.goto("/tonight");
     await page.getByRole("button", { name: "Delete" }).click();
-    await expect(page.getByPlaceholder("Six words, exactly.")).toBeVisible();
+    await expect(page.getByPlaceholder("Exactly six words")).toBeVisible();
   });
 
   test("member deletes their account from You", async ({ page }) => {

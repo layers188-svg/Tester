@@ -120,10 +120,8 @@ export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWord
   if (!own || editing) {
     return (
       <div className={styles.panel}>
-        <h3>Six words</h3>
-        <p className={styles.hint}>
-          Write what you felt. Exactly six words. You will see it before anyone else&rsquo;s.
-        </p>
+        <h3>How did it leave you?</h3>
+        <p className={styles.hint}>Six words. Yours alone, before you read anyone else&rsquo;s.</p>
         <label className="hd-visually-hidden" htmlFor="six-words">
           Your six words
         </label>
@@ -133,7 +131,7 @@ export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWord
           rows={2}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Six words, exactly."
+          placeholder="Exactly six words"
           aria-invalid={error ? true : undefined}
           // The count is part of the field's description, not decoration:
           // "exactly six" is the rule, so the running total has to be
@@ -149,7 +147,7 @@ export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWord
           )}
         </div>
         <Button variant="primary" onClick={submit} disabled={busy || !validation.valid}>
-          {busy ? "Saving…" : "Leave your six words"}
+          {busy ? "Publishing…" : "Publish six words"}
         </Button>
       </div>
     );

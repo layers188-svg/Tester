@@ -14,7 +14,11 @@ test.describe("send and receive a film under seal", () => {
     // Five words: the private note is six or fewer, not exactly six.
     await senderPage.getByPlaceholder(/trust me on this one/i).fill("You need to see this");
     await senderPage.getByLabel(emailFor(PERSONAS.friend).split("@")[0]).check();
-    await senderPage.getByRole("button", { name: /send under seal/i }).click();
+    // The send is now two steps: preview the seal as the recipient
+    // will meet it, then send. A sealed send cannot be taken back.
+    await senderPage.getByRole("button", { name: /preview the seal/i }).click();
+    await expect(senderPage.getByText(/as it arrives/i)).toBeVisible();
+    await senderPage.getByRole("button", { name: /^send under seal$/i }).click();
     await expect(senderPage.getByText(/sent under seal/i)).toBeVisible();
 
     const recipient = await browser.newContext({ storageState: storageStateFor(PERSONAS.friend) });

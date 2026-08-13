@@ -361,6 +361,21 @@ export interface CirclesActivityRow {
   happened_at: string | null;
 }
 
+/**
+ * A Circle friend's six words — see migration 0019. `body` is null
+ * until the viewer has published their own on that opening; `title` is
+ * null until they have revealed it. The two are independent.
+ */
+export interface CircleSixWords {
+  review_id: string;
+  opening_id: string;
+  opening_number: number;
+  actor_display_name: string;
+  title: string | null;
+  body: string | null;
+  unlocked: boolean;
+}
+
 export interface MySealedRecommendation {
   id: string;
   sender_id: string;
@@ -532,6 +547,7 @@ export interface Database {
       get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
+      get_circle_six_words: { Args: Record<string, never>; Returns: CircleSixWords[] };
       get_analytics_summary: { Args: { p_days?: number }; Returns: AnalyticsSummaryRow[] };
     };
   };

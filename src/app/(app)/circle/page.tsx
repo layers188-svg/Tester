@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { CircleForms } from "@/components/circle/CircleForms";
+import { FriendWords } from "@/components/circle/FriendWords";
 import { Button } from "@/components/Button";
 import styles from "./page.module.css";
 
@@ -16,13 +17,18 @@ export default async function CirclePage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [{ data: memberships }, { data: recommendations }] = await Promise.all([
-    supabase
-      .from("circle_members")
-      .select("role, circles(id, name, invite_code)")
-      .eq("user_id", user.id),
-    supabase.rpc("list_my_sealed_recommendations"),
-  ]);
+  const [{ data: memberships }, { data: recommendations }, { data: friendWords }] =
+    await Promise.all([
+      supabase
+        .from("circle_members")
+        .select("role, circles(id, name, invite_code)")
+        .eq("user_id", user.id),
+      supabase.rpc("list_my_sealed_recommendations"),
+      // Sealed until the viewer has left their own six words; see
+      // migration 0019. Absent until that migration is applied, in
+      // which case the section shows its empty state.
+      supabase.rpc("get_circle_six_words"),
+    ]);
 
   const sentToYou = (recommendations ?? []).filter((r) => !r.is_sender && !r.watched_at);
   const sentByYou = (recommendations ?? []).filter((r) => r.is_sender);
@@ -53,6 +59,17 @@ export default async function CirclePage() {
           </ul>
         </section>
       )}
+
+      {/*
+        The brief's two areas: recommendations sent directly to the
+        member, above, and friend activity here. Circle activity used to
+        live in Library, which is the wrong place for it — Library is a
+        collection, this is a room.
+      */}
+      <section className={styles.section}>
+        <h2>From your Circle</h2>
+        <FriendWords words={friendWords ?? []} />
+      </section>
 
       <section className={styles.section}>
         <h2>Your Circles</h2>

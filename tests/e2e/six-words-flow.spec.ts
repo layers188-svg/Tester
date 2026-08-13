@@ -14,10 +14,10 @@ test.describe("mark watched and leave six words", () => {
   }) => {
     await page.goto("/tonight");
     await page.getByRole("button", { name: /mark watched/i }).click();
-    await expect(page.getByPlaceholder("Six words, exactly.")).toBeVisible();
+    await expect(page.getByPlaceholder("Exactly six words")).toBeVisible();
 
-    await page.getByPlaceholder("Six words, exactly.").fill("I did not see that coming");
-    await page.getByRole("button", { name: /leave your six words/i }).click();
+    await page.getByPlaceholder("Exactly six words").fill("I did not see that coming");
+    await page.getByRole("button", { name: /publish six words/i }).click();
 
     await expect(page.getByText(/i did not see that coming/i)).toBeVisible();
     await expect(page.getByRole("heading", { name: /after credits/i })).toBeVisible();
