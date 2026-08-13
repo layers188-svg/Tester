@@ -1,0 +1,144 @@
+/*
+ * After Credits.
+ *
+ * A wall of six-word lines that has to feel alive without becoming
+ * cluttered. Rhythm comes from two things only: Circle members set a
+ * size larger and in full ink, and the entries alternate their indent
+ * so the column reads as a room rather than a list. No cards, no
+ * avatars, no counts.
+ */
+
+.wrap {
+  margin-top: var(--hd-space-7);
+  border-top: 1px solid var(--hd-rule);
+  padding-top: var(--hd-space-6);
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.72rem;
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.heading {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  margin: 0 0 var(--hd-space-6);
+}
+
+.loading,
+.empty {
+  color: var(--hd-ink-muted);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  margin: 0;
+}
+
+/* The member's own words, pinned. Oxblood edge so it reads as theirs
+   without needing a label to do the work alone. */
+.mine {
+  border-left: 2px solid var(--hd-oxblood-raised);
+  padding-left: var(--hd-space-4);
+  margin-bottom: var(--hd-space-6);
+}
+
+.mineLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.68rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.mineBody {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.375rem;
+  line-height: 1.3;
+  color: var(--hd-ink);
+  margin: 0;
+}
+
+.views {
+  display: flex;
+  gap: var(--hd-space-2);
+  margin-bottom: var(--hd-space-5);
+}
+
+.view {
+  min-height: var(--hd-touch-min);
+  padding: var(--hd-space-2) var(--hd-space-4);
+  background: transparent;
+  border: 1px solid var(--hd-rule);
+  border-radius: 999px;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+}
+
+.view[data-active="true"] {
+  border-color: var(--hd-accent);
+  color: var(--hd-accent);
+}
+
+.view:focus-visible {
+  outline: 2px solid var(--hd-focus);
+  outline-offset: 2px;
+}
+
+.room {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-6);
+}
+
+.entry {
+  max-width: 34ch;
+}
+
+/* Alternating indent, so the column has a pulse. Kept small: this is
+   rhythm, not decoration, and every line stays left-readable. */
+.entry:nth-child(even) {
+  margin-left: auto;
+  text-align: right;
+}
+
+.body {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.125rem;
+  line-height: 1.35;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-2);
+}
+
+/* Circle members, a step louder. */
+.entry[data-circle="true"] .body {
+  font-size: 1.375rem;
+  color: var(--hd-ink);
+}
+
+.who {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--hd-ink-faint, rgba(216, 204, 184, 0.6));
+  margin: 0;
+}
+
+.entry[data-circle="true"] .who {
+  color: var(--hd-accent);
+}

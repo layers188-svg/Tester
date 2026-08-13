@@ -8,6 +8,7 @@ import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
 import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SixWordsPanel } from "./SixWordsPanel";
+import { AfterCredits } from "./AfterCredits";
 import styles from "./TonightExperience.module.css";
 
 type Phase = "not_available" | "sealed" | "dimming" | "trailer" | "revealing" | "revealed";
@@ -27,6 +28,12 @@ export function TonightExperience({
   const [reveal, setReveal] = useState<RevealPayload | null>(null);
   const [revealError, setRevealError] = useState<string | null>(null);
   const [watchState, setWatchState] = useState(progress?.watchState ?? null);
+  /**
+   * Whether this member has published their six words for tonight. It
+   * is what opens After Credits, so it starts from what the server
+   * already knew and flips the moment they publish, without a reload.
+   */
+  const [hasPublished, setHasPublished] = useState(Boolean(progress?.hasSixWords));
   const [copyLabel, setCopyLabel] = useState("Copy title");
 
   useEffect(() => {
@@ -285,8 +292,14 @@ export function TonightExperience({
                     }
                   : null
               }
+              onPublished={() => setHasPublished(true)}
             />
           )}
+
+          {/* The room opens only once the member has spoken in it. The
+              database enforces the same rule; this just avoids asking
+              for a result that would come back empty. */}
+          {watchState === "watched" && hasPublished && <AfterCredits openingId={opening.id} />}
         </>
       ) : (
         <p className={styles.error}>{revealError ?? "Loading…"}</p>

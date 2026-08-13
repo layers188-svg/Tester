@@ -15,6 +15,11 @@ interface OwnReview {
 interface SixWordsPanelProps {
   target: { openingId: string } | { sealedRecommendationId: string };
   initialOwnReview: OwnReview | null;
+  /**
+   * Fired when the member publishes. After Credits opens off this
+   * rather than a reload, so the room appears the moment they speak.
+   */
+  onPublished?: () => void;
 }
 
 interface OtherWord {
@@ -29,7 +34,7 @@ interface OtherWord {
  * can_view_six_word_review in Postgres RLS (never trust the browser
  * alone for that boundary).
  */
-export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) {
+export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWordsPanelProps) {
   const [own, setOwn] = useState(initialOwnReview);
   const [draft, setDraft] = useState(initialOwnReview?.body ?? "");
   const [editing, setEditing] = useState(false);
@@ -90,6 +95,7 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
       }
       const saved = await res.json();
       setOwn({ id: saved.id, body: saved.body, createdAt: saved.created_at });
+      onPublished?.();
       setEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

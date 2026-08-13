@@ -479,6 +479,23 @@ export interface Database {
       };
       get_house_words: { Args: { p_limit?: number }; Returns: { body: string }[] };
       /**
+       * After Credits — see migration 0017. Returns no rows when the
+       * caller has not published their own six words for the opening,
+       * which is how the caller distinguishes a shut room from an
+       * empty one.
+       */
+      get_after_credits: {
+        Args: { p_opening_id: string };
+        Returns: {
+          review_id: string;
+          body: string;
+          display_name: string;
+          is_mine: boolean;
+          in_my_circle: boolean;
+          written_at: string;
+        }[];
+      };
+      /**
        * Tonight's opening ordinal for the public home page — see
        * migration 0016. Returns a bare integer, and null when nothing
        * is open. Deliberately returns no other column: everything else
