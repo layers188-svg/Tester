@@ -118,6 +118,28 @@ must contain `{{ .Token }}`, or Supabase sends a link and the app asks
 for a code that never arrives. `OPERATIONS.md` has the exact template
 text.
 
+> **This is where the "no domain needed" path actually bites, and it
+> is not where I expected.**
+>
+> On a free-tier project still using Supabase's built-in email, the
+> Management API refuses the change outright:
+>
+> ```
+> 400 Email template modification is not available for free tier
+>     projects using the default email provider. Please upgrade your
+>     plan or configure a custom SMTP provider.
+> ```
+>
+> The dashboard enforces the same rule. So the built-in email service
+> cannot deliver a six-digit code at all, and **nobody can sign in
+> until custom SMTP is configured** — which means step 5's Resend
+> account is not optional for testing, it is a prerequisite for
+> sign-in. The order is: Resend key → set as Supabase custom SMTP →
+> the template unlocks → set `{{ .Token }}`.
+>
+> Everything else on this page still holds, including the part that
+> matters: none of it requires a purchased domain.
+
 ### 5. Email, for an audience of one
 
 This is the one place the missing domain is actually felt, and the
@@ -134,9 +156,11 @@ House Dark sends over two separate channels, and they fail differently:
 
 **For an audience of one, neither needs a domain:**
 
-- Leave Supabase on its built-in email service (no custom SMTP). It is
-  rate-limited to a handful of messages an hour — useless for a beta,
-  entirely adequate for signing yourself in.
+- Supabase **must** be moved off its built-in email onto custom SMTP —
+  see the box in step 4. Point it at Resend:
+  host `smtp.resend.com`, port `465`, username `resend`, password = the
+  Resend API key. This is what unlocks the `{{ .Token }}` template, and
+  without it nobody can sign in at all.
 - Set `RESEND_FROM_EMAIL=onboarding@resend.dev`, Resend's shared test
   sender. It requires no verification and delivers **only to the address
   that owns the Resend account** — so point `ADMIN_EMAILS` and your test

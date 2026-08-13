@@ -39,7 +39,37 @@ The Supabase CLI is now a devDependency, so `npx supabase` works after
 
 ---
 
-## 2. Resend account and verified sending domain
+## 2. Resend account — now blocks sign-in entirely
+
+**Upgraded from "throttled beta" to "nobody can sign in."** Supabase
+refuses email-template edits on a free-tier project using its built-in
+email provider — the Management API returns:
+
+```
+400 Email template modification is not available for free tier projects
+    using the default email provider.
+```
+
+`/join` needs a six-digit code, which requires `{{ .Token }}` in the
+Magic Link template, which requires custom SMTP. So the built-in service
+cannot deliver a usable sign-in email at any volume, not just a low one.
+
+**Order:** create the Resend account → API key → set it as Supabase
+custom SMTP → the template unlocks → I set `{{ .Token }}`.
+
+For testing alone, `onboarding@resend.dev` needs no verified domain (it
+delivers only to the address owning the Resend account). Inviting anyone
+else still needs the domain from item 4.
+
+Already applied to the project, so they are not waiting on this: OTP
+length `6` (was `8` — the app's code field is `maxLength=6`, so an
+8-digit code could never have been entered), expiry `300` (was `3600`),
+and Site URL `https://house-dark.layers188.workers.dev` (was localhost).
+
+**Then give me:** `RESEND_API_KEY`, and a fresh Supabase personal access
+token for the one template call.
+
+Original note, still true for the public beta:
 
 Supabase's shared SMTP will throttle a public beta to a trickle. Auth
 codes are the first thing a new member sees.
