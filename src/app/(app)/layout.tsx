@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AppNav } from "@/components/AppNav";
+import { Wordmark } from "@/components/Wordmark";
 import styles from "./layout.module.css";
 
 /**
@@ -34,6 +36,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className={styles.shell}>
+      {/*
+        The signed-in shell had no masthead at all, so once a member was
+        past /join the identity disappeared entirely. Kept deliberately
+        quiet: the wordmark, a hairline, and nothing else. The four tabs
+        are the navigation (brief §5), so this header carries no links
+        of its own beyond returning to Tonight.
+      */}
+      <header className={styles.header}>
+        <Link href="/tonight" className={styles.brand} aria-label="House Dark, tonight">
+          <Wordmark />
+        </Link>
+      </header>
       <main id="hd-main" className={styles.main}>
         {children}
       </main>

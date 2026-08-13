@@ -111,3 +111,13 @@
 .legalNav a {
   color: var(--hd-ink-muted);
 }
+
+/* The one-line pointer to /why. */
+.sectionNote {
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+.sectionNote a {
+  color: var(--hd-accent);
+}

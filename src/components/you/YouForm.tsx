@@ -272,6 +272,20 @@ export function YouForm({
         )}
       </section>
 
+      {/*
+        The mission lives here rather than in the tab bar: brief §5 fixes
+        the navigation at four tabs, and this is something a member reads
+        once, when they are thinking about the house rather than about
+        tonight's film. You is where they already are when that happens.
+      */}
+      <section className={styles.section}>
+        <h2>The house</h2>
+        <p className={styles.sectionNote}>
+          <Link href="/why">Why House Dark exists</Link> &mdash; what it is for, and what it
+          deliberately is not.
+        </p>
+      </section>
+
       <section className={styles.section}>
         <nav className={styles.legalNav}>
           <Link href="/terms">Terms</Link>
