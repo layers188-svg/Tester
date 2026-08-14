@@ -131,6 +131,16 @@
    * that most needs to survive review: an interface that answers
    * instantly everywhere has no significant moments in it.
    */
+  /*
+   * How long a signature transformation takes.
+   *
+   * The one the six verbs are measured against, and the duration every
+   * shared-element view transition runs at unless it says otherwise.
+   * Long enough that a member sees an object move rather than noticing
+   * that a screen changed: below about 500ms a morph reads as a cut,
+   * whatever it is technically doing.
+   */
+  --hd-motion-signature: 700ms;
   --hd-motion-focus: 620ms;
   --hd-motion-unseal: 720ms;
   --hd-motion-transform: 900ms;
@@ -179,6 +189,7 @@
     --hd-motion-panel: 0ms;
     --hd-motion-dim: 0ms;
     --hd-motion-reveal: 0ms;
+    --hd-motion-signature: 0ms;
     --hd-motion-focus: 0ms;
     --hd-motion-unseal: 0ms;
     --hd-motion-transform: 0ms;

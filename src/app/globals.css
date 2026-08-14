@@ -204,6 +204,53 @@ ol {
   navigation: auto;
 }
 
+/*
+ * ---------------------------------------------------------------------
+ * HOW LONG A TRANSITION LASTS.
+ *
+ * This block is the reason three motion passes read as cuts.
+ *
+ * A `view-transition-name` makes two elements one object, and the
+ * browser then animates that object with its OWN default: 250ms, on a
+ * default ease. Nothing in this stylesheet had ever overridden it. So
+ * every shared-element morph in the product — the clue frame growing
+ * into the playback stage, the film title travelling into the House,
+ * the member's six words arriving in the Room, the seal opening — has
+ * been running at 250ms, while the tokens that were supposed to govern
+ * them (620ms, 720ms, 900ms) applied only to ordinary CSS transitions
+ * on elements that were not part of a view transition at all.
+ *
+ * 250ms is enough to see that something changed and not enough to see
+ * what. Frame by frame the object was demonstrably surviving; at normal
+ * speed it read as a cut, because it was one. The objects were right
+ * and the clock was wrong.
+ *
+ * The group carries the movement (position, size, shape). The old and
+ * new pseudo-elements carry the content cross-fade, and they have to
+ * last as long or the contents snap while the box is still travelling.
+ * ---------------------------------------------------------------------
+ */
+::view-transition-group(*) {
+  animation-duration: var(--hd-motion-signature);
+  animation-timing-function: var(--hd-ease-entering);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: var(--hd-motion-signature);
+  animation-timing-function: var(--hd-ease-entering);
+}
+
+/*
+ * A page change is not a signature moment, so the root group keeps the
+ * structural speed. Without this every ordinary navigation would take
+ * as long as the reveal, which is the opposite failure: making
+ * everything cinematic is the same as making nothing cinematic.
+ */
+::view-transition-group(root) {
+  animation-duration: var(--hd-motion-standard);
+}
+
 ::view-transition-old(root) {
   animation: hd-page-out var(--hd-motion-fast) var(--hd-ease-standard) both;
 }
