@@ -147,3 +147,19 @@
     font-size: clamp(3.5rem, 7vw, 5.5rem);
   }
 }
+
+/*
+ * The seal on the waiting film.
+ *
+ * Named to match the one on the recommendation page, so choosing this
+ * carries the object across rather than drawing a second copy of it
+ * there. Set above the label rather than beside it: on this screen the
+ * seal is the subject, not an icon decorating a heading.
+ */
+.waitingSeal {
+  view-transition-name: hd-seal;
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: var(--hd-space-5);
+}

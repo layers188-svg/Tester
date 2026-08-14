@@ -4,6 +4,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { CircleForms } from "@/components/circle/CircleForms";
 import { FriendWords } from "@/components/circle/FriendWords";
 import { Button } from "@/components/Button";
+import { SealMark } from "@/components/circle/SealMark";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -56,6 +57,16 @@ export default async function CirclePage() {
       */}
       {waiting ? (
         <section className={styles.waiting}>
+          {/*
+            The seal, as an object rather than as a word.
+
+            It carries `hd-seal`, which the recommendation page's own
+            seal also carries, so choosing this does not replace one
+            screen with another: the seal travels from here into the
+            page where it breaks. It is the same two arcs and a rule the
+            sender watched close.
+          */}
+          <SealMark broken={false} className={styles.waitingSeal} />
           <p className={styles.waitingLabel}>Under seal</p>
           <h1 className={styles.waitingTitle}>A film is waiting.</h1>
           <p className={styles.waitingFrom}>From {waiting.sender_display_name}</p>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import type { RevealPayload } from "@/lib/reveal/payload";
 import { PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
-import { MOTION, motionDuration } from "@/lib/motion";
+import { MOTION, motionDuration, startViewTransition } from "@/lib/motion";
 import { SixWordsPanel } from "@/components/tonight/SixWordsPanel";
 import type { SealedProgress } from "@/lib/sealed/queries";
 import { SealMark } from "./SealMark";
@@ -48,7 +48,15 @@ export function SealedExperience({
 
   useEffect(() => {
     if (!breaking) return;
-    const timer = setTimeout(() => setRevealed(true), motionDuration(MOTION.unseal));
+    const timer = setTimeout(
+      // Inside a transition, so the sealed card and the opened one are
+      // the same composition rearranging. The seal is `hd-seal` on both
+      // sides and the sender line is `hd-seal-from`, so the two things
+      // the member was looking at hold their place while everything
+      // else finds a new one.
+      () => startViewTransition(() => setRevealed(true)),
+      motionDuration(MOTION.unseal),
+    );
     return () => clearTimeout(timer);
   }, [breaking]);
 
@@ -131,8 +139,10 @@ export function SealedExperience({
     return (
       <div className={styles.card} data-state={breaking ? "breaking" : "sealed"}>
         <div className={styles.sealHead}>
-          <SealMark broken={breaking} />
-          <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
+          <SealMark broken={breaking} className={styles.namedSeal} />
+          <p className={`${styles.eyebrow} ${styles.namedFrom}`}>
+            From {recommendation.senderDisplayName}
+          </p>
         </div>
         <h1>A film under seal.</h1>
         {recommendation.personalNote && (
@@ -174,8 +184,10 @@ export function SealedExperience({
     return (
       <div className={styles.card}>
         <div className={styles.sealHead}>
-          <SealMark broken />
-          <p className={styles.eyebrow}>From {recommendation.senderDisplayName}</p>
+          <SealMark broken className={styles.namedSeal} />
+          <p className={`${styles.eyebrow} ${styles.namedFrom}`}>
+            From {recommendation.senderDisplayName}
+          </p>
         </div>
         <p>{error ? "The house could not open this one." : "Opening…"}</p>
         {error && <p className={styles.error}>{error}</p>}

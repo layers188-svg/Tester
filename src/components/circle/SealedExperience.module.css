@@ -174,3 +174,25 @@
   margin-bottom: var(--hd-space-4);
   flex-wrap: wrap;
 }
+
+/*
+ * ---------------------------------------------------------------------
+ * The two things that survive the seal breaking.
+ *
+ * `hd-seal` is also on the seal in Circle's hero, so arriving here is
+ * the same object moving rather than one screen replacing another. It
+ * then stays named through the open, which means the card does not swap
+ * for a different card: the seal holds its place, the sender line holds
+ * its place, and everything else rearranges around them.
+ *
+ * That is the whole of UNSEAL as a composition rather than as an
+ * animation. There is no envelope, no wax and no ticket anywhere in it.
+ * ---------------------------------------------------------------------
+ */
+.namedSeal {
+  view-transition-name: hd-seal;
+}
+
+.namedFrom {
+  view-transition-name: hd-seal-from;
+}
