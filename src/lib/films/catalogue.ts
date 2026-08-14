@@ -966,6 +966,777 @@ const CATALOGUE: CatalogueEntry[] = [
       intensity: "High",
     },
   },
+
+  /*
+   * -------------------------------------------------------------------
+   * The films people actually type.
+   *
+   * The entries above are the house's own programming. These are the
+   * ones a member reaches for when they open Search: the films that
+   * come up in conversation, get recommended, get argued about.
+   *
+   * They are here because the alternative was worse. Search went to a
+   * model for any film the house had not described, which meant "La La
+   * Land" answered "the house has nothing on that one" unless somebody
+   * was paying for an API key — a mainstream title failing on a billing
+   * question. Hand-written six words need no key, no quota and no
+   * network; they are exactly six by construction rather than by retry;
+   * and they are better, because a person choosing the six words that
+   * matter beats a model averaging what a synopsis said.
+   *
+   * The wide index still sits behind these for the long tail, and the
+   * editorial engine still writes anything neither covers. This is the
+   * floor, and it is now high enough that most searches never reach
+   * past it.
+   * -------------------------------------------------------------------
+   */
+  {
+    provider: "catalogue",
+    externalId: "la-la-land",
+    title: "La La Land",
+    releaseYear: 2016,
+    runtimeMinutes: 128,
+    genres: ["Drama", "Music", "Romance"],
+    synopsis:
+      "A jazz pianist and an aspiring actress fall in love in Los Angeles while each pursues a career that pulls them apart.",
+    editorial: {
+      sixWordPlot: "Two dreamers meet where ambition wins.",
+      territory: ["Love", "Ambition", "Compromise"],
+      pace: "Buoyant",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-godfather",
+    title: "The Godfather",
+    releaseYear: 1972,
+    runtimeMinutes: 175,
+    genres: ["Crime", "Drama"],
+    synopsis:
+      "The youngest son of a crime family returns from the war intending to stay outside the business.",
+    editorial: {
+      sixWordPlot: "A son inherits what he refused.",
+      territory: ["Family", "Power", "Duty"],
+      pace: "Stately",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "pulp-fiction",
+    title: "Pulp Fiction",
+    releaseYear: 1994,
+    runtimeMinutes: 154,
+    genres: ["Crime", "Drama"],
+    synopsis:
+      "Interlocking stories of hitmen, a boxer and a gangster's wife in Los Angeles, told out of sequence.",
+    editorial: {
+      sixWordPlot: "Crime stories fold into each other.",
+      territory: ["Chance", "Violence", "Talk"],
+      pace: "Springy",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "fight-club",
+    title: "Fight Club",
+    releaseYear: 1999,
+    runtimeMinutes: 139,
+    genres: ["Drama", "Thriller"],
+    synopsis:
+      "A sleepless office worker meets a soap salesman and together they start an underground club.",
+    editorial: {
+      sixWordPlot: "An insomniac finds a violent outlet.",
+      territory: ["Identity", "Rage", "Consumption"],
+      pace: "Escalating",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "goodfellas",
+    title: "Goodfellas",
+    releaseYear: 1990,
+    runtimeMinutes: 145,
+    genres: ["Crime", "Drama"],
+    synopsis:
+      "A boy grows up idolising the gangsters in his neighbourhood and spends his life among them.",
+    editorial: {
+      sixWordPlot: "Belonging to the crew costs everything.",
+      territory: ["Loyalty", "Ambition", "Decay"],
+      pace: "Propulsive",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-shawshank-redemption",
+    title: "The Shawshank Redemption",
+    releaseYear: 1994,
+    runtimeMinutes: 142,
+    genres: ["Drama"],
+    synopsis:
+      "A banker convicted of murder builds a life and a friendship over decades inside a state penitentiary.",
+    editorial: {
+      sixWordPlot: "A banker keeps hope inside prison.",
+      territory: ["Hope", "Endurance", "Friendship"],
+      pace: "Patient",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "inception",
+    title: "Inception",
+    releaseYear: 2010,
+    runtimeMinutes: 148,
+    genres: ["Science Fiction", "Thriller"],
+    synopsis:
+      "A team of specialists enter dreams to steal secrets, and are asked instead to plant one.",
+    editorial: {
+      sixWordPlot: "Thieves work inside other people's dreams.",
+      territory: ["Memory", "Guilt", "Architecture"],
+      pace: "Propulsive",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "interstellar",
+    title: "Interstellar",
+    releaseYear: 2014,
+    runtimeMinutes: 169,
+    genres: ["Science Fiction", "Drama"],
+    synopsis:
+      "A former pilot joins a mission through a wormhole to find a habitable world as Earth fails.",
+    editorial: {
+      sixWordPlot: "A father leaves Earth for time.",
+      territory: ["Love", "Time", "Survival"],
+      pace: "Expansive",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-dark-knight",
+    title: "The Dark Knight",
+    releaseYear: 2008,
+    runtimeMinutes: 152,
+    genres: ["Action", "Crime", "Drama"],
+    synopsis:
+      "A masked vigilante and a district attorney face an anarchist who wants to prove everyone will break.",
+    editorial: {
+      sixWordPlot: "A city tests its protector's limits.",
+      territory: ["Order", "Chaos", "Sacrifice"],
+      pace: "Relentless",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "se7en",
+    title: "Se7en",
+    releaseYear: 1995,
+    runtimeMinutes: 127,
+    genres: ["Crime", "Thriller"],
+    synopsis:
+      "A retiring detective and his replacement track a murderer who arranges killings around the deadly sins.",
+    editorial: {
+      sixWordPlot: "Two detectives follow a moralising killer.",
+      territory: ["Sin", "Dread", "Futility"],
+      pace: "Grim",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "taxi-driver",
+    title: "Taxi Driver",
+    releaseYear: 1976,
+    runtimeMinutes: 114,
+    genres: ["Drama", "Crime"],
+    synopsis:
+      "An insomniac cab driver in New York becomes fixated on rescuing people who have not asked him to.",
+    editorial: {
+      sixWordPlot: "A lonely driver decides to act.",
+      territory: ["Isolation", "Violence", "Delusion"],
+      pace: "Simmering",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "apocalypse-now",
+    title: "Apocalypse Now",
+    releaseYear: 1979,
+    runtimeMinutes: 147,
+    genres: ["War", "Drama"],
+    synopsis:
+      "A captain is sent up a river during the Vietnam War to find and remove a colonel who has gone rogue.",
+    editorial: {
+      sixWordPlot: "A soldier travels upriver toward madness.",
+      territory: ["War", "Madness", "Myth"],
+      pace: "Hypnotic",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "2001-a-space-odyssey",
+    title: "2001: A Space Odyssey",
+    releaseYear: 1968,
+    runtimeMinutes: 149,
+    genres: ["Science Fiction"],
+    synopsis:
+      "From prehistory to deep space, humanity encounters an object that appears at each leap forward.",
+    editorial: {
+      sixWordPlot: "Humanity meets something it cannot explain.",
+      territory: ["Evolution", "Machines", "Awe"],
+      pace: "Glacial",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "alien",
+    title: "Alien",
+    releaseYear: 1979,
+    runtimeMinutes: 117,
+    genres: ["Science Fiction", "Horror"],
+    synopsis:
+      "The crew of a commercial towing ship is woken early to investigate a transmission from a nearby moon.",
+    editorial: {
+      sixWordPlot: "A crew answers a distress signal.",
+      territory: ["Isolation", "Dread", "Survival"],
+      pace: "Tightening",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "jaws",
+    title: "Jaws",
+    releaseYear: 1975,
+    runtimeMinutes: 124,
+    genres: ["Thriller", "Adventure"],
+    synopsis:
+      "A police chief on a summer island wants the beaches shut, and the people who profit from them do not.",
+    editorial: {
+      sixWordPlot: "A resort town will not close.",
+      territory: ["Denial", "Fear", "Duty"],
+      pace: "Building",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-shining",
+    title: "The Shining",
+    releaseYear: 1980,
+    runtimeMinutes: 146,
+    genres: ["Horror", "Drama"],
+    synopsis:
+      "A writer takes a job as winter caretaker of a remote hotel and moves his wife and son in.",
+    editorial: {
+      sixWordPlot: "A family winters alone in emptiness.",
+      territory: ["Isolation", "Madness", "Inheritance"],
+      pace: "Creeping",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "casablanca",
+    title: "Casablanca",
+    releaseYear: 1942,
+    runtimeMinutes: 102,
+    genres: ["Drama", "Romance"],
+    synopsis:
+      "An American running a nightclub in wartime Morocco is confronted by the woman who left him.",
+    editorial: {
+      sixWordPlot: "An old love arrives during wartime.",
+      territory: ["Love", "Duty", "Exile"],
+      pace: "Measured",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "vertigo",
+    title: "Vertigo",
+    releaseYear: 1958,
+    runtimeMinutes: 128,
+    genres: ["Thriller", "Mystery"],
+    synopsis: "A retired detective with a fear of heights is hired to follow an old friend's wife.",
+    editorial: {
+      sixWordPlot: "A detective follows a woman obsessively.",
+      territory: ["Obsession", "Illusion", "Guilt"],
+      pace: "Spiralling",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "psycho",
+    title: "Psycho",
+    releaseYear: 1960,
+    runtimeMinutes: 109,
+    genres: ["Horror", "Thriller"],
+    synopsis: "A secretary drives out of the city with stolen money and pulls in for the night.",
+    editorial: {
+      sixWordPlot: "A woman stops at one motel.",
+      territory: ["Secrecy", "Fear", "Watching"],
+      pace: "Sharp",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "citizen-kane",
+    title: "Citizen Kane",
+    releaseYear: 1941,
+    runtimeMinutes: 119,
+    genres: ["Drama"],
+    synopsis: "After a newspaper magnate dies, reporters try to work out what his last word meant.",
+    editorial: {
+      sixWordPlot: "Reporters chase one dying man's word.",
+      territory: ["Power", "Memory", "Loneliness"],
+      pace: "Stately",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "schindlers-list",
+    title: "Schindler's List",
+    releaseYear: 1993,
+    runtimeMinutes: 195,
+    genres: ["Drama", "History"],
+    synopsis:
+      "An industrialist profits from the war and then begins buying the freedom of the people working for him.",
+    editorial: {
+      sixWordPlot: "A businessman spends everything on lives.",
+      territory: ["Complicity", "Mercy", "Horror"],
+      pace: "Unflinching",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "forrest-gump",
+    title: "Forrest Gump",
+    releaseYear: 1994,
+    runtimeMinutes: 142,
+    genres: ["Drama", "Romance"],
+    synopsis:
+      "A man from Alabama passes through several decades of American life, mostly by accident.",
+    editorial: {
+      sixWordPlot: "A gentle man walks through history.",
+      territory: ["Chance", "Devotion", "America"],
+      pace: "Ambling",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "titanic",
+    title: "Titanic",
+    releaseYear: 1997,
+    runtimeMinutes: 194,
+    genres: ["Drama", "Romance"],
+    synopsis:
+      "A young woman travelling first class and an artist travelling steerage meet on an ocean liner.",
+    editorial: {
+      sixWordPlot: "Two strangers meet aboard one crossing.",
+      territory: ["Class", "Love", "Catastrophe"],
+      pace: "Sweeping",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-matrix",
+    title: "The Matrix",
+    releaseYear: 1999,
+    runtimeMinutes: 136,
+    genres: ["Science Fiction", "Action"],
+    synopsis:
+      "A software engineer who moonlights as a hacker is contacted by people who say the world is not what it seems.",
+    editorial: {
+      sixWordPlot: "A programmer learns the world's shape.",
+      territory: ["Reality", "Control", "Awakening"],
+      pace: "Kinetic",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "gladiator",
+    title: "Gladiator",
+    releaseYear: 2000,
+    runtimeMinutes: 155,
+    genres: ["Action", "Drama"],
+    synopsis:
+      "A Roman general is betrayed after the emperor's death and ends up fighting in the arena.",
+    editorial: {
+      sixWordPlot: "A general is stripped of everything.",
+      territory: ["Vengeance", "Honour", "Empire"],
+      pace: "Grand",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "heat",
+    title: "Heat",
+    releaseYear: 1995,
+    runtimeMinutes: 170,
+    genres: ["Crime", "Drama"],
+    synopsis:
+      "A career criminal planning a last job and the detective pursuing him lead strangely similar lives.",
+    editorial: {
+      sixWordPlot: "Thief and detective mirror each other.",
+      territory: ["Discipline", "Loneliness", "Craft"],
+      pace: "Deliberate",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "fargo",
+    title: "Fargo",
+    releaseYear: 1996,
+    runtimeMinutes: 98,
+    genres: ["Crime", "Drama"],
+    synopsis:
+      "A car salesman arranges something small to solve a money problem, and a pregnant police chief investigates.",
+    editorial: {
+      sixWordPlot: "A small plan goes badly wrong.",
+      territory: ["Greed", "Snow", "Decency"],
+      pace: "Deadpan",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-big-lebowski",
+    title: "The Big Lebowski",
+    releaseYear: 1998,
+    runtimeMinutes: 117,
+    genres: ["Comedy", "Crime"],
+    synopsis: "A man in Los Angeles is mistaken for a millionaire who shares his name.",
+    editorial: {
+      sixWordPlot: "Mistaken identity disturbs a quiet life.",
+      territory: ["Confusion", "Leisure", "Nihilism"],
+      pace: "Loose",
+      intensity: "Low",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "trainspotting",
+    title: "Trainspotting",
+    releaseYear: 1996,
+    runtimeMinutes: 93,
+    genres: ["Drama"],
+    synopsis:
+      "A group of friends in Edinburgh move in and out of heroin addiction and each other's schemes.",
+    editorial: {
+      sixWordPlot: "Edinburgh friends chase the next high.",
+      territory: ["Addiction", "Friendship", "Escape"],
+      pace: "Frantic",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "amadeus",
+    title: "Amadeus",
+    releaseYear: 1984,
+    runtimeMinutes: 160,
+    genres: ["Drama", "Music"],
+    synopsis:
+      "An ageing court composer recalls his encounters with a younger musician whose talent he cannot match.",
+    editorial: {
+      sixWordPlot: "A court composer meets undeniable genius.",
+      territory: ["Envy", "Genius", "Faith"],
+      pace: "Operatic",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "raging-bull",
+    title: "Raging Bull",
+    releaseYear: 1980,
+    runtimeMinutes: 129,
+    genres: ["Drama", "Sport"],
+    synopsis:
+      "A middleweight boxer's jealousy and rage wreck his relationships as his career rises and falls.",
+    editorial: {
+      sixWordPlot: "A boxer destroys everything outside boxing.",
+      territory: ["Jealousy", "Violence", "Ruin"],
+      pace: "Brutal",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "chinatown",
+    title: "Chinatown",
+    releaseYear: 1974,
+    runtimeMinutes: 130,
+    genres: ["Mystery", "Drama"],
+    synopsis:
+      "A private investigator taking a routine adultery case finds himself inside a dispute over water rights.",
+    editorial: {
+      sixWordPlot: "A detective pulls at city water.",
+      territory: ["Corruption", "Secrets", "Power"],
+      pace: "Unhurried",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "blade-runner",
+    title: "Blade Runner",
+    releaseYear: 1982,
+    runtimeMinutes: 117,
+    genres: ["Science Fiction"],
+    synopsis:
+      "A retired officer is brought back to find four escaped artificial humans in a rain-soaked city.",
+    editorial: {
+      sixWordPlot: "A hunter questions what counts alive.",
+      territory: ["Memory", "Mortality", "Rain"],
+      pace: "Languid",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "back-to-the-future",
+    title: "Back to the Future",
+    releaseYear: 1985,
+    runtimeMinutes: 116,
+    genres: ["Adventure", "Comedy"],
+    synopsis: "A high school student is sent thirty years into the past by his friend's invention.",
+    editorial: {
+      sixWordPlot: "A teenager visits his parents' youth.",
+      territory: ["Family", "Time", "Chance"],
+      pace: "Brisk",
+      intensity: "Low",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "jurassic-park",
+    title: "Jurassic Park",
+    releaseYear: 1993,
+    runtimeMinutes: 127,
+    genres: ["Adventure", "Science Fiction"],
+    synopsis:
+      "Scientists are invited to inspect an island attraction before it opens to the public.",
+    editorial: {
+      sixWordPlot: "A park opens before anyone's ready.",
+      territory: ["Wonder", "Hubris", "Nature"],
+      pace: "Escalating",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-silence-of-the-lambs",
+    title: "The Silence of the Lambs",
+    releaseYear: 1991,
+    runtimeMinutes: 118,
+    genres: ["Thriller", "Crime"],
+    synopsis:
+      "A trainee FBI agent is sent to interview an imprisoned psychiatrist about an active case.",
+    editorial: {
+      sixWordPlot: "A trainee bargains with a prisoner.",
+      territory: ["Fear", "Intellect", "Power"],
+      pace: "Tightening",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "good-will-hunting",
+    title: "Good Will Hunting",
+    releaseYear: 1997,
+    runtimeMinutes: 126,
+    genres: ["Drama"],
+    synopsis:
+      "A young man working as a caretaker at a university turns out to be a mathematical prodigy.",
+    editorial: {
+      sixWordPlot: "A janitor solves what professors cannot.",
+      territory: ["Talent", "Grief", "Trust"],
+      pace: "Warm",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "mulholland-drive",
+    title: "Mulholland Drive",
+    releaseYear: 2001,
+    runtimeMinutes: 147,
+    genres: ["Mystery", "Drama"],
+    synopsis:
+      "An aspiring actress arriving in Los Angeles finds a woman with no memory hiding in her apartment.",
+    editorial: {
+      sixWordPlot: "A newcomer meets an amnesiac stranger.",
+      territory: ["Dreams", "Identity", "Hollywood"],
+      pace: "Drifting",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "oppenheimer",
+    title: "Oppenheimer",
+    releaseYear: 2023,
+    runtimeMinutes: 180,
+    genres: ["Drama", "History"],
+    synopsis:
+      "The theoretical physicist who led the wartime laboratory that developed the first nuclear weapons.",
+    editorial: {
+      sixWordPlot: "A physicist builds something never undone.",
+      territory: ["Conscience", "Power", "Consequence"],
+      pace: "Relentless",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "poor-things",
+    title: "Poor Things",
+    releaseYear: 2023,
+    runtimeMinutes: 141,
+    genres: ["Drama", "Comedy"],
+    synopsis:
+      "A woman brought back to life by an unorthodox surgeon sets out to see the world on her own terms.",
+    editorial: {
+      sixWordPlot: "A remade woman decides her appetites.",
+      territory: ["Freedom", "Appetite", "Invention"],
+      pace: "Buoyant",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "dune",
+    title: "Dune",
+    releaseYear: 2021,
+    runtimeMinutes: 155,
+    genres: ["Science Fiction", "Adventure"],
+    synopsis:
+      "A noble house is given stewardship of a desert planet that is the source of the empire's most valuable substance.",
+    editorial: {
+      sixWordPlot: "A family inherits a hostile planet.",
+      territory: ["Destiny", "Power", "Desert"],
+      pace: "Monumental",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-holdovers",
+    title: "The Holdovers",
+    releaseYear: 2023,
+    runtimeMinutes: 133,
+    genres: ["Drama", "Comedy"],
+    synopsis:
+      "A disliked teacher, a student with nowhere to go and the head cook spend the winter holiday at a boarding school.",
+    editorial: {
+      sixWordPlot: "Three strangers share an empty school.",
+      territory: ["Loneliness", "Grief", "Care"],
+      pace: "Gentle",
+      intensity: "Low",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "killers-of-the-flower-moon",
+    title: "Killers of the Flower Moon",
+    releaseYear: 2023,
+    runtimeMinutes: 206,
+    genres: ["Drama", "Crime", "History"],
+    synopsis:
+      "After oil is found on Osage land in 1920s Oklahoma, members of the community begin to be murdered.",
+    editorial: {
+      sixWordPlot: "Wealth arrives, and so do killings.",
+      territory: ["Greed", "Complicity", "Betrayal"],
+      pace: "Deliberate",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "anora",
+    title: "Anora",
+    releaseYear: 2024,
+    runtimeMinutes: 139,
+    genres: ["Drama", "Comedy"],
+    synopsis:
+      "A dancer from Brooklyn marries the son of a wealthy family, and his parents send people to undo it.",
+    editorial: {
+      sixWordPlot: "A whirlwind marriage meets its consequences.",
+      territory: ["Class", "Illusion", "Endurance"],
+      pace: "Frantic",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "challengers",
+    title: "Challengers",
+    releaseYear: 2024,
+    runtimeMinutes: 131,
+    genres: ["Drama", "Romance", "Sport"],
+    synopsis:
+      "A former tennis prodigy turned coach enters her husband in a low-level tournament against his old friend.",
+    editorial: {
+      sixWordPlot: "Three players circle one another endlessly.",
+      territory: ["Desire", "Rivalry", "Control"],
+      pace: "Charged",
+      intensity: "High",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "all-of-us-strangers",
+    title: "All of Us Strangers",
+    releaseYear: 2023,
+    runtimeMinutes: 105,
+    genres: ["Drama", "Romance"],
+    synopsis:
+      "A screenwriter living in a near-empty London tower block begins a relationship with a neighbour and revisits his childhood home.",
+    editorial: {
+      sixWordPlot: "A writer returns to childhood rooms.",
+      territory: ["Grief", "Loneliness", "Tenderness"],
+      pace: "Hushed",
+      intensity: "Medium",
+    },
+  },
+  {
+    provider: "catalogue",
+    externalId: "the-substance",
+    title: "The Substance",
+    releaseYear: 2024,
+    runtimeMinutes: 141,
+    genres: ["Horror", "Drama"],
+    synopsis:
+      "A television fitness presenter dropped for being too old is offered an experimental treatment.",
+    editorial: {
+      sixWordPlot: "A star takes a promised youth.",
+      territory: ["Vanity", "Horror", "Ageing"],
+      pace: "Escalating",
+      intensity: "High",
+    },
+  },
 ];
 
 /** Case and punctuation insensitive, so "portrait of a lady" finds it. */

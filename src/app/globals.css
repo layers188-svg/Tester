@@ -251,6 +251,29 @@ ol {
   animation-duration: var(--hd-motion-standard);
 }
 
+/*
+ * The shell does not animate at all.
+ *
+ * `hd-nav` and `hd-header` are named so the tab bar and masthead stay
+ * put across a navigation — they are the fixed part of the house. Being
+ * named also opts them into the transition, though, and while a group
+ * is animating the real element is replaced by a snapshot that does not
+ * take clicks. At the browser's 250ms default that was a flicker nobody
+ * caught; at 700ms it is a tab bar that ignores you for two thirds of a
+ * second, which the navigation journey found immediately.
+ *
+ * Zero duration keeps them in the transition — so the rest of the page
+ * still animates around them — while making the swap instant.
+ */
+::view-transition-group(hd-nav),
+::view-transition-group(hd-header),
+::view-transition-old(hd-nav),
+::view-transition-new(hd-nav),
+::view-transition-old(hd-header),
+::view-transition-new(hd-header) {
+  animation-duration: 0s;
+}
+
 ::view-transition-old(root) {
   animation: hd-page-out var(--hd-motion-fast) var(--hd-ease-standard) both;
 }
