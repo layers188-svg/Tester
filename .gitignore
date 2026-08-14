@@ -54,3 +54,7 @@ next-env.d.ts
 
 # Screenshots from tests/e2e/capture.spec.ts — regenerated on demand.
 /capture/
+
+# Motion capture frames. Evidence for a person to look at, regenerated
+# on demand by tests/e2e/motion-capture.spec.ts — not source.
+capture/motion/
