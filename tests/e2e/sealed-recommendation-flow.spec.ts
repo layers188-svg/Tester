@@ -24,11 +24,20 @@ test.describe("send and receive a film under seal", () => {
     const recipient = await browser.newContext({ storageState: storageStateFor(PERSONAS.friend) });
     const recipientPage = await recipient.newPage();
     await recipientPage.goto("/circle");
-    await recipientPage.getByRole("heading", { name: "Sent to you" }).scrollIntoViewIfNeeded();
-    await recipientPage
-      .locator("a", { hasText: /sealed/i })
-      .first()
-      .click();
+
+    // What is waiting is now the page, not a row inside it. Circle used
+    // to open with a heading, a lead and a primary button, and put the
+    // film somebody chose for you below all three — the composition of
+    // an admin screen. Asserting on the hero is asserting the product
+    // idea: a person picked something and you do not know what.
+    await expect(recipientPage.getByRole("heading", { name: /a film is waiting/i })).toBeVisible();
+    await expect(recipientPage.getByText(/under seal/i).first()).toBeVisible();
+
+    // Still nothing that names it, on the screen that shouts loudest
+    // about it.
+    expect(await recipientPage.content()).not.toMatch(/whiplash/i);
+
+    await recipientPage.getByRole("link", { name: /enter under seal/i }).click();
 
     const html = await recipientPage.content();
     expect(html).not.toMatch(/whiplash/i);

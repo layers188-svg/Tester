@@ -169,3 +169,65 @@
   color: var(--hd-ink-muted);
   margin: 0;
 }
+
+/*
+ * ---------------------------------------------------------------------
+ * Sent.
+ *
+ * The form contracts into the seal rather than being replaced by a line
+ * of text. A receipt tells a member the request succeeded; this tells
+ * them what happened to the film — it closed, and somebody else now has
+ * to open it.
+ *
+ * The seal draws itself shut: the arcs come together and the rule
+ * settles, which is SEAL run in the opposite direction from the one the
+ * recipient will see. Then it stops. Nothing pulses, nothing ticks.
+ * ---------------------------------------------------------------------
+ */
+.sentStage {
+  min-height: 50dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hd-space-5);
+}
+
+.sentSeal {
+  width: 4rem;
+  height: 4rem;
+  animation: hd-seal-close var(--hd-motion-unseal) var(--hd-ease-entering) backwards;
+}
+
+@keyframes hd-seal-close {
+  from {
+    /* Arriving from the open state, so the closing is visible as a
+       movement rather than as a graphic that was always shut. */
+    transform: scale(1.15);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.confirmation {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: 0;
+  animation: hd-sent-said var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-motion-unseal);
+}
+
+@keyframes hd-sent-said {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

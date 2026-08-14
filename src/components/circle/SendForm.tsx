@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { validateCues } from "@/lib/validation/cues";
 import { validateRecommendationNote } from "@/lib/validation/six-words";
+import { MOTION, motionDuration, startViewTransition } from "@/lib/motion";
+import { SealMark } from "./SealMark";
 import styles from "./SendForm.module.css";
 
 interface Recipient {
@@ -103,11 +105,25 @@ export function SendForm({
         throw new Error(payload.error ?? "Could not send that.");
       }
       idempotencyKey.current = crypto.randomUUID();
-      setSent(true);
-      setTimeout(() => {
-        router.push("/circle");
-        router.refresh();
-      }, 900);
+      /*
+       * The send closes rather than announcing itself.
+       *
+       * A line of text reading "Sent under seal." is a receipt: it tells
+       * you the request succeeded and nothing about what happened to the
+       * film. The form now contracts into the seal instead — the same
+       * SealMark object the recipient will meet, drawn closed — and only
+       * then says the words. The pause afterwards is the hold; it was
+       * already here as a 900ms delay before the redirect, doing nothing
+       * visible.
+       */
+      startViewTransition(() => setSent(true));
+      setTimeout(
+        () => {
+          router.push("/circle");
+          router.refresh();
+        },
+        motionDuration(MOTION.unseal + MOTION.holdLong),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -116,7 +132,17 @@ export function SendForm({
   }
 
   if (sent) {
-    return <p className={styles.confirmation}>Sent under seal.</p>;
+    return (
+      <section className={styles.sentStage} aria-live="polite">
+        {/*
+          The same object the recipient will be handed, closed. Not an
+          envelope, not a wax stamp, not a ticket: SealMark is two arcs
+          and a rule, and `broken={false}` is it shut.
+        */}
+        <SealMark broken={false} className={styles.sentSeal} />
+        <p className={styles.confirmation}>Sent under seal.</p>
+      </section>
+    );
   }
 
   return (
