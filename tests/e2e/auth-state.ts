@@ -18,6 +18,17 @@ export const PERSONAS = {
   /** A second member, for anything needing two people in a Circle. */
   friend: "friend",
   /**
+   * A complete Library record, and left alone.
+   *
+   * Revealed the fixture opening, watched it and wrote six words about
+   * it, so its Library holds a record with detail to open. It exists
+   * because the personas that already had one are both moving targets:
+   * `expendable` is deleted by the account-deletion journey, and
+   * `friend` gains its six words partway through the six-words journey.
+   * A test that reads a Library needs a Library that is standing still.
+   */
+  archivist: "archivist",
+  /**
    * Revealed, and left alone.
    *
    * The House journeys assert what a member sees *before* they watch or

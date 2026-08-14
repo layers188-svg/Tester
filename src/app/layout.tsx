@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "House Dark",
-    description: "One film. A few friends. Nobody knows.",
+    description: "Find the joy in not knowing.",
     siteName: "House Dark",
     type: "website",
   },

@@ -6,7 +6,7 @@ import type { RevealPayload } from "@/lib/reveal/payload";
 import { Button } from "@/components/Button";
 import { useHouseLights } from "@/components/HouseLights";
 import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
-import { MOTION, motionDuration } from "@/lib/motion";
+import { MOTION, motionDuration, startViewTransition } from "@/lib/motion";
 import { isLive } from "@/lib/opening/schedule";
 import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
@@ -83,7 +83,21 @@ export function TonightExperience({
    */
   useEffect(() => {
     if (phase !== "dimming") return;
-    const timer = setTimeout(() => setPhase("trailer"), motionDuration(MOTION.dim + MOTION.hold));
+    const timer = setTimeout(
+      /*
+       * FOCUS, as one object rather than two screens.
+       *
+       * The clue frame in the sealed card and the playback stage share
+       * `hd-clue-frame`, so inside a view transition the browser treats
+       * them as the same rectangle and grows it from where it sat in
+       * the card to the whole viewport. Without this the frame was
+       * destroyed and a visually similar one was built somewhere else,
+       * which is precisely the thing that made this read as a page
+       * change rather than the clue coming closer.
+       */
+      () => startViewTransition(() => setPhase("trailer")),
+      motionDuration(MOTION.dim + MOTION.hold),
+    );
     return () => clearTimeout(timer);
   }, [phase]);
 
@@ -128,8 +142,19 @@ export function TonightExperience({
         throw new Error(payload.error ?? "The house could not open tonight's opening.");
       }
       const data = (await res.json()) as RevealPayload;
-      setReveal(data);
-      setPhase("revealed");
+      /*
+       * REVEAL. The page becomes the answer.
+       *
+       * Both updates go inside one transition so the black hold and the
+       * title are a single change of state rather than two renders. The
+       * brass rule above the title carries `hd-reveal-rule`, which the
+       * rule in the hold also carries, so the line that was dividing
+       * the dark is the line the title arrives under.
+       */
+      startViewTransition(() => {
+        setReveal(data);
+        setPhase("revealed");
+      });
     } catch (err) {
       setRevealError(err instanceof Error ? err.message : "Something went wrong.");
       setPhase("sealed");
@@ -138,7 +163,22 @@ export function TonightExperience({
 
   async function setWatch(state: "saved" | "opened_service" | "watched") {
     if (!opening) return;
-    setWatchState(state);
+    /*
+     * Marking it watched is the moment the page stops being about the
+     * film and starts being about the member.
+     *
+     * Inside a view transition the title does not vanish and reappear
+     * smaller: it is `hd-opening-title` on both sides, so it physically
+     * reduces and moves up while the providers, the clipboard control
+     * and the watch buttons leave underneath it. What is left is the
+     * question. "Saved for later" is an ordinary control change and
+     * gets no transition at all.
+     */
+    if (state === "watched") {
+      startViewTransition(() => setWatchState(state));
+    } else {
+      setWatchState(state);
+    }
     await fetch("/api/watch", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -221,7 +261,7 @@ export function TonightExperience({
           Tonight at House Dark
         </p>
         <h1 className="hd-stage" style={stageIndex(1)}>
-          Tonight&rsquo;s film is sealed.
+          Tonight is sealed.
         </h1>
         <p className={`${styles.sealedLead} hd-stage`} style={stageIndex(2)}>
           Ten seconds. A person, a world, a pressure. Nothing more.
@@ -241,13 +281,32 @@ export function TonightExperience({
           </div>
         </dl>
 
-        {opening.cues.length > 0 && (
-          <ul className={`${styles.cues} hd-stage`} style={stageIndex(4)}>
-            {opening.cues.map((cue) => (
-              <li key={cue}>{cue}</li>
-            ))}
-          </ul>
-        )}
+        {/*
+          The clue frame: the object that survives into the No Trailer.
+          A ruled black field and the safe cues, and deliberately no
+          imagery of any kind — before the title is known House Dark
+          owns the visual, and there is nothing here to withhold because
+          there was never a picture in it.
+
+          It carries `hd-clue-frame`, which the playback stage also
+          carries, so asking for the clue grows this exact rectangle
+          into the viewport instead of replacing it.
+        */}
+        <div
+          className={`${styles.clueFrame} hd-stage`}
+          style={stageIndex(4)}
+          data-clue-frame=""
+          data-leaving={phase === "dimming"}
+        >
+          <span className={styles.clueFrameLabel}>Ten seconds</span>
+          {opening.cues.length > 0 && (
+            <ul className={styles.cues}>
+              {opening.cues.map((cue) => (
+                <li key={cue}>{cue}</li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {opening.contentNotes && (
           <div className={`${styles.disclosure} hd-stage`} style={stageIndex(5)}>
@@ -283,6 +342,9 @@ export function TonightExperience({
               // Brief §15 event 3, recorded on the gesture itself.
               reportAnalyticsEvent("dimming_started", opening.openingNumber);
               setPhase("dimming");
+              // Not a view transition: DIM is a CSS transition on
+              // elements that stay mounted, and wrapping it would
+              // snapshot the card mid-fade and animate the snapshot.
             }}
           >
             {phase === "dimming" ? "Dimming the house…" : "See tonight’s clue"}
@@ -312,7 +374,10 @@ export function TonightExperience({
             // Brief §15 event 4 — the No Trailer ran to the end, which
             // only the player can know.
             reportAnalyticsEvent("no_trailer_completed", opening.openingNumber);
-            setPhase("revealing");
+            // The playback surface and the black hold share
+            // `hd-clue-frame`, so the film does not cut to a different
+            // screen: the same frame empties and goes dark.
+            startViewTransition(() => setPhase("revealing"));
           }}
         />
         {/* "The rest belongs to the film" is the beat after the clue,
@@ -338,7 +403,10 @@ export function TonightExperience({
   if (phase === "revealing") {
     return (
       <div className={styles.openingStage} aria-live="polite">
-        <span className={styles.openingRule} aria-hidden="true" />
+        {/* Only the upper rule is named: a view-transition-name has to
+            be unique in the document, and it is the one that ends up
+            above the title. */}
+        <span className={`${styles.openingRule} ${styles.namedRule}`} aria-hidden="true" />
         <p className={styles.openingWord}>Opening the house</p>
         <span className={styles.openingRule} aria-hidden="true" />
       </div>
@@ -356,7 +424,7 @@ export function TonightExperience({
    * changes — the title still arrives only from /api/reveal.
    */
   return (
-    <div className={styles.revealedCard}>
+    <div className={styles.revealedCard} data-responding={watchState === "watched"}>
       <p className={`${styles.eyebrow} hd-stage`} style={stageIndex(0)}>
         Opening {opening.openingNumber}
       </p>

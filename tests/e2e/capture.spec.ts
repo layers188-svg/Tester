@@ -57,7 +57,7 @@ test.describe("capture", () => {
 
     test("the member's four tabs, sealed", async ({ page }) => {
       await page.goto("/tonight");
-      await expect(page.getByText(/tonight’s film is sealed/i)).toBeVisible();
+      await expect(page.getByText(/tonight is sealed/i)).toBeVisible();
       await shot(page, "04-tonight-sealed");
 
       // Mid-ritual: the No Trailer playing, before any title exists.

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { CirclesActivityRow, HouseOpening, LibraryItem } from "@/lib/supabase/types";
+import { startViewTransition } from "@/lib/motion";
 import { WATCH_STATE_LABEL } from "@/lib/labels";
 import { EntryField } from "./EntryField";
 import { AddFilmForm } from "./AddFilmForm";
@@ -33,6 +34,14 @@ export function LibraryTabs({
 }) {
   const [tab, setTab] = useState<Tab>("yours");
   const [query, setQuery] = useState("");
+  /*
+   * Which record is open, by key. One at a time: two open records turn
+   * the archive back into the wall of detail the index exists to avoid,
+   * and closing the previous one is what makes the list recompose
+   * around the new choice.
+   */
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const toggle = (key: string) => setOpenKey((current) => (current === key ? null : key));
 
   // Search only ever matches items where `title` is populated, and the
   // safe RPCs behind this page only populate `title` for rows the
@@ -107,6 +116,8 @@ export function LibraryTabs({
                 key={`entry-${entry.id}`}
                 position={index}
                 id={entry.id}
+                open={openKey === `entry-${entry.id}`}
+                onToggle={() => toggle(`entry-${entry.id}`)}
                 revealed
                 title={entry.title}
                 badge="Yours"
@@ -136,6 +147,8 @@ export function LibraryTabs({
                 key={`${item.kind}-${item.target_id}`}
                 position={filteredEntries.length + index}
                 id={item.target_id}
+                open={openKey === `${item.kind}-${item.target_id}`}
+                onToggle={() => toggle(`${item.kind}-${item.target_id}`)}
                 revealed={item.revealed}
                 title={item.title ?? "Sealed"}
                 badge={WATCH_STATE_LABEL[item.watch_state]}
@@ -213,6 +226,8 @@ export function LibraryTabs({
                 key={opening.id}
                 position={index}
                 id={opening.id}
+                open={openKey === opening.id}
+                onToggle={() => toggle(opening.id)}
                 revealed={opening.revealed}
                 title={opening.title ?? `Opening ${opening.opening_number}`}
                 badge={new Date(opening.opens_at).toLocaleDateString(undefined, {
@@ -284,6 +299,8 @@ function Entry({
   badge,
   meta,
   sixWords,
+  open,
+  onToggle,
   children,
 }: {
   position: number;
@@ -293,36 +310,62 @@ function Entry({
   badge: string;
   meta?: string | null;
   sixWords?: string | null;
+  open: boolean;
+  onToggle: () => void;
   children?: React.ReactNode;
 }) {
   return (
     <li
       className={`${styles.entry} hd-stage`}
       data-revealed={revealed}
+      data-open={open}
       // Capped so a long collection does not have its last entries
       // arriving seconds after its first.
       style={{ "--hd-stage-index": Math.min(position, 8) } as React.CSSProperties}
     >
-      <span className={styles.index} aria-hidden="true">
-        {String(position + 1).padStart(2, "0")}
-      </span>
-      <EntryField id={id} revealed={revealed} />
-      <div className={styles.entryBody}>
-        <span className={styles.badge}>{badge}</span>
-        <span className={styles.title}>{title}</span>
-        {meta && <p className={styles.meta}>{meta}</p>}
+      {/*
+        The record opens where it is.
+        
+        A Library entry used to show everything at once, which made a
+        long collection a wall and made the list a database rather than
+        an archive. Now the spine and the title are the index, and the
+        record unfolds in place: adjacent entries move down to make
+        room, this one takes more of the page, and closing returns it to
+        exactly where it was. Nothing navigates, so nothing has to find
+        its way back.
+      */}
+      <button
+        type="button"
+        className={styles.entryHead}
+        aria-expanded={open}
+        onClick={() => startViewTransition(onToggle)}
+      >
+        <span className={styles.index} aria-hidden="true">
+          {String(position + 1).padStart(2, "0")}
+        </span>
+        <EntryField id={id} revealed={revealed} />
+        <span className={styles.entryHeadText}>
+          <span className={styles.badge}>{badge}</span>
+          <span className={styles.title}>{title}</span>
+        </span>
+      </button>
 
-        {/* What the member felt, not just that they watched it. This is
-            the difference between a list of films and a record. */}
-        {sixWords && (
-          <>
-            <p className={styles.sixWordsLabel}>Your six words</p>
-            <p className={styles.sixWords}>{sixWords}</p>
-          </>
-        )}
+      {open && (
+        <div className={styles.entryBody}>
+          {meta && <p className={styles.meta}>{meta}</p>}
 
-        <div className={styles.actions}>{children}</div>
-      </div>
+          {/* What the member felt, not just that they watched it. This
+              is the difference between a list of films and a record. */}
+          {sixWords && (
+            <>
+              <p className={styles.sixWordsLabel}>Your six words</p>
+              <p className={styles.sixWords}>{sixWords}</p>
+            </>
+          )}
+
+          <div className={styles.actions}>{children}</div>
+        </div>
+      )}
     </li>
   );
 }

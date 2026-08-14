@@ -147,8 +147,65 @@
   transition: opacity var(--hd-motion-dim) var(--hd-ease-standard);
 }
 
-.sealedCard[data-leaving="true"] {
+/*
+ * DIM. Everything except the clue recedes.
+ *
+ * The card used to fade as one block, which took the clue frame down
+ * with it and meant the thing the member had just asked for was the
+ * first thing to disappear. Now the surrounding editorial goes and the
+ * frame stays, so what is left on the darkening page is the object
+ * that is about to become the film.
+ */
+.sealedCard[data-leaving="true"] > *:not([data-clue-frame]) {
   opacity: 0;
+  transform: translate3d(0, calc(var(--hd-stage-rise) * -0.5), 0);
+  transition:
+    opacity var(--hd-motion-dim) var(--hd-ease-standard),
+    transform var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+/*
+ * The clue frame: an original House Dark object, and the one that
+ * survives into playback.
+ *
+ * A ruled black field with the safe cues inside it. There is no image
+ * here and there never was: before the title is known the house owns
+ * the visual, so the frame is geometry and type. `hd-clue-frame` is
+ * also on .trailerStage, which is what lets asking for the clue grow
+ * this exact rectangle into the viewport rather than building a second
+ * one somewhere else.
+ */
+.clueFrame {
+  view-transition-name: hd-clue-frame;
+  contain: paint;
+  position: relative;
+  margin: var(--hd-space-6) 0;
+  padding: var(--hd-space-5) var(--hd-space-4);
+  min-height: 9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--hd-space-4);
+  border: 1px solid var(--hd-rule);
+  background: var(--hd-projection-black);
+  transition:
+    transform var(--hd-motion-dim) var(--hd-ease-entering),
+    border-color var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+/* The clue comes closer while the room goes dark. Small: a frame
+   moving toward you, not a card popping forward. */
+.clueFrame[data-leaving="true"] {
+  transform: scale(1.06);
+  border-color: var(--hd-accent);
+}
+
+.clueFrameLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
 }
 
 /*
@@ -174,7 +231,19 @@
   padding: var(--hd-space-4);
   padding-bottom: calc(var(--hd-space-4) + env(safe-area-inset-bottom, 0px));
   background: var(--hd-projection-black);
+  /*
+   * The same named object as the clue frame in the sealed card, so the
+   * browser grows one rectangle into the viewport instead of fading a
+   * new screen in over the old one. `focus-in` remains as the fallback
+   * for browsers without view transitions and is suppressed while one
+   * is running, or the frame would scale twice.
+   */
+  view-transition-name: hd-clue-frame;
   animation: focus-in var(--hd-motion-focus) var(--hd-ease-entering) backwards;
+}
+
+:root:active-view-transition .trailerStage {
+  animation: none;
 }
 
 /*
@@ -224,6 +293,15 @@
  * would make this feel like waiting rather than like a pause.
  */
 .openingStage {
+  /*
+   * HOLD, in the same frame the film just played in.
+   *
+   * `hd-clue-frame` again: the playback surface does not cut away to a
+   * different screen, it empties and goes black with the member still
+   * looking at it. That continuity is what makes the pause read as part
+   * of the film ending rather than as a load.
+   */
+  view-transition-name: hd-clue-frame;
   position: fixed;
   inset: 0;
   z-index: 40;
@@ -327,6 +405,19 @@
  * /api/reveal response, and a member who cannot see the animation sees
  * the finished title, never a missing one.
  */
+/*
+ * The line that survives the reveal.
+ *
+ * Shared with the upper rule of the black hold through
+ * `hd-reveal-rule`: the brass line dividing the dark travels up and
+ * becomes the rule the title sits under, rather than the hold's rules
+ * vanishing and a new one being drawn somewhere else.
+ */
+.namedRule,
+.revealRule {
+  view-transition-name: hd-reveal-rule;
+}
+
 .revealRule {
   display: block;
   height: 1px;
@@ -370,4 +461,32 @@
   color: var(--hd-ink-muted);
   margin: 0 0 var(--hd-space-6);
   max-width: 32ch;
+}
+
+/*
+ * The film steps back so the question can be the largest thing.
+ *
+ * Once the member has marked it watched the page is about their
+ * response, so the title reduces to a caption on the evening rather
+ * than the headline of it. It travels there rather than being redrawn:
+ * `.revealTitle` carries `hd-opening-title`, and `setWatch` runs the
+ * change inside a view transition, so this is one object changing size.
+ *
+ * The rule above it goes with it. A brass line at display scale over a
+ * caption-sized title is a rule looking for a heading that has left.
+ */
+.revealedCard[data-responding="true"] .revealTitle {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-6);
+}
+
+.revealedCard[data-responding="true"] .revealTitle .year {
+  font-size: 0.75em;
+  display: inline;
+  margin-top: 0;
+}
+
+.revealedCard[data-responding="true"] .revealRule {
+  opacity: 0.35;
 }

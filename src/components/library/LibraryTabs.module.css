@@ -256,3 +256,64 @@
   color: var(--hd-ink);
   font-weight: 500;
 }
+
+/*
+ * ---------------------------------------------------------------------
+ * The archive record, open and shut.
+ *
+ * Overview to focus, in place. The head is always the record's index
+ * line — number, spine, badge, title — and it is the control. The body
+ * only exists while the record is open, so the list is a list until the
+ * member asks it to be something more, and the entries around the open
+ * one move down rather than being replaced by a different screen.
+ *
+ * The movement itself is the browser's: the toggle runs inside a view
+ * transition, so every sibling that shifts is a snapshot the browser
+ * interpolates. No measuring, no absolute positioning, and closing puts
+ * the record back exactly where it came from because that is simply
+ * where it is.
+ * ---------------------------------------------------------------------
+ */
+.entryHead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hd-space-4);
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  min-height: var(--hd-touch-min);
+  transition: opacity var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+@media (hover: hover) {
+  .entryHead:hover {
+    opacity: 0.72;
+  }
+}
+
+.entryHead:active {
+  opacity: 0.6;
+}
+
+.entryHeadText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+  min-width: 0;
+}
+
+/* Open records get the page's attention and a brass registration mark
+   at the head, the same way an opened entry in a printed index carries
+   a rule. Nothing else changes colour: this is a state, not a theme. */
+.entry[data-open="true"] {
+  border-left: 1px solid var(--hd-accent);
+  padding-left: var(--hd-space-4);
+}
+
+.entry[data-open="true"] .title {
+  color: var(--hd-ink);
+}

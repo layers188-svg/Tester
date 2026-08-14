@@ -201,7 +201,7 @@ export function TheHouse({ state }: { state: HouseState }) {
       {/* An entry point, not the Search product reproduced. */}
       <section className={styles.search}>
         <p className={styles.sectionLabel}>Find a film</p>
-        <p className={styles.searchLead}>Know enough. Nothing more.</p>
+        <p className={styles.searchLead}>Know enough to choose. Nothing more.</p>
         <Link href="/search" className={styles.searchField}>
           Search any film
         </Link>

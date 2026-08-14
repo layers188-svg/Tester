@@ -94,7 +94,16 @@
  * Results arrive as a group. One transition on the list, not one per
  * row: staggering eight titles makes a member wait to read a year.
  */
+/*
+ * The rows that were not chosen.
+ *
+ * Named so they leave as a group and as a collapse rather than a fade:
+ * the list closes upward while the chosen title travels out of it,
+ * which is what makes the choice look like a reduction rather than a
+ * page swap. See ::view-transition-old below.
+ */
 .results {
+  view-transition-name: hd-search-results;
   list-style: none;
   margin: var(--hd-space-5) 0 0;
   padding: 0;
@@ -187,11 +196,26 @@
  * It arrives already in place; only the material underneath it builds.
  * ---------------------------------------------------------------------
  */
+/*
+ * The chosen title, which is the row the member touched.
+ *
+ * `hd-search-title` is the other half of the pairing set up in
+ * SearchExperience.tsx: the browser sees one title that changed size
+ * and position rather than a list disappearing and a heading being
+ * drawn. `settle` is the fallback for browsers with no view
+ * transitions, and is suppressed while one runs or the title would
+ * arrive twice.
+ */
 .filmTitle {
+  view-transition-name: hd-search-title;
   font-size: var(--hd-size-display);
   margin: 0 0 var(--hd-space-2);
   text-wrap: balance;
   animation: settle var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+}
+
+:root:active-view-transition .filmTitle {
+  animation: none;
 }
 
 .facts {
@@ -367,4 +391,28 @@
   color: var(--hd-danger-ink);
   font-size: var(--hd-size-small);
   margin: var(--hd-space-4) 0 0;
+}
+
+/*
+ * The unselected results collapsing.
+ *
+ * `scaleY` from the top edge, so the list folds up toward the search
+ * field it came from. Declared at the top level of the module because
+ * ::view-transition pseudo-elements live on the document root and are
+ * not scoped to any component's DOM.
+ */
+:global(::view-transition-old(hd-search-results)) {
+  animation: hd-collapse-results var(--hd-motion-standard) var(--hd-ease-standard) both;
+  transform-origin: top center;
+}
+
+:global(::view-transition-new(hd-search-results)) {
+  animation: none;
+}
+
+@keyframes hd-collapse-results {
+  to {
+    opacity: 0;
+    transform: scaleY(0.7) translate3d(0, -12px, 0);
+  }
 }

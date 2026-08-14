@@ -65,7 +65,7 @@ test.describe("a member who has not revealed still gets the event", () => {
 
   test("Tonight stays sealed until this member opens it", async ({ page }) => {
     await page.goto("/tonight");
-    await expect(page.getByText(/tonight’s film is sealed/i)).toBeVisible();
+    await expect(page.getByText(/tonight is sealed/i)).toBeVisible();
     // The switch is per member, so the House must not leak the title to
     // someone who has not revealed it.
     expect(await page.content()).not.toMatch(new RegExp(FIXTURE.filmTitle, "i"));
@@ -92,7 +92,7 @@ test.describe("six words can be skipped", () => {
     await page.getByRole("button", { name: /mark watched/i }).click({ timeout: 20_000 });
 
     await expect(page.getByText(/six words after the picture/i)).toBeVisible();
-    await page.getByRole("button", { name: /not this time/i }).click();
+    await page.getByRole("button", { name: /skip for now/i }).click();
 
     // The prompt goes; nothing is recorded and nothing is unlocked.
     await expect(page.getByText(/six words after the picture/i)).toHaveCount(0);

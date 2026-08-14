@@ -63,3 +63,81 @@ export function prefersReducedMotion(): boolean {
 export function motionDuration(ms: number): number {
   return prefersReducedMotion() ? 0 : ms;
 }
+
+/**
+ * The three levels of the House Dark motion system.
+ *
+ * Not every change deserves the same amount of movement. If everything
+ * moves, nothing reads as important, so each transition is deliberately
+ * assigned a level and the level fixes its budget.
+ *
+ *   TACTILE     a control answering a touch
+ *   STRUCTURAL  a piece of the page changing: navigation, a record
+ *               opening, a search result being chosen
+ *   CINEMATIC   one of the six verbs. Reserved for the moments the
+ *               product exists for, and never spent anywhere else.
+ */
+export const LEVEL = {
+  tactile: MOTION.fast,
+  structural: MOTION.standard,
+  cinematic: MOTION.focus,
+} as const;
+
+/**
+ * Run a state change inside a View Transition.
+ *
+ * This is the mechanism behind the persistent-object rule. React
+ * unmounts one tree and mounts another; without this the browser has no
+ * idea the large title on the reveal and the smaller one on the House
+ * are the same words, so it cross-fades two unrelated pictures. Inside
+ * a view transition, any two elements sharing a `view-transition-name`
+ * are treated as one object that moved, and the browser interpolates
+ * position, size and shape for free — no measuring, no FLIP maths, no
+ * animation library.
+ *
+ * Three things it deliberately does NOT do:
+ *
+ *   * wait. The returned promise is ignored by callers, because a
+ *     transition that has to be awaited is a transition that can block
+ *     an interaction if it goes wrong.
+ *   * animate under reduced motion. The update runs immediately, so the
+ *     member gets the new state with no travel and no delay.
+ *   * require support. Browsers without `startViewTransition` run the
+ *     update directly, which is exactly the old behaviour.
+ */
+export function startViewTransition(update: () => void): void {
+  if (typeof document === "undefined") {
+    update();
+    return;
+  }
+
+  const doc = document as Document & {
+    startViewTransition?: (callback: () => void) => { finished: Promise<void> };
+  };
+
+  if (prefersReducedMotion() || typeof doc.startViewTransition !== "function") {
+    update();
+    return;
+  }
+
+  /*
+   * React 19 batches state updates asynchronously, so the callback has
+   * to flush synchronously for the browser to capture the "after" state
+   * at the right moment. `flushSync` is the documented way, but calling
+   * it from inside an event handler that React is already processing
+   * warns — and the warning is right. Instead the update is scheduled
+   * and the transition captures on the next frame, which is what the
+   * View Transition API is built to do with `startViewTransition`
+   * returning a promise that resolves once the DOM has settled.
+   */
+  doc
+    .startViewTransition(() => {
+      update();
+      // Give React a chance to commit before the browser snapshots.
+      return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    })
+    .finished.catch(() => {
+      // A transition interrupted by another one rejects. That is normal
+      // when somebody taps twice, and it is not an error worth surfacing.
+    });
+}

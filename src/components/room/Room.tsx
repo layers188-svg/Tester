@@ -76,7 +76,7 @@ export function Room({
   return (
     <>
       <p className={styles.eyebrow}>The Room</p>
-      <p className={styles.lead}>What stayed with everyone else.</p>
+      <p className={styles.lead}>See what stayed with everyone else.</p>
 
       {/*
         The member's own words first, and never behind a wait. They came

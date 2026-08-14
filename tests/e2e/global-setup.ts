@@ -281,9 +281,10 @@ async function seedFixtures(admin: SupabaseClient) {
   // spoiler journey both need the sealed state, which is the state that
   // matters most. The friend carries the reveal instead, for the
   // journeys that start after one.
-  const [friendId, returningId, expendableId] = await profileIds(admin, [
+  const [friendId, returningId, archivistId, expendableId] = await profileIds(admin, [
     PERSONAS.friend,
     PERSONAS.returning,
+    PERSONAS.archivist,
     PERSONAS.expendable,
   ]);
   if (friendId) {
@@ -294,6 +295,25 @@ async function seedFixtures(admin: SupabaseClient) {
   if (returningId) {
     await admin.from("reveals").upsert({ user_id: returningId, opening_id: FIXTURE.openingId });
   }
+  // A finished record: revealed, watched, written about. The Library
+  // journeys read it and nothing writes to it.
+  if (archivistId) {
+    await admin.from("reveals").upsert({ user_id: archivistId, opening_id: FIXTURE.openingId });
+    await admin.from("watches").upsert({
+      user_id: archivistId,
+      opening_id: FIXTURE.openingId,
+      state: "watched",
+      watched_at: new Date().toISOString(),
+    });
+    await admin.from("six_word_reviews").upsert({
+      user_id: archivistId,
+      opening_id: FIXTURE.openingId,
+      body: "Loud film, quiet drive home",
+      word_count: 6,
+      visibility: "circle",
+    });
+  }
+
   if (expendableId) {
     await admin.from("reveals").upsert({ user_id: expendableId, opening_id: FIXTURE.openingId });
     await admin.from("watches").upsert({

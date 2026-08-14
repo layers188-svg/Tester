@@ -15,7 +15,7 @@ test.describe("Tonight: dim, play, reveal, provider handoff", () => {
 
   test("sealed opening dims, plays the No Trailer, and reveals on demand", async ({ page }) => {
     await page.goto("/tonight");
-    await expect(page.getByText(/tonight’s film is sealed/i)).toBeVisible();
+    await expect(page.getByText(/tonight is sealed/i)).toBeVisible();
 
     const html = await page.content();
     expect(html).not.toMatch(/whiplash/i);

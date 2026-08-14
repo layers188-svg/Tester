@@ -211,7 +211,7 @@ export function SixWordsPanel({
         */}
         {onSkip && !editing && (
           <button type="button" className={styles.skip} onClick={onSkip}>
-            Not this time
+            Skip for now
           </button>
         )}
       </section>

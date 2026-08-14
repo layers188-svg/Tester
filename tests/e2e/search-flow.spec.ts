@@ -17,7 +17,7 @@ test.describe("spoiler-free search", () => {
   test("a member searches, disambiguates by year, and gets six words", async ({ page }) => {
     await page.goto("/search");
     await expect(page.getByRole("heading", { name: /find a film/i })).toBeVisible();
-    await expect(page.getByText(/know enough\. nothing more\./i)).toBeVisible();
+    await expect(page.getByText(/know enough to choose\. nothing more\./i)).toBeVisible();
 
     await page.getByLabel(/search any film/i).fill("whiplash");
 

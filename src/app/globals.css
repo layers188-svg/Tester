@@ -212,16 +212,30 @@ ol {
   animation: hd-page-in var(--hd-motion-standard) var(--hd-ease-entering) both;
 }
 
+/*
+ * A page change is a composition receding and another resolving in its
+ * place, not a cross-fade.
+ *
+ * The old composition lifts as it goes and the new one settles from
+ * below, which gives a navigation a direction and makes the sections
+ * feel like rooms in one house rather than unrelated documents. The
+ * distance is deliberately small: this is the STRUCTURAL level, and
+ * anything larger starts competing with the moments that matter.
+ *
+ * It used to be six pixels, which at that size is a fade with a
+ * rounding error attached.
+ */
 @keyframes hd-page-out {
   to {
     opacity: 0;
+    transform: translate3d(0, -16px, 0);
   }
 }
 
 @keyframes hd-page-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 6px, 0);
+    transform: translate3d(0, 16px, 0);
   }
   to {
     opacity: 1;
@@ -243,9 +257,24 @@ ol {
   view-transition-name: hd-header;
 }
 
+/*
+ * Reduced motion removes the travel from every transition, not only
+ * the root one.
+ *
+ * The named objects — the film title, the member's six words, the clue
+ * frame — are morphed by the browser's own default animation on
+ * ::view-transition-group, so silencing only the root would leave the
+ * largest movements on the page running. Information and navigation are
+ * untouched: what goes is the travel, never the state change.
+ *
+ * `startViewTransition` in src/lib/motion.ts also refuses to start one
+ * at all under this preference, so this is the second line of defence
+ * and covers cross-document navigations, which JavaScript never sees.
+ */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

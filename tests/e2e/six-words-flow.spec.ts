@@ -38,7 +38,7 @@ test.describe("mark watched and leave six words", () => {
 
     await page.getByRole("link", { name: /enter the room/i }).click();
     await expect(page).toHaveURL(/\/room\//);
-    await expect(page.getByText(/what stayed with everyone else/i)).toBeVisible();
+    await expect(page.getByText(/see what stayed with everyone else/i)).toBeVisible();
     await expect(page.getByText(/i did not see that coming/i)).toBeVisible();
 
     // The member's own words come with the page, not with the fetch.

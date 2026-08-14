@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/Button";
-import { MOTION, motionDuration } from "@/lib/motion";
+import { MOTION, motionDuration, startViewTransition } from "@/lib/motion";
 import type { FilmRecord, FilmSuggestion } from "@/lib/films/types";
 import styles from "./SearchExperience.module.css";
 
@@ -89,15 +89,27 @@ export function SearchExperience() {
   }, [query, stage]);
 
   const choose = useCallback(async (suggestion: FilmSuggestion) => {
-    setChosen(suggestion);
-    setRecord(null);
-    setError(null);
-    setSaved(false);
-    setNotesOpen(false);
-    // The results recede and the title holds while the house looks it
-    // up. The hold is what makes the next state feel like the same
-    // object continuing rather than a new screen arriving.
-    setStage("opening");
+    /*
+     * The chosen title is the same object on both sides.
+     *
+     * `hd-search-title` is painted onto the row the member touched a
+     * moment before the transition starts, and `.filmTitle` carries it
+     * in CSS, so the browser moves and resizes one title into its new
+     * position instead of collapsing a list and drawing a heading
+     * somewhere else. The rows that were not chosen collapse as a
+     * group, which is why `.results` is named too.
+     */
+    startViewTransition(() => {
+      setChosen(suggestion);
+      setRecord(null);
+      setError(null);
+      setSaved(false);
+      setNotesOpen(false);
+      // The results recede and the title holds while the house looks it
+      // up. The hold is what makes the next state feel like the same
+      // object continuing rather than a new screen arriving.
+      setStage("opening");
+    });
 
     try {
       const res = await fetch(
@@ -267,7 +279,7 @@ export function SearchExperience() {
     <section className={styles.search}>
       <p className={styles.eyebrow}>Search</p>
       <h1 className={styles.heading}>Find a film.</h1>
-      <p className={styles.lead}>Know enough. Nothing more.</p>
+      <p className={styles.lead}>Know enough to choose. Nothing more.</p>
 
       <div className={styles.field}>
         <label className="hd-visually-hidden" htmlFor="hd-search">
@@ -303,8 +315,27 @@ export function SearchExperience() {
       <ul className={styles.results} id="hd-search-results" data-visible={suggestions.length > 0}>
         {suggestions.map((suggestion) => (
           <li key={`${suggestion.provider}:${suggestion.externalId}`}>
-            <button type="button" className={styles.result} onClick={() => void choose(suggestion)}>
-              <span className={styles.resultTitle}>{suggestion.title}</span>
+            <button
+              type="button"
+              className={styles.result}
+              onClick={(event) => {
+                /*
+                 * Painted here rather than in CSS because at the moment
+                 * the browser captures the "before" state React has not
+                 * yet been told which row was chosen. A direct write on
+                 * the element the member just touched is synchronous
+                 * and needs no cleanup: the row unmounts and takes the
+                 * inline style with it.
+                 */
+                event.currentTarget
+                  .querySelector<HTMLElement>("[data-result-title]")
+                  ?.style.setProperty("view-transition-name", "hd-search-title");
+                void choose(suggestion);
+              }}
+            >
+              <span className={styles.resultTitle} data-result-title="">
+                {suggestion.title}
+              </span>
               <span className={styles.resultYear}>{suggestion.releaseYear ?? ""}</span>
             </button>
           </li>
