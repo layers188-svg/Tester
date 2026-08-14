@@ -28,6 +28,7 @@ export function SearchExperience() {
   const [error, setError] = useState<string | null>(null);
   const [notesOpen, setNotesOpen] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   /**
    * The query the results on screen actually answer.
    *
@@ -123,9 +124,22 @@ export function SearchExperience() {
     setTimeout(() => inputRef.current?.focus(), motionDuration(MOTION.fast));
   }, []);
 
+  /**
+   * Save for later, confirmed rather than assumed.
+   *
+   * This used to flip the label to "Saved" before the request went out.
+   * It read as instant and it was a lie: leaving the page cancels the
+   * in-flight fetch, so a member could walk away believing a film was
+   * in their Library while nothing had been written. Found by the
+   * journey failing only under parallel load, which is exactly the
+   * timing a slow phone reproduces.
+   *
+   * The button shows its loading rule until the row exists.
+   */
   async function saveForLater() {
-    if (!record) return;
-    setSaved(true);
+    if (!record || saving) return;
+    setSaving(true);
+    setError(null);
     try {
       const res = await fetch("/api/library-entries", {
         method: "POST",
@@ -138,9 +152,11 @@ export function SearchExperience() {
         }),
       });
       if (!res.ok) throw new Error();
+      setSaved(true);
     } catch {
-      setSaved(false);
       setError("The house could not save that. Try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -217,7 +233,12 @@ export function SearchExperience() {
             )}
 
             <div className={styles.actions}>
-              <Button variant="secondary" onClick={saveForLater} disabled={saved}>
+              <Button
+                variant="secondary"
+                onClick={saveForLater}
+                disabled={saved || saving}
+                loading={saving}
+              >
                 {saved ? "Saved" : "Save for later"}
               </Button>
               <Button

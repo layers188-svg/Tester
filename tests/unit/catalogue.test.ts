@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { catalogueEditorial, catalogueProvider } from "@/lib/films/catalogue";
+import {
+  allCatalogueEditorial,
+  catalogueEditorial,
+  catalogueProvider,
+} from "@/lib/films/catalogue";
 import { validateEditorial } from "@/lib/films/editorial";
 
 describe("the local catalogue", () => {
@@ -59,22 +63,56 @@ describe("the local catalogue", () => {
 
 describe("hand-written editorial", () => {
   /**
-   * The house's own writing goes through the same check as the model's.
-   * A typo here would otherwise be the one description in the product
-   * that escaped validation.
+   * Every entry, not a list someone remembered to update. The catalogue
+   * is the one place a premise can be written without a model counting
+   * it first, so this is where a typo would otherwise ship.
    */
-  it("is exactly six words for every film that has it", () => {
-    for (const id of [
-      "whiplash-2014",
-      "parasite-2019",
-      "portrait-2019",
-      "burning-2018",
-      "florida-project-2017",
-      "in-the-mood-for-love-2000",
-    ]) {
-      const editorial = catalogueEditorial(id);
-      expect(editorial, `${id} should have hand-written six words`).toBeTruthy();
-      expect(() => validateEditorial(editorial)).not.toThrow();
+  it("is exactly six words for every film in the catalogue", () => {
+    const all = allCatalogueEditorial();
+    expect(all.length).toBeGreaterThan(50);
+
+    for (const { title, editorial } of all) {
+      expect(
+        () => validateEditorial(editorial),
+        `${title}: "${editorial.sixWordPlot}"`,
+      ).not.toThrow();
+    }
+  });
+
+  it("gives every film three territory words, a pace and an intensity", () => {
+    for (const { title, editorial } of allCatalogueEditorial()) {
+      expect(editorial.territory, title).toHaveLength(3);
+      expect(editorial.pace, title).toBeTruthy();
+      expect(editorial.intensity, title).toBeTruthy();
+    }
+  });
+
+  /**
+   * A premise that names its own film has spent one of six words saying
+   * nothing the member cannot already see.
+   *
+   * Matched on whole words, not substrings. The first version of this
+   * compared normalised strings and failed on Drive, whose premise
+   * mentions a "driver" — the same trap the title-leak detector has
+   * (CLAUDE.md: a film called _It_ matches `initial-scale`). A short
+   * title inside a longer word is a coincidence, not a repeat.
+   */
+  it("does not repeat the film's title inside its six words", () => {
+    const words = (value: string) =>
+      value
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter(Boolean);
+
+    for (const { title, editorial } of allCatalogueEditorial()) {
+      const premise = words(editorial.sixWordPlot);
+      const name = words(title);
+
+      const repeated = premise.some((_, index) =>
+        name.every((word, offset) => premise[index + offset] === word),
+      );
+
+      expect(repeated, `${title}: "${editorial.sixWordPlot}"`).toBe(false);
     }
   });
 
