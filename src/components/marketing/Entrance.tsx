@@ -158,7 +158,14 @@ export function Entrance({ testKey }: { testKey: string | null }) {
             <button type="button" className={styles.primary} onClick={enter}>
               Enter House Dark
             </button>
-            <Link href="/join" className={styles.secondary}>
+            {/* Carries the testing key. Without it a visitor who
+                arrived at /?k=... and chose to sign in rather than
+                enter here landed on the ordinary form and was asked
+                for a code that cannot currently be delivered. */}
+            <Link
+              href={testKey ? `/join?k=${encodeURIComponent(testKey)}` : "/join"}
+              className={styles.secondary}
+            >
               Member sign in
             </Link>
           </div>

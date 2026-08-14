@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
-import { Button } from "@/components/Button";
+import { SignInLink } from "@/components/marketing/SignInLink";
 import styles from "./layout.module.css";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
@@ -14,9 +14,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             only holds identity and a way back. "How it works" moved to
             the footer with the other reading. */}
         <nav className={styles.nav} aria-label="Primary">
-          <Button href="/join" variant="secondary">
-            Sign in
-          </Button>
+          <SignInLink label="Sign in" />
         </nav>
       </header>
       <main id="hd-main" className={styles.main}>
