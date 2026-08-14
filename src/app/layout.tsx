@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     template: "%s · House Dark",
   },
   description:
-    "The best film experiences happen when you know nothing. House Dark presents one human chosen film each night, sealed until you choose to enter.",
+    "A film club built around knowing less before you watch. One human chosen film each night, sealed until you choose to enter.",
   applicationName: "House Dark",
   manifest: "/manifest.webmanifest",
   appleWebApp: {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { MemberIdentity } from "@/components/you/MemberIdentity";
 import { YouForm } from "@/components/you/YouForm";
@@ -60,6 +61,8 @@ export default async function YouPage() {
     .map((m) => m.circles as unknown as { id: string; name: string } | null)
     .filter((c): c is { id: string; name: string } => Boolean(c));
 
+  const isOwner = profile?.role === "owner";
+
   return (
     <div className={styles.page}>
       <MemberIdentity
@@ -104,6 +107,25 @@ export default async function YouPage() {
           circles={circles}
         />
       </section>
+
+      {/*
+        The Programming Desk, for the people who programme.
+        
+        It used to sit in the member tab bar as a sixth item labelled
+        "Desk", which read as leftover development UI beside Tonight,
+        Search, Circle, Library and Me — and contradicted this project's
+        own rule that the Desk lives at /desk and is reached from Me.
+        Here it is what it actually is: a tool belonging to this account,
+        below the settings that also belong to it.
+      */}
+      {isOwner && (
+        <section aria-label="Programming" className={styles.desk}>
+          <p className={styles.deskLabel}>Programming</p>
+          <Link href="/desk" className={styles.deskLink}>
+            Open the Programming Desk
+          </Link>
+        </section>
+      )}
     </div>
   );
 }

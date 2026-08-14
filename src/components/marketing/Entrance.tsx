@@ -147,10 +147,17 @@ export function Entrance({ testKey }: { testKey: string | null }) {
 
       <div className={styles.content}>
         <p className={styles.eyebrow}>A private film club</p>
-        <h1 className={styles.headline}>The best film experiences happen when you know nothing.</h1>
+        <h1 className={styles.headline}>Find the joy in not knowing.</h1>
+        {/*
+          Two lines, not four. The old copy argued against trailers,
+          reviews, clips and consensus, which made the entrance a
+          complaint about other products. What House Dark offers is
+          the pleasure on the other side of that, so the page says
+          what it is and then stops.
+        */}
         <p className={styles.body}>
-          House Dark takes you back to opening night. Before the trailer, the reviews, the clips and
-          the consensus. You get just enough to choose. Then the film goes first.
+          A film club built around knowing less before you watch. Get just enough to choose. Leave
+          the rest for the film.
         </p>
 
         {!entering ? (

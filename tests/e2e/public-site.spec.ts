@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 const PUBLIC_PAGES = [
-  { path: "/", heading: /best film experiences/i },
+  // The brand line, which is now the entrance headline rather than an
+  // argument against trailers and reviews.
+  { path: "/", heading: /find the joy in not knowing/i },
   { path: "/how-it-works", heading: /how it works/i },
   { path: "/join", heading: /join or sign in/i },
   { path: "/terms", heading: /terms/i },

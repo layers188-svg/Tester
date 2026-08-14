@@ -20,14 +20,32 @@ import { createWikidataProvider } from "@/lib/films/wikidata";
  * next step, and it needs one machine with network access.
  */
 
+/*
+ * CirrusSearch answers with Q-ids only. Filtering happens server side
+ * on `haswbstatement:P31=Q11424`, so a soundtrack album never reaches
+ * this payload at all — which is the whole point of the change these
+ * tests cover.
+ */
 const SEARCH_PAYLOAD = {
-  search: [
-    { id: "Q1234", label: "Whiplash", description: "2014 film by Damien Chazelle" },
-    { id: "Q9999", label: "Whiplash", description: "2002 film" },
-    { id: "Q5555", label: "Whiplash", description: "album by James Brown" },
-    { id: "Q7777", label: "Whiplash", description: "neck injury" },
-    { id: "Q8888", description: "1996 film" },
-  ],
+  query: { search: [{ title: "Q1234" }, { title: "Q9999" }, { title: "not-an-entity" }] },
+};
+
+/** Labels and dates for the ids the search returned. */
+const SEARCH_ENTITIES_PAYLOAD = {
+  entities: {
+    Q1234: {
+      labels: { en: { value: "Whiplash" } },
+      claims: {
+        P577: [{ mainsnak: { datavalue: { value: { time: "+2014-10-10T00:00:00Z" } } } }],
+      },
+    },
+    Q9999: {
+      labels: { en: { value: "Whiplash" } },
+      claims: {
+        P577: [{ mainsnak: { datavalue: { value: { time: "+2002-05-01T00:00:00Z" } } } }],
+      },
+    },
+  },
 };
 
 const ENTITY_PAYLOAD = {
@@ -81,13 +99,15 @@ function routeFetch(overrides: Record<string, unknown> = {}) {
     const body =
       url in overrides
         ? overrides[url]
-        : url.includes("wbsearchentities")
+        : url.includes("list=search")
           ? SEARCH_PAYLOAD
-          : url.includes("props=labels&")
-            ? GENRE_PAYLOAD
-            : url.includes("wbgetentities")
-              ? ENTITY_PAYLOAD
-              : SUMMARY_PAYLOAD;
+          : url.includes("props=labels|claims&languages=en&format=json")
+            ? SEARCH_ENTITIES_PAYLOAD
+            : url.includes("props=labels&")
+              ? GENRE_PAYLOAD
+              : url.includes("wbgetentities")
+                ? ENTITY_PAYLOAD
+                : SUMMARY_PAYLOAD;
     return new Response(JSON.stringify(body), {
       status: 200,
       headers: { "content-type": "application/json" },
@@ -100,20 +120,34 @@ afterEach(() => {
 });
 
 describe("Wikidata as a metadata source", () => {
-  it("returns films and drops everything else", async () => {
+  it("asks the catalogue for films, not for anything that mentions films", async () => {
+    const fetchMock = routeFetch();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const results = await createWikidataProvider().search("whiplash");
+
+    // The filter is a statement about the data, not a phrase in a
+    // description. "Soundtrack album for the 2016 film La La Land" is
+    // what broke the old heuristic; nothing in this query could match
+    // it, because a soundtrack is not an instance of a film.
+    const searchUrl = String(fetchMock.mock.calls[0][0]);
+    expect(decodeURIComponent(searchUrl)).toContain("haswbstatement:P31=Q11424");
+
+    expect(results.map((r) => r.externalId)).toEqual(["Q1234", "Q9999"]);
+    // The year is read from the publication date now, not scraped out
+    // of a sentence, so two films of one name are told apart on a fact.
+    expect(results[0]).toMatchObject({ title: "Whiplash", releaseYear: 2014 });
+    expect(results[1].releaseYear).toBe(2002);
+  });
+
+  it("skips a search hit that is not an entity id", async () => {
     vi.stubGlobal("fetch", routeFetch());
 
     const results = await createWikidataProvider().search("whiplash");
 
-    // The album and the neck injury are not films; the row with no
-    // label has nothing to show a member.
-    expect(results.map((r) => r.externalId)).toEqual(["Q1234", "Q9999"]);
-    expect(results[0]).toMatchObject({
-      provider: "wikidata",
-      title: "Whiplash",
-      releaseYear: 2014,
-    });
-    expect(results[1].releaseYear).toBe(2002);
+    // CirrusSearch can return page titles that are not items. Asking
+    // wbgetentities about one is a wasted round trip and a null row.
+    expect(results.every((r) => /^Q\d+$/.test(r.externalId))).toBe(true);
   });
 
   it("identifies itself, because an anonymous machine is how a platform gets rate limited", async () => {

@@ -29,12 +29,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/join");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
   return (
     // HouseLights wraps the shell so that DIM, triggered inside
     // Tonight, can take the masthead and the four tabs down with it.
@@ -57,7 +51,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <main id="hd-main" className={styles.main}>
           {children}
         </main>
-        <AppNav isOwner={profile?.role === "owner"} />
+        <AppNav />
       </div>
     </HouseLights>
   );

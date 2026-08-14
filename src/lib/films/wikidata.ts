@@ -53,12 +53,6 @@ const P_GENRE = "P136";
 const Q_MINUTE = "Q7727";
 const Q_HOUR = "Q25235";
 
-interface SearchEntity {
-  id?: string;
-  label?: string;
-  description?: string;
-}
-
 interface Snak {
   mainsnak?: {
     datavalue?: {
@@ -88,23 +82,19 @@ async function wiki<T>(url: string, signal?: AbortSignal): Promise<T> {
 }
 
 /**
- * Is this search hit a film?
+ * Film classes, for the search filter.
  *
- * `wbsearchentities` cannot filter by "instance of film", so this reads
- * the one-line description Wikidata already returns, which for a film
- * is almost always of the form "2014 film by Damien Chazelle" or "1999
- * American science fiction film".
- *
- * A heuristic, and named as one. It costs recall on the rare film with
- * an unusual description, and the alternative — a CirrusSearch
- * `haswbstatement:P31=Q11424` query followed by a batch label lookup —
- * is two round trips on every keystroke. Autocomplete has to answer
- * while somebody is still typing, so the cheap filter wins and the
- * misses are films that stay findable by a more exact query.
+ * Q11424 is "film". The others are the classes a film is commonly filed
+ * under instead, and a member searching for one of those does not care
+ * about the distinction.
  */
-function looksLikeFilm(description: string | undefined): boolean {
-  return Boolean(description && /\bfilms?\b/i.test(description));
-}
+const FILM_CLASSES = [
+  "Q11424", // film
+  "Q24869", // feature film
+  "Q202866", // animated film
+  "Q506240", // television film
+  "Q226730", // silent film
+];
 
 /** The year out of a Wikidata time value: "+2014-10-10T00:00:00Z". */
 function yearFromTime(value: unknown): number | null {
@@ -203,29 +193,59 @@ export function createWikidataProvider(): FilmProvider {
   return {
     name: "wikidata",
 
+    /**
+     * Films, and only films.
+     *
+     * This used to ask `wbsearchentities` for anything matching the
+     * query and then guess from the one-line description, testing it
+     * for the word "film". Searching "La La Land" returned the
+     * soundtrack album, whose description is "soundtrack album for the
+     * 2016 film La La Land" — the heuristic could not have been more
+     * confidently wrong. Record labels, articles and songs all read the
+     * same way.
+     *
+     * CirrusSearch can filter on the data instead of on prose:
+     * `haswbstatement:P31=Q11424` means "instance of film", which a
+     * soundtrack is not, whatever its description says. That costs a
+     * second request to turn the returned ids into labels and years,
+     * and it is worth it — the first version was fast and wrong.
+     *
+     * The year now comes from P577 rather than from a number scraped
+     * out of the description, so disambiguating two films of the same
+     * name is reading a fact instead of a coincidence.
+     */
     async search(query, signal) {
-      const data = await wiki<{ search?: SearchEntity[] }>(
-        `${WIKIDATA_API}?action=wbsearchentities&search=${encodeURIComponent(query)}` +
-          `&language=en&uselang=en&type=item&limit=20&format=json&origin=*`,
+      const statements = FILM_CLASSES.map((id) => `haswbstatement:P31=${id}`).join(" OR ");
+      const found = await wiki<{ query?: { search?: { title?: string }[] } }>(
+        `${WIKIDATA_API}?action=query&list=search&format=json&origin=*&srlimit=8` +
+          `&srsearch=${encodeURIComponent(`${query} (${statements})`)}`,
         signal,
       );
 
-      return (data.search ?? [])
-        .filter((entity) => entity.id && entity.label && looksLikeFilm(entity.description))
-        .slice(0, 8)
-        .map((entity): FilmSuggestion => ({
-          provider: "wikidata",
-          externalId: entity.id as string,
-          title: entity.label as string,
-          /*
-           * Out of the description rather than a second lookup. The
-           * year is what tells two films called Whiplash apart, and
-           * fetching it properly would mean one request per row on
-           * every keystroke. `facts()` reads the real P577 when the
-           * member picks one.
-           */
-          releaseYear: yearFromDescription(entity.description),
-        }));
+      const ids = (found.query?.search ?? [])
+        .map((hit) => hit.title)
+        .filter((id): id is string => Boolean(id) && /^Q\d+$/.test(id as string));
+      if (ids.length === 0) return [];
+
+      const entities = await wiki<{ entities?: Record<string, Entity> }>(
+        `${WIKIDATA_API}?action=wbgetentities&ids=${ids.join("|")}` +
+          `&props=labels|claims&languages=en&format=json&origin=*`,
+        signal,
+      );
+
+      return ids
+        .map((id) => {
+          const entity = entities.entities?.[id];
+          const title = entity?.labels?.en?.value;
+          if (!title) return null;
+          return {
+            provider: "wikidata",
+            externalId: id,
+            title,
+            releaseYear: yearFromTime(bestClaim(entity?.claims?.[P_PUBLICATION_DATE])),
+          } satisfies FilmSuggestion;
+        })
+        .filter((row): row is FilmSuggestion => row !== null);
     },
 
     async facts(externalId, signal) {
@@ -257,10 +277,4 @@ export function createWikidataProvider(): FilmProvider {
       } satisfies FilmFacts;
     },
   };
-}
-
-/** "2014 film by Damien Chazelle" -> 2014. Absent is fine; facts() has the real one. */
-function yearFromDescription(description: string | undefined): number | null {
-  const match = description?.match(/\b(1[89]\d{2}|20\d{2})\b/);
-  return match ? Number(match[1]) : null;
 }

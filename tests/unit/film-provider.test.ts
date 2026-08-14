@@ -21,23 +21,49 @@ afterEach(() => {
   process.env = { ...ORIGINAL_ENV };
 });
 
-/** A wide provider that answers with one invented film. */
+/**
+ * A wide provider that answers with one invented film.
+ *
+ * Two requests, because that is what the Wikidata provider now makes:
+ * CirrusSearch returns entity ids filtered by "instance of film", then
+ * a batch lookup turns those ids into labels and publication dates.
+ */
 function wideSearchReturning(rows: { id: string; title: string; year: number | null }[]) {
   return vi.fn(async (input: string | URL) => {
     const url = String(input);
-    if (url.includes("wbsearchentities")) {
+    if (url.includes("list=search")) {
+      return new Response(
+        JSON.stringify({ query: { search: rows.map((row) => ({ title: row.id })) } }),
+        { status: 200 },
+      );
+    }
+    if (url.includes("wbgetentities")) {
       return new Response(
         JSON.stringify({
-          search: rows.map((row) => ({
-            id: row.id,
-            label: row.title,
-            description: `${row.year ?? ""} film`,
-          })),
+          entities: Object.fromEntries(
+            rows.map((row) => [
+              row.id,
+              {
+                labels: { en: { value: row.title } },
+                claims: row.year
+                  ? {
+                      P577: [
+                        {
+                          mainsnak: {
+                            datavalue: { value: { time: `+${row.year}-01-01T00:00:00Z` } },
+                          },
+                        },
+                      ],
+                    }
+                  : {},
+              },
+            ]),
+          ),
         }),
         { status: 200 },
       );
     }
-    return new Response(JSON.stringify({ entities: {} }), { status: 200 });
+    return new Response(JSON.stringify({}), { status: 200 });
   });
 }
 

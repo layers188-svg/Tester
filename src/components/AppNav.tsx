@@ -24,9 +24,11 @@ const DESTINATIONS = [
  * and do not want to Google it" had nowhere to go.
  *
  * The Programming Desk still does not belong here — it lives at /desk,
- * reachable from Me for owners.
+ * reachable from Me for owners. It briefly sat in this bar as a sixth
+ * item labelled "Desk", which read as development UI left in by
+ * mistake, and contradicted the rule directly above it.
  */
-export function AppNav({ isOwner }: { isOwner: boolean }) {
+export function AppNav() {
   const pathname = usePathname();
   // The tabs go dark with the room. `inert` matters as much as the
   // opacity: an invisible tab bar that is still tabbable is not dark.
@@ -104,11 +106,6 @@ export function AppNav({ isOwner }: { isOwner: boolean }) {
           </Link>
         );
       })}
-      {isOwner && (
-        <Link href="/desk" className={styles.deskLink}>
-          Desk
-        </Link>
-      )}
     </nav>
   );
 }
