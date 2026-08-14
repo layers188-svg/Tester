@@ -57,17 +57,28 @@ test.describe("mark watched and leave six words", () => {
   // publishes, so it raced for a "Mark watched" button that the first
   // test had already spent.
 
-  test("the server rejects a review that is not exactly six words", async ({ request }) => {
-    const response = await request.post("/api/six-words", {
-      data: { openingId: "00000000-0000-0000-0000-000000000000", body: "Too short" },
+  test("the server refuses a seventh word, and accepts fewer than six", async ({ request }) => {
+    // The rule changed from "exactly six" to "up to six": a reaction is
+    // not a form, and "Exhausting." is a complete answer to a film.
+    // What is still refused is a seventh word, because six is the shape
+    // the Room is built to hold.
+    const tooMany = await request.post("/api/six-words", {
+      data: {
+        openingId: "00000000-0000-0000-0000-000000000000",
+        body: "One two three four five six seven",
+      },
     });
     // 422, not 401: there is a session now, so the request gets as far
-    // as the six-word rule and is refused on its merits. The comment
-    // this replaces predicted exactly that.
-    expect(response.status()).toBe(422);
-    // The copy counts up rather than restating the rule: "4 more
-    // words needed." Better wording than the assertion I first wrote.
-    expect((await response.json()).error).toMatch(/more words? needed/i);
+    // as the six-word rule and is refused on its merits.
+    expect(tooMany.status()).toBe(422);
+    expect((await tooMany.json()).error).toMatch(/too many/i);
+
+    // Two words gets past the rule and fails on the opening instead,
+    // which is the proof that the length is no longer what stops it.
+    const short = await request.post("/api/six-words", {
+      data: { openingId: "00000000-0000-0000-0000-000000000000", body: "Too short" },
+    });
+    expect(short.status()).not.toBe(422);
   });
 });
 

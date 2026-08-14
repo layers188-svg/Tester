@@ -23,12 +23,27 @@ export function countWords(body: string): number {
     .filter((token) => token.length > 0).length;
 }
 
+/**
+ * A member's response: one to six words.
+ *
+ * Not exactly six. That rule made a form out of a reaction, and a form
+ * is answered with padding — "Exhausting." is a complete thing to say
+ * about a film, and stretching it to six words makes it a worse one.
+ *
+ * Zero is not a response, it is a skip, and skipping records nothing.
+ * A member in the Room having said nothing is worse than a member who
+ * is not in the Room.
+ *
+ * The house's own six words about a film are still exactly six. See
+ * `validateEditorial` — that one is the house writing to a fixed form,
+ * and the form is the product.
+ */
 export function validateSixWords(rawBody: string): SixWordValidation {
   const normalized = rawBody.trim().replace(/\s+/g, " ");
   const wordCount = countWords(normalized);
 
   if (normalized.length === 0) {
-    return { valid: false, wordCount: 0, normalized, error: "Write six words." };
+    return { valid: false, wordCount: 0, normalized, error: "Write a word or six." };
   }
   if (normalized.length > SIX_WORD_MAX_LENGTH) {
     return {
@@ -38,19 +53,13 @@ export function validateSixWords(rawBody: string): SixWordValidation {
       error: "That is too long for six words.",
     };
   }
-  if (wordCount !== SIX_WORD_REQUIRED_COUNT) {
+  if (wordCount > SIX_WORD_REQUIRED_COUNT) {
+    const over = wordCount - SIX_WORD_REQUIRED_COUNT;
     return {
       valid: false,
       wordCount,
       normalized,
-      error:
-        wordCount < SIX_WORD_REQUIRED_COUNT
-          ? `${SIX_WORD_REQUIRED_COUNT - wordCount} more word${
-              SIX_WORD_REQUIRED_COUNT - wordCount === 1 ? "" : "s"
-            } needed.`
-          : `${wordCount - SIX_WORD_REQUIRED_COUNT} word${
-              wordCount - SIX_WORD_REQUIRED_COUNT === 1 ? "" : "s"
-            } too many.`,
+      error: `${over} word${over === 1 ? "" : "s"} too many. Six or fewer.`,
     };
   }
   return { valid: true, wordCount, normalized };

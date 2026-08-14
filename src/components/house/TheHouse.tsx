@@ -177,76 +177,89 @@ export function TheHouse({ state }: { state: HouseState }) {
       </section>
 
       {/*
+        The quieter half of the House.
+        
+        On a phone these simply follow the Room, which is the reading
+        order the hierarchy asks for. On a desktop they become a rail
+        beside it: the page was a 34rem column stranded in the middle of
+        a very large canvas, every section the same width as every
+        other, which is the composition of a document rather than of a
+        house. Grouping them is what lets the Opening and the Room take
+        real scale without the rest of the page emptying out.
+      */}
+      <div className={styles.rail}>
+        {/*
         Under seal, high on the page when something is waiting and
         absent entirely when nothing is. An empty "you have no
         recommendations" panel is a product asking to be noticed.
       */}
-      {state.waiting.length > 0 && (
-        <section className={styles.sealed}>
-          <p className={styles.sectionLabel}>Under seal</p>
-          <p className={styles.sealedCount}>
-            {state.waiting.length === 1
-              ? "1 film is waiting"
-              : `${state.waiting.length} films are waiting`}
-          </p>
-          <p className={styles.sealedFrom}>
-            From {state.waiting.map((r) => r.sender_display_name).join(", ")}
-          </p>
-          <Button variant="secondary" href={`/circle/recommendation/${state.waiting[0].id}`}>
-            Open
-          </Button>
-        </section>
-      )}
+        {state.waiting.length > 0 && (
+          <section className={styles.sealed}>
+            <p className={styles.sectionLabel}>Under seal</p>
+            <p className={styles.sealedCount}>
+              {state.waiting.length === 1
+                ? "1 film is waiting"
+                : `${state.waiting.length} films are waiting`}
+            </p>
+            <p className={styles.sealedFrom}>
+              From {state.waiting.map((r) => r.sender_display_name).join(", ")}
+            </p>
+            <Button variant="secondary" href={`/circle/recommendation/${state.waiting[0].id}`}>
+              Open
+            </Button>
+          </section>
+        )}
 
-      {/* An entry point, not the Search product reproduced. */}
-      <section className={styles.search}>
-        <p className={styles.sectionLabel}>Find a film</p>
-        <p className={styles.searchLead}>Know enough to choose. Nothing more.</p>
-        <Link href="/search" className={styles.searchField}>
-          Search any film
-        </Link>
-      </section>
-
-      {state.libraryCount > 0 && (
-        <section className={styles.library}>
-          <p className={styles.sectionLabel}>
-            {state.libraryCount === 1
-              ? "1 film in your house"
-              : `${state.libraryCount} films in your house`}
-          </p>
-          <ul className={styles.recent}>
-            {state.recent.slice(0, 3).map((item) => (
-              <li key={`${item.kind}-${item.target_id}`}>
-                <span className={styles.recentTitle}>{item.title ?? "Sealed"}</span>
-                {item.six_words && <span className={styles.recentWords}>{item.six_words}</span>}
-              </li>
-            ))}
-          </ul>
-          <Link href="/library" className={styles.enter}>
-            Open library
+        {/* An entry point, not the Search product reproduced. */}
+        <section className={styles.search}>
+          <p className={styles.sectionLabel}>Find a film</p>
+          <p className={styles.searchLead}>Know enough to choose. Nothing more.</p>
+          <Link href="/search" className={styles.searchField}>
+            Search any film
           </Link>
         </section>
-      )}
 
-      {/* The last thing on the page, and the reason to come back. */}
-      <section className={styles.next}>
-        <p className={styles.sectionLabel}>Next opening</p>
-        {state.next ? (
-          <p className={styles.nextWhen}>
-            <time dateTime={state.next.opensAt}>
-              {new Date(state.next.opensAt).toLocaleDateString(undefined, { weekday: "long" })}
-              {" · "}
-              {new Date(state.next.opensAt).toLocaleTimeString(undefined, {
-                hour: "numeric",
-                minute: "2-digit",
-              })}
-            </time>
-          </p>
-        ) : (
-          <p className={styles.nextWhen}>Seven, most nights</p>
+        {state.libraryCount > 0 && (
+          <section className={styles.library}>
+            <p className={styles.sectionLabel}>
+              {state.libraryCount === 1
+                ? "1 film in your house"
+                : `${state.libraryCount} films in your house`}
+            </p>
+            <ul className={styles.recent}>
+              {state.recent.slice(0, 3).map((item) => (
+                <li key={`${item.kind}-${item.target_id}`}>
+                  <span className={styles.recentTitle}>{item.title ?? "Sealed"}</span>
+                  {item.six_words && <span className={styles.recentWords}>{item.six_words}</span>}
+                </li>
+              ))}
+            </ul>
+            <Link href="/library" className={styles.enter}>
+              Open library
+            </Link>
+          </section>
         )}
-        <p className={styles.nextSealed}>Sealed</p>
-      </section>
+
+        {/* The last thing on the page, and the reason to come back. */}
+        <section className={styles.next}>
+          <p className={styles.sectionLabel}>Next opening</p>
+          {state.next ? (
+            <p className={styles.nextWhen}>
+              <time dateTime={state.next.opensAt}>
+                {new Date(state.next.opensAt).toLocaleDateString(undefined, { weekday: "long" })}
+                {" · "}
+                {new Date(state.next.opensAt).toLocaleTimeString(undefined, {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </time>
+            </p>
+          ) : (
+            <p className={styles.nextWhen}>Seven, most nights</p>
+          )}
+          <p className={styles.nextSealed}>Sealed</p>
+        </section>
+      </div>
     </div>
   );
 }

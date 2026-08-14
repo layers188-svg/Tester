@@ -15,7 +15,8 @@
   margin: 0 auto;
 }
 
-.house > section {
+.house > section,
+.house > .rail > section {
   animation: house-in var(--hd-motion-standard) var(--hd-ease-entering) backwards;
 }
 
@@ -338,4 +339,82 @@
   font-size: var(--hd-size-micro);
   color: var(--hd-accent);
   margin: 0;
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * Desktop: an editorial page rather than a phone screen in the middle
+ * of a very large canvas.
+ *
+ * What was wrong was not the negative space, it was that every section
+ * was the same width as every other and stacked in one 34rem column, so
+ * a laptop showed a narrow document with two thirds of the screen doing
+ * nothing. Negative space is a decision; unused canvas is a leftover.
+ *
+ * The Opening spans the full measure and takes real scale. The Room
+ * keeps the wide column, because it is the reason to come back. The
+ * quieter sections become a rail beside it at a smaller type size —
+ * varying width, scale and horizontal position, which is what makes it
+ * read as a composition instead of six equal blocks.
+ *
+ * Mobile is untouched and stays linear.
+ * ---------------------------------------------------------------------
+ */
+@media (min-width: 60rem) {
+  .house {
+    max-width: 72rem;
+    padding: var(--hd-space-8) var(--hd-space-6) var(--hd-space-8);
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    column-gap: var(--hd-space-8);
+    align-items: start;
+  }
+
+  /* The Opening is the page's masthead: full measure, nothing beside it. */
+  .opening {
+    grid-column: 1 / -1;
+    margin-bottom: var(--hd-space-8);
+  }
+
+  .title {
+    font-size: clamp(4rem, 9vw, 7rem);
+    line-height: 0.95;
+  }
+
+  .room {
+    grid-column: 1;
+  }
+
+  .rail {
+    grid-column: 2;
+    /* A hairline, not a box. The rail is a different register, and one
+       vertical rule says so more quietly than a panel would. */
+    border-left: 1px solid var(--hd-rule);
+    padding-left: var(--hd-space-6);
+  }
+
+  /* Quieter register: the rail carries what a member glances at, not
+     what they came for. */
+  .rail .sectionLabel {
+    font-size: var(--hd-size-micro);
+  }
+
+  .searchLead,
+  .sealedCount,
+  .nextWhen {
+    font-size: 1.125rem;
+  }
+
+  /* The member's own words stay large. They are the anchor of the Room
+     on every surface, and shrinking them here would make the Room look
+     like a summary of itself. */
+  .roomMine {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+  }
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-7);
 }

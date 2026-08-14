@@ -20,10 +20,21 @@ describe("validateSixWords", () => {
     expect(result.wordCount).toBe(6);
   });
 
-  it("rejects fewer than six words", () => {
-    const result = validateSixWords("Too short");
+  it("accepts fewer than six words, because a reaction is not a form", () => {
+    // "Exhausting." is a complete answer to a film. The rule used to be
+    // exactly six, which meant the only way to say it was to pad it,
+    // and padding is the one thing a six-word review cannot survive.
+    expect(validateSixWords("Too short").valid).toBe(true);
+    expect(validateSixWords("Exhausting.").valid).toBe(true);
+    expect(validateSixWords("Exhausting.").wordCount).toBe(1);
+  });
+
+  it("still refuses an empty response, because that is a skip", () => {
+    // Skipping records nothing at all. A member in the Room having said
+    // nothing is worse than a member who is not in the Room.
+    const result = validateSixWords("   ");
     expect(result.valid).toBe(false);
-    expect(result.error).toMatch(/more word/);
+    expect(result.wordCount).toBe(0);
   });
 
   it("rejects more than six words", () => {
