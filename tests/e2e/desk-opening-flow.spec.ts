@@ -16,7 +16,12 @@ test.describe("Programming Desk: create and schedule an opening", () => {
     await page.getByLabel(/film title/i).fill(`E2E Test Film ${Date.now()}`);
     await page.getByLabel(/runtime/i).fill("100");
     await page.getByRole("button", { name: /create opening/i }).click();
-    await expect(page).toHaveURL(/\/desk\/openings\/[0-9a-f-]+/);
+    // One click, five sequential writes to a remote Supabase: the film,
+    // the opening number lookup, the opening, the secret link and the
+    // cues. Alone that takes a moment; with the rest of the suite on
+    // the same project it exceeded the default five seconds and read as
+    // a broken Desk rather than a slow one.
+    await expect(page).toHaveURL(/\/desk\/openings\/[0-9a-f-]+/, { timeout: 20_000 });
 
     await page.setInputFiles('input[type="file"]', "tests/e2e/fixtures/sample-no-trailer.mp4");
     // The Desk names the stored object rather than announcing the act:

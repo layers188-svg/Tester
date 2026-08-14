@@ -11,7 +11,15 @@ test.describe("mark watched and leave six words", () => {
   signedInAs(PERSONAS.friend);
 
   test("watching asks for six words, and the room opens once they are in", async ({ page }) => {
+    // The friend has revealed, so Tonight is the House now, and the
+    // House offers exactly one way on. Walking through it rather than
+    // deep-linking is deliberate: this journey is the whole point of
+    // the hero action, so if that action ever stops leading here the
+    // test should be the thing that notices.
     await page.goto("/tonight");
+    await page.getByRole("link", { name: /watch when you.re ready/i }).click();
+    await expect(page).toHaveURL(/\/opening\//);
+
     await page.getByRole("button", { name: /mark watched/i }).click();
 
     await expect(page.getByText(/six words after the picture/i)).toBeVisible();

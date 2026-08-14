@@ -341,6 +341,16 @@
 .revealTitle {
   animation: reveal-title var(--hd-motion-transform) var(--hd-ease-entering) backwards;
   animation-delay: calc(var(--hd-stage-step) * 2);
+  /*
+   * The same object as the House's hero title.
+   *
+   * A shared view-transition name means the browser carries this
+   * element into its new position and scale on the next navigation
+   * rather than fading one title out and another in. Reveal → House is
+   * the signature moment of the whole product, and this is what makes
+   * it a recomposition instead of a page load.
+   */
+  view-transition-name: hd-opening-title;
 }
 
 @keyframes reveal-title {

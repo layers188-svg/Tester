@@ -22,6 +22,11 @@ interface SixWordsPanelProps {
    * change without a reload.
    */
   onPublished?: () => void;
+  /**
+   * Offered when the member can reasonably move on without writing.
+   * Absent means there is nowhere for them to go yet.
+   */
+  onSkip?: () => void;
 }
 
 /** The submission moment, in the order the member sees it. */
@@ -42,7 +47,12 @@ type Stage = "writing" | "settling" | "yours" | "open";
  * the list here is a product decision resting on a database guarantee,
  * not the guarantee itself.
  */
-export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWordsPanelProps) {
+export function SixWordsPanel({
+  target,
+  initialOwnReview,
+  onPublished,
+  onSkip,
+}: SixWordsPanelProps) {
   const [own, setOwn] = useState(initialOwnReview);
   const [draft, setDraft] = useState(initialOwnReview?.body ?? "");
   const [editing, setEditing] = useState(false);
@@ -191,6 +201,19 @@ export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWord
         <Button variant="primary" fullWidth onClick={submit} disabled={busy || !validation.valid}>
           {busy ? "Leaving your words…" : "Leave my six words"}
         </Button>
+
+        {/*
+          Not everybody has something to say, and a film met in silence
+          is still a film met. Skipping costs nothing and takes nothing
+          away: the Room stays shut, because the rule is that your words
+          come before anyone else's, not that you are made to have any.
+          The prompt is still here whenever they come back.
+        */}
+        {onSkip && !editing && (
+          <button type="button" className={styles.skip} onClick={onSkip}>
+            Not this time
+          </button>
+        )}
       </section>
     );
   }

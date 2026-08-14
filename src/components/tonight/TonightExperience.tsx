@@ -56,6 +56,15 @@ export function TonightExperience({
   const [revealError, setRevealError] = useState<string | null>(null);
   const [watchState, setWatchState] = useState(progress?.watchState ?? null);
   const [copyLabel, setCopyLabel] = useState("Copy title");
+  /**
+   * The member chose not to write anything this time.
+   *
+   * Local to the visit: nothing is recorded, because "did not feel like
+   * it tonight" is not a fact worth storing about somebody. The prompt
+   * returns next time they open the film, and the Room stays shut
+   * either way.
+   */
+  const [skipped, setSkipped] = useState(false);
 
   /**
    * DIM reaches past this component. The masthead and the four tabs
@@ -414,7 +423,7 @@ export function TonightExperience({
             </>
           )}
 
-          {watchState === "watched" && (
+          {watchState === "watched" && !skipped && (
             <SixWordsPanel
               target={{ openingId: opening.id }}
               initialOwnReview={
@@ -429,6 +438,9 @@ export function TonightExperience({
                     }
                   : null
               }
+              // Skipping returns them to the House, where the Room sits
+              // closed until they do have something to say.
+              onSkip={() => setSkipped(true)}
             />
           )}
         </>

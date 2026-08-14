@@ -192,3 +192,31 @@
   margin: 0;
   max-width: 34ch;
 }
+
+/*
+ * Not this time.
+ *
+ * Quiet, and deliberately below the primary action rather than beside
+ * it: skipping is allowed, not encouraged. The Room stays shut either
+ * way — the rule is that a member's own words come first, not that
+ * they are obliged to have any.
+ */
+.skip {
+  display: block;
+  margin: var(--hd-space-4) auto 0;
+  background: none;
+  border: none;
+  padding: 0 var(--hd-space-4);
+  min-height: var(--hd-touch-min);
+  cursor: pointer;
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  transition: color var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.skip:hover {
+  color: var(--hd-ink);
+}

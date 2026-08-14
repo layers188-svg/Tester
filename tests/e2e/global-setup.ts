@@ -281,9 +281,18 @@ async function seedFixtures(admin: SupabaseClient) {
   // spoiler journey both need the sealed state, which is the state that
   // matters most. The friend carries the reveal instead, for the
   // journeys that start after one.
-  const [friendId, expendableId] = await profileIds(admin, [PERSONAS.friend, PERSONAS.expendable]);
+  const [friendId, returningId, expendableId] = await profileIds(admin, [
+    PERSONAS.friend,
+    PERSONAS.returning,
+    PERSONAS.expendable,
+  ]);
   if (friendId) {
     await admin.from("reveals").upsert({ user_id: friendId, opening_id: FIXTURE.openingId });
+  }
+  // A reveal and nothing after it: the House journeys read the state of
+  // a member who has opened the night and not yet watched or spoken.
+  if (returningId) {
+    await admin.from("reveals").upsert({ user_id: returningId, opening_id: FIXTURE.openingId });
   }
   if (expendableId) {
     await admin.from("reveals").upsert({ user_id: expendableId, opening_id: FIXTURE.openingId });

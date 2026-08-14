@@ -18,7 +18,15 @@ test.describe("delete review and account", () => {
   signedInAs(PERSONAS.expendable);
 
   test("member deletes their own six-word review", async ({ page }) => {
+    // Reached the way a member reaches it, not by deep link. This
+    // persona has already published, so /tonight gives them the House
+    // rather than the reveal card, and the House has to carry a route
+    // back to their own words — otherwise the deletion this journey
+    // asserts is a capability nothing in the product can find.
     await page.goto("/tonight");
+    await page.getByRole("link", { name: /change your words/i }).click();
+    await expect(page).toHaveURL(/\/opening\//);
+
     await page.getByRole("button", { name: "Delete" }).click();
     // Deleting returns the member to the empty field, ready to write
     // again. Asserted on the heading rather than on the field's

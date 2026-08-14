@@ -148,11 +148,22 @@ export function LibraryTabs({
                   Only for openings: a sealed recommendation is between
                   two people and has no room.
                 */}
-                {item.six_words && item.kind === "opening" && (
-                  <Link href={`/room/${item.target_id}`} className={styles.link}>
-                    Enter the room
-                  </Link>
-                )}
+                {/*
+                  Every Opening has a Room, not only tonight's and not
+                  only the ones this member spoke in. With their six
+                  words on record it opens; without, it is a way back to
+                  the film to leave some — which is what unlocks it.
+                */}
+                {item.kind === "opening" &&
+                  (item.six_words ? (
+                    <Link href={`/room/${item.target_id}`} className={styles.link}>
+                      Enter the room
+                    </Link>
+                  ) : (
+                    <Link href={`/opening/${item.target_id}`} className={styles.link}>
+                      The room is closed
+                    </Link>
+                  ))}
                 {item.revealed && item.title && (
                   <Link
                     href={`/circle/send?title=${encodeURIComponent(item.title)}${

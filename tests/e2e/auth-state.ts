@@ -18,6 +18,15 @@ export const PERSONAS = {
   /** A second member, for anything needing two people in a Circle. */
   friend: "friend",
   /**
+   * Revealed, and left alone.
+   *
+   * The House journeys assert what a member sees *before* they watch or
+   * speak, so they need an account whose Tonight state nothing else
+   * moves. `friend` cannot be it: the six-words journey publishes as
+   * friend, and the two raced for the same starting state.
+   */
+  returning: "returning",
+  /**
    * Deleted by the account-deletion journey, which is the point. It has
    * its own persona because that journey destroys the account it runs
    * as, and files run in parallel — sharing `member` would pull the
