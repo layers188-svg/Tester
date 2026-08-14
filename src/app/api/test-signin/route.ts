@@ -24,9 +24,17 @@ import type { Database } from "@/lib/supabase/types";
  * and no programmed film. It stops being acceptable the moment either
  * exists.
  *
- * Removal is one environment variable: unset NEXT_PUBLIC_TEST_SIGNIN
- * and this route 404s. Do that as part of configuring custom SMTP —
- * see LAUNCH_CHECKLIST item 2.
+ * Removal is one environment variable: unset TEST_SIGNIN_KEY — the
+ * variable checked immediately below — and this route 404s. On the
+ * deployed worker that is `npx wrangler secret delete TEST_SIGNIN_KEY`
+ * followed by a rebuild and redeploy; see LAUNCH_CHECKLIST item 9 for
+ * the exact sequence. Do it as part of configuring custom SMTP (item 2),
+ * which is what makes the bypass unnecessary.
+ *
+ * There is no NEXT_PUBLIC_TEST_SIGNIN. An earlier version of this note
+ * named one, which would have been a dangerous thing to follow: unsetting
+ * a variable that does not exist changes nothing, and the bypass would
+ * have stayed live on a deployment believed to be closed.
  */
 export async function POST(request: Request) {
   const env = getServerEnv();

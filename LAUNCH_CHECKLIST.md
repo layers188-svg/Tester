@@ -283,18 +283,30 @@ Resolved by the guidelines, no longer blocking:
 
 These need no action — noting them so they are not re-litigated:
 
-- `npm run lint`, `npm run typecheck`, `npm run test` (153 unit tests),
-  `npm run build` and `npm run cf:build` all pass.
-- `npm run test:rls` — 134 assertions against a throwaway Postgres with
+- `npm run format:check`, `npm run lint`, `npm run typecheck`,
+  `npm run test` (271 unit tests across 27 files), `npm run test:spoiler`
+  (33), `npm run build` and `npm run cf:build` all pass.
+- `npm run test:rls` — 169 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
-  title gating, and that no protected title reaches a member-readable
-  column. This is what proves a policy holds; RLS filters rows rather
-  than raising, so a test that only looked for an error would pass
-  while leaking everything.
-- Playwright: 95 journeys — 82 passing (public site, PWA installability,
+  title gating, the Room's reveal/watch gate (RM.1–RM.13), and that no
+  protected title reaches a member-readable column. This is what proves
+  a policy holds; RLS filters rows rather than raising, so a test that
+  only looked for an error would pass while leaking everything.
+- Playwright: 117 journeys — 82 passing (public site, PWA installability,
   spoiler regression, auth gating on all five protected route groups),
-  13 skipped. The skipped ones self-document why: each needs a live
-  Supabase project and an authenticated session.
+  35 skipped, none failing. The skipped ones self-document why: each
+  needs a live Supabase project and an authenticated session.
+- The production build marks every protected route dynamic (`ƒ`). Only
+  `/terms`, `/privacy`, `/how-it-works` and `/film-rights` prerender, so
+  no Desk, Room, Tonight or reveal surface can bake data into a static
+  artefact.
+
+  > These figures were re-measured on 14 August against
+  > `claude/house-dark-build-network-if5nhg`, with no Supabase reachable
+  > and CI's placeholder credentials. The counts immediately below,
+  > which are higher, come from runs against the real project and could
+  > not be repeated in that environment — see "Environment constraints".
+
 - The signed-in product has now been run against the real project.
   93 of 99 journeys pass, including Tonight sealed/dim/reveal, the
   provider handoff, six words, After Credits, Circle creation and
@@ -374,14 +386,14 @@ Recorded so it is not re-derived every session, and because it changed:
   manifests resolve, blobs return 403. The Docker daemon itself runs
   fine. This rules out `supabase start` (the whole local stack) and
   `supabase gen types`, which runs `postgres-meta` as a container.
-- What that costs: the 13 skipped Playwright journeys stay skipped. They
+- What that costs: the 35 skipped Playwright journeys stay skipped. They
   need a running auth server to mint a real session, and with no local
   stack and no hosted project there is nowhere to get one. This is
   waiting on item 1, not on code.
 - What still works natively, and was run: every migration applied to a
-  local PostgreSQL 16 with all 107 RLS assertions passing, the full unit
-  and spoiler suites, the production build, and the 79 Playwright
-  journeys that do not need a session.
+  local PostgreSQL 16 with all 169 RLS assertions passing, the full unit
+  and spoiler suites, the production build, the Workers bundle build,
+  and the 82 Playwright journeys that do not need a session.
 
 ---
 
