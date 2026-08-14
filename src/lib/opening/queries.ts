@@ -77,6 +77,82 @@ export async function getTonightOpening(
   return null;
 }
 
+/**
+ * The next opening that has not started yet.
+ *
+ * Separate from `getTonightOpening`, which answers "what is on now, or
+ * failing that, what is next". This one is only ever about the future,
+ * because the countdown has to keep counting while tonight is already
+ * open: at 8pm a member wants to know when the next one lands, not be
+ * told about the one they are looking at.
+ *
+ * Returns null when nothing is scheduled. That is a real state and the
+ * countdown says so rather than counting toward a time the house has
+ * not promised.
+ */
+export async function getNextOpening(
+  supabase: SupabaseClient<Database>,
+): Promise<{ openingNumber: number; opensAt: string } | null> {
+  const { data } = await supabase
+    .from("openings")
+    .select("opening_number, opens_at")
+    .eq("status", "scheduled")
+    .gt("opens_at", new Date().toISOString())
+    .order("opens_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return null;
+  return { openingNumber: data.opening_number, opensAt: data.opens_at };
+}
+
+/**
+ * The most recent opening that has already run, for a member who has
+ * arrived before tonight's has started.
+ *
+ * A new member landing at 4pm otherwise meets a countdown and nothing
+ * else, which explains the product without ever showing it. Last
+ * night's is the whole thing in miniature: sealed card, clue, reveal,
+ * six words, room.
+ *
+ * Only openings with a real No Trailer are offered. One still marked
+ * `pending-upload` would hand them a clue that cannot play, which is a
+ * worse introduction than the countdown alone.
+ */
+export async function getPreviousOpening(
+  supabase: SupabaseClient<Database>,
+): Promise<OpeningSafe | null> {
+  const { data } = await supabase
+    .from("openings")
+    .select("*")
+    .in("status", ["open", "closed"])
+    .lt("opens_at", new Date().toISOString())
+    .neq("no_trailer_storage_path", "pending-upload")
+    .order("opens_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return null;
+  return attachCues(supabase, data);
+}
+
+/**
+ * One opening by id, through the same safe projection as Tonight.
+ *
+ * Reads `openings` and `opening_cues` only, exactly like every other
+ * function in this module — so the archive route cannot become the one
+ * place a title reaches the browser without a reveal.
+ */
+export async function getOpeningById(
+  supabase: SupabaseClient<Database>,
+  openingId: string,
+): Promise<OpeningSafe | null> {
+  const { data } = await supabase.from("openings").select("*").eq("id", openingId).maybeSingle();
+
+  if (!data) return null;
+  return attachCues(supabase, data);
+}
+
 export interface MemberOpeningProgress {
   hasRevealed: boolean;
   watchState: WatchState | null;

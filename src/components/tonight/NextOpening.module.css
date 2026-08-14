@@ -1,0 +1,35 @@
+/*
+ * The countdown, set as a caption rather than as a widget. No box, no
+ * digit tiles, no colon flashing: a line of condensed caps with a
+ * hairline between the label and the number, so it reads like the
+ * board outside a picture house rather than a timer in an app.
+ */
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+}
+
+.label {
+  flex-shrink: 0;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: var(--hd-rule);
+}
+
+.value {
+  color: var(--hd-accent);
+  flex-shrink: 0;
+  /* Tabular figures so the line does not shuffle sideways each time a
+     digit changes. */
+  font-variant-numeric: tabular-nums;
+}

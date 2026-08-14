@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { requireOwner } from "@/lib/auth/require-owner";
 import { validateCues } from "@/lib/validation/cues";
+import { HOUSE_TIMEZONE, nextHouseOpening } from "@/lib/opening/countdown";
 
 const schema = z.object({
   filmTitle: z.string().trim().min(1).max(200),
@@ -61,7 +62,20 @@ export async function POST(request: Request) {
     .from("openings")
     .insert({
       opening_number: nextNumber,
-      opens_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      /*
+       * The next 7pm, not "24 hours from whenever this was clicked".
+       *
+       * The house has a daily hour, and a draft created at 2:40pm was
+       * landing at 2:40pm the next day. The owner could always correct
+       * it before scheduling, but a default that has to be corrected
+       * every time is a default that is wrong.
+       *
+       * Anchored to the house's timezone rather than the owner's
+       * browser: this runs on the server, and an opening's hour is a
+       * property of the programme, not of where the desk was sitting
+       * when it was created.
+       */
+      opens_at: nextHouseOpening(HOUSE_TIMEZONE).toISOString(),
       status: "draft",
       runtime_minutes: data.runtimeMinutes,
       minimum_access_type: data.minimumAccessType,

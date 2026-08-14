@@ -9,6 +9,7 @@ import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
 import { MOTION, motionDuration } from "@/lib/motion";
 import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
+import { NextOpening } from "./NextOpening";
 import { SixWordsPanel } from "./SixWordsPanel";
 import styles from "./TonightExperience.module.css";
 
@@ -17,12 +18,34 @@ type Phase = "not_available" | "sealed" | "dimming" | "trailer" | "revealing" | 
 export function TonightExperience({
   opening,
   progress,
+  nextOpening = null,
+  previousOpening = null,
+  archive = false,
 }: {
   opening: OpeningSafe | null;
   progress: MemberOpeningProgress | null;
+  /** The next scheduled opening, for the countdown. Null when none is programmed. */
+  nextOpening?: { openingNumber: number; opensAt: string } | null;
+  /**
+   * Last night's opening, offered only to a member who has never opened
+   * one. The countdown alone explains the product without ever showing
+   * it.
+   */
+  previousOpening?: OpeningSafe | null;
+  /**
+   * Whether a past opening may be walked through here.
+   *
+   * Tonight refuses anything that is not `open`, which is what keeps a
+   * scheduled opening sealed until its hour. The archive route sets
+   * this so a member can go back through a night that has already run
+   * without that gate treating it as unavailable.
+   */
+  archive?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>(() => {
-    if (!opening || opening.status !== "open") return "not_available";
+    const watchable =
+      opening && (opening.status === "open" || (archive && opening.status !== "scheduled"));
+    if (!watchable) return "not_available";
     return progress?.hasRevealed ? "revealed" : "sealed";
   });
   const [contentNotesOpen, setContentNotesOpen] = useState(false);
@@ -123,22 +146,52 @@ export function TonightExperience({
   }
 
   if (!opening || phase === "not_available") {
+    // The countdown targets whichever is real: the opening sitting in
+    // `opening` when it is merely scheduled, or the next one after it.
+    const target =
+      opening && opening.status === "scheduled"
+        ? { openingNumber: opening.openingNumber, opensAt: opening.opensAt }
+        : nextOpening;
+
     return (
-      <div className={styles.centeredCard}>
-        <p className={styles.eyebrow}>Tonight</p>
-        <h1>Opening not yet available.</h1>
-        <p>
-          {opening
-            ? `Opening ${opening.openingNumber} opens ${new Date(opening.opensAt).toLocaleString(
-                undefined,
-                {
-                  weekday: "long",
-                  hour: "numeric",
-                  minute: "2-digit",
-                },
-              )}.`
-            : "Nothing is scheduled yet. Check back soon."}
+      <div className={styles.waitingCard}>
+        <p className={`${styles.eyebrow} hd-stage`} style={stageIndex(0)}>
+          Tonight at House Dark
         </p>
+        <h1 className="hd-stage" style={stageIndex(1)}>
+          The house is closed until seven.
+        </h1>
+
+        <div className="hd-stage" style={stageIndex(2)}>
+          <NextOpening
+            opensAt={target?.opensAt ?? null}
+            openingNumber={target?.openingNumber ?? null}
+            label="Opening"
+          />
+        </div>
+
+        {/*
+          Someone who has never opened one gets last night's rather than
+          a countdown and nothing else. It is the whole product in
+          miniature, and it costs them nothing to walk through it before
+          tonight lands.
+        */}
+        {previousOpening && (
+          <div className={`${styles.previously} hd-stage`} style={stageIndex(3)}>
+            <p className={styles.previouslyLabel}>While you wait</p>
+            <p className={styles.previouslyLead}>
+              Last night&rsquo;s opening is still here. Ten seconds, then the film, then the room.
+              It is the whole evening, and it will show you how this works before tonight arrives.
+            </p>
+            <Button variant="secondary" href={`/opening/${previousOpening.id}`}>
+              Open last night&rsquo;s
+            </Button>
+          </div>
+        )}
+
+        {!previousOpening && !target && (
+          <p className={styles.hint}>Nothing is scheduled yet. Check back soon.</p>
+        )}
       </div>
     );
   }
@@ -200,7 +253,16 @@ export function TonightExperience({
 
         {revealError && <p className={styles.error}>{revealError}</p>}
 
-        <div className="hd-stage" style={stageIndex(6)}>
+        {/* The rhythm stays visible even with tonight's in front of
+            them: the house opens again tomorrow, and knowing that is
+            part of what makes it a house rather than a page. */}
+        {nextOpening && (
+          <div className="hd-stage" style={stageIndex(6)}>
+            <NextOpening opensAt={nextOpening.opensAt} openingNumber={nextOpening.openingNumber} />
+          </div>
+        )}
+
+        <div className="hd-stage" style={stageIndex(7)}>
           <Button
             variant="primary"
             fullWidth

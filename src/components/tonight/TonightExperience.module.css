@@ -18,10 +18,43 @@
 }
 
 .sealedCard,
-.revealedCard {
+.revealedCard,
+.waitingCard {
   padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
   max-width: var(--hd-max-width);
   margin: 0 auto;
+}
+
+/*
+ * Before seven.
+ *
+ * The old version of this screen said "Opening not yet available" over
+ * a formatted timestamp, which reads as an error state for a house
+ * that is simply not open yet. It now says the hour, counts to it, and
+ * gives a first-time member something to actually do.
+ */
+.previously {
+  margin-top: var(--hd-space-7);
+  padding-top: var(--hd-space-5);
+  border-top: 1px solid var(--hd-rule);
+}
+
+.previouslyLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.previouslyLead {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+  max-width: 36ch;
 }
 
 .factList {

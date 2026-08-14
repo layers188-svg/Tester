@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { countWords, validateSixWords, withinEditWindow } from "@/lib/validation/six-words";
 import { MOTION, motionDuration } from "@/lib/motion";
-import { useHouseLights } from "@/components/HouseLights";
 import { Button } from "@/components/Button";
 import { WordSlots } from "./WordSlots";
 import styles from "./SixWordsPanel.module.css";
@@ -51,8 +50,6 @@ export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWord
   const [error, setError] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>("writing");
 
-  const { setDimmed } = useHouseLights();
-
   const validation = validateSixWords(draft);
   const wordCount = countWords(draft);
 
@@ -78,17 +75,6 @@ export function SixWordsPanel({ target, initialOwnReview, onPublished }: SixWord
     const timer = setTimeout(() => setStage(next), motionDuration(wait));
     return () => clearTimeout(timer);
   }, [stage]);
-
-  /**
-   * The house dims around the words while the sequence runs and comes
-   * back up when it settles. Same gesture as the clue: quieter room,
-   * one thing to look at.
-   */
-  useEffect(() => {
-    setDimmed(stage === "settling" || stage === "yours");
-  }, [stage, setDimmed]);
-
-  useEffect(() => () => setDimmed(false), [setDimmed]);
 
   async function submit() {
     setError(null);
