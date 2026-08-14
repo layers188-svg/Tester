@@ -93,10 +93,26 @@
   background: var(--hd-rule-strong);
 }
 
+/*
+ * `contain`, not `cover`.
+ *
+ * The No Trailers are composed frames, and the supplied ones are 16:9
+ * against a stage that fills a portrait viewport. `cover` centre-crops
+ * a landscape source to roughly a third of its width, throwing away
+ * most of a shot somebody framed on purpose — the one thing this
+ * player exists to show.
+ *
+ * Letterboxing is not a compromise here. The bars are Projection
+ * Black on a Projection Black stage, so in a dark room what the member
+ * sees is an image with the room around it, which is what a screen
+ * looks like. It also means the clue is right whether the footage
+ * arrives portrait or landscape, rather than being right for one and
+ * quietly destructive to the other.
+ */
 .video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .progressTrack {

@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import { useHouseLights } from "@/components/HouseLights";
 import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
 import { MOTION, motionDuration } from "@/lib/motion";
+import { isLive } from "@/lib/opening/schedule";
 import { reportAnalyticsEvent } from "@/lib/analytics/client";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { NextOpening } from "./NextOpening";
@@ -43,8 +44,10 @@ export function TonightExperience({
   archive?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>(() => {
-    const watchable =
-      opening && (opening.status === "open" || (archive && opening.status !== "scheduled"));
+    // Live by the clock, not by the status column — see isLive() and
+    // getTonightOpening(). The archive route additionally allows a
+    // night that has already closed.
+    const watchable = opening && (isLive(opening) || (archive && opening.status !== "scheduled"));
     if (!watchable) return "not_available";
     return progress?.hasRevealed ? "revealed" : "sealed";
   });
@@ -93,7 +96,7 @@ export function TonightExperience({
   // the same view twice.
   const viewReported = useRef<number | null>(null);
   useEffect(() => {
-    if (!opening || opening.status !== "open") return;
+    if (!opening || !isLive(opening)) return;
     if (viewReported.current === opening.openingNumber) return;
     viewReported.current = opening.openingNumber;
     reportAnalyticsEvent("opening_viewed", opening.openingNumber);

@@ -12,6 +12,8 @@ export interface OpeningSafe {
   id: string;
   openingNumber: number;
   opensAt: string;
+  /** When the night ends. Null means nothing closes it. */
+  closesAt: string | null;
   status: Database["public"]["Tables"]["openings"]["Row"]["status"];
   runtimeMinutes: number;
   availabilityCount: number;
@@ -36,6 +38,7 @@ async function attachCues(
     id: opening.id,
     openingNumber: opening.opening_number,
     opensAt: opening.opens_at,
+    closesAt: opening.closes_at,
     status: opening.status,
     runtimeMinutes: opening.runtime_minutes,
     availabilityCount: opening.availability_count,
@@ -48,27 +51,42 @@ async function attachCues(
 }
 
 /**
- * Tonight's opening: the currently open one, or if none is open yet,
- * the soonest scheduled one (so Tonight can render "not available" with
+ * Tonight's opening: whichever night the clock says we are in, or if we
+ * are between nights, the next one (so Tonight can count down against
  * an honest opening number rather than an empty screen).
+ *
+ * Deliberately not `status = 'open'`.
+ *
+ * That column is maintained by the cron worker, and on the deployed
+ * preview a scheduled opening whose hour had passed stayed `scheduled`
+ * through four consecutive cron windows — so keying off it meant the
+ * house never opened at all, silently. `opens_at` is the fact and the
+ * status is a cache of it, so this reads the fact: an approved opening
+ * whose hour has come is tonight's whether or not anything has got
+ * round to relabelling it.
  */
 export async function getTonightOpening(
   supabase: SupabaseClient<Database>,
 ): Promise<OpeningSafe | null> {
-  const { data: open } = await supabase
+  const now = new Date().toISOString();
+
+  const { data: live } = await supabase
     .from("openings")
     .select("*")
-    .eq("status", "open")
+    .in("status", ["open", "scheduled"])
+    .lte("opens_at", now)
+    .or(`closes_at.is.null,closes_at.gt.${now}`)
     .order("opens_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (open) return attachCues(supabase, open);
+  if (live) return attachCues(supabase, live);
 
   const { data: scheduled } = await supabase
     .from("openings")
     .select("*")
     .eq("status", "scheduled")
+    .gt("opens_at", now)
     .order("opens_at", { ascending: true })
     .limit(1)
     .maybeSingle();
