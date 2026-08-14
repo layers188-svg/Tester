@@ -1,0 +1,5 @@
+.page {
+  /* The component holds its own measure so the two states can differ;
+     this is only the outer breathing room. */
+  padding-top: var(--hd-space-4);
+}

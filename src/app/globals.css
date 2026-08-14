@@ -186,3 +186,66 @@ ol {
 .hd-dimmable[data-dimmed="true"] {
   opacity: 0;
 }
+
+/*
+ * Moving between sections.
+ *
+ * The navigation and the masthead stay exactly where they are; only the
+ * content between them changes. Native View Transitions do this with no
+ * dependency and no wrapper component: the browser holds the outgoing
+ * frame, we cross it with the incoming one, and anything the transition
+ * cannot handle simply happens instantly, which is the correct fallback.
+ *
+ * Deliberately not a slide. A screen sliding left and right is a
+ * generic mobile app; House Dark is one room whose contents change, so
+ * the outgoing content recedes very slightly and the incoming settles.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: hd-page-out var(--hd-motion-fast) var(--hd-ease-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: hd-page-in var(--hd-motion-standard) var(--hd-ease-entering) both;
+}
+
+@keyframes hd-page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes hd-page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * The shell does not travel with the content. Naming these excludes
+ * them from the root snapshot, so the tab bar and masthead are
+ * continuous across a navigation rather than fading out and back in
+ * with everything else.
+ */
+.hd-persistent-nav {
+  view-transition-name: hd-nav;
+}
+
+.hd-persistent-header {
+  view-transition-name: hd-header;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

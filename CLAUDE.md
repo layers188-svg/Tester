@@ -106,10 +106,37 @@ can meet a film before outside opinion reshapes it.
   built to resist. Response scale varies only by position
   (`:nth-child`), never randomly.
 
+## Search (six words before)
+
+**Know enough to choose. Nothing enough to spoil it.** A member types a
+title and gets the House Dark version: an exactly-six-word premise,
+three territory words, a pace and an intensity. Never a synopsis, a
+rating, a poster or a cast list.
+
+- "Six words before the picture" (the house describes a film) and "six
+  words after the picture" (a member answers one) are related product
+  language and **separate systems**. `film_records` is the first,
+  `six_word_reviews` the second; they never share a table.
+- `film_records` is **not** `films`. `films` holds what an opening is
+  sealing and is never member-readable; `film_records` is spoiler-safe
+  by construction and readable by any member. Keep them apart.
+- Exactly six words is enforced three times: `validateEditorial`, the
+  `film_records_six_words` check constraint, and a retry when the model
+  miscounts. Never pad or trim a premise to reach six.
+- The source synopsis lives only in `FilmFacts` on the server. It is
+  input to the editorial engine and must never reach a response.
+- One description per film for the whole house — that is the point of
+  caching, not a performance trick.
+- Both outside services are optional. Without `TMDB_API_KEY` Search
+  runs on the local catalogue in `src/lib/films/catalogue.ts`; without
+  `ANTHROPIC_API_KEY` it serves only films already written up. Neither
+  is `NEXT_PUBLIC_`.
+
 ## Signed-in navigation
 
-Exactly four tabs: **Tonight, Library, Circle, Me.** Don't add a fifth
-unless a feature genuinely cannot live inside these.
+Five tabs: **Tonight, Search, Circle, Library, Me.** Search was added
+by direction on 14 August because it genuinely could not live inside
+the others. Don't add a sixth.
 
 The last tab is labelled "Me" but still routes to `/you`. The label was
 changed by direction on 13 August; the route was not, because renaming
@@ -164,6 +191,16 @@ animation is none of them, it is decoration and does not belong.
 
 Slow, confident, restrained. No fade-up-on-scroll, parallax, floating
 cards, bouncing UI, or WebGL spectacle.
+
+Three ordinary speeds sit under the six verbs: `--hd-motion-fast`
+(180ms, a control answering a touch), `--hd-motion-standard` (320ms, a
+piece of the page changing) and `--hd-motion-slow` (560ms, something
+uncovered). Reach for a verb only when the movement is one of the six.
+
+Motion happens because the member did something, never because they
+scrolled, and it stops when the interaction does. The one permitted
+loop is the rule on a loading button, and only while a request is
+actually in flight.
 
 Two rules that are easy to get wrong:
 

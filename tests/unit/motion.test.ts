@@ -37,6 +37,9 @@ describe("motion vocabulary", () => {
     ["transform", "--hd-motion-transform"],
     ["hold", "--hd-hold"],
     ["holdLong", "--hd-hold-long"],
+    ["fast", "--hd-motion-fast"],
+    ["standard", "--hd-motion-standard"],
+    ["slow", "--hd-motion-slow"],
   ];
 
   it.each(pairs)("MOTION.%s matches %s in tokens.css", (key, token) => {

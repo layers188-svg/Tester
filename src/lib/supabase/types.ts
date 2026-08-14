@@ -394,6 +394,30 @@ export interface RoomOpening {
   has_published: boolean;
 }
 
+/**
+ * The House Dark description of a film, for Search — migration 0021.
+ *
+ * Distinct from `FilmRow`, which is the protected side of the spoiler
+ * boundary. This one is spoiler-safe by construction and readable by
+ * any signed-in member.
+ */
+export interface FilmRecordRow {
+  id: string;
+  provider: string;
+  external_id: string;
+  title: string;
+  release_year: number | null;
+  runtime_minutes: number | null;
+  six_word_plot: string;
+  territory: string[];
+  pace: string | null;
+  intensity: string | null;
+  content_notes: string | null;
+  editorial_state: "generated" | "approved" | "rejected";
+  created_at: string;
+  updated_at: string;
+}
+
 export interface MySealedRecommendation {
   id: string;
   sender_id: string;
@@ -497,6 +521,11 @@ export interface Database {
       library_entries: Table<
         LibraryEntryRow,
         Pick<LibraryEntryRow, "user_id" | "title"> & Partial<LibraryEntryRow>
+      >;
+      film_records: Table<
+        FilmRecordRow,
+        Pick<FilmRecordRow, "provider" | "external_id" | "title" | "six_word_plot"> &
+          Partial<FilmRecordRow>
       >;
       audit_log: Table<AuditLogRow, Partial<AuditLogRow> & { action: string; target_type: string }>;
       analytics_events: Table<

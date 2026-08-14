@@ -1,4 +1,17 @@
+/*
+ * One control, five states: rest, hover, focus, pressed, disabled, plus
+ * a loading state the component drives.
+ *
+ * Restrained on purpose. The pressed state is a 2% scale and a small
+ * darkening, not a bounce; nothing glows, nothing casts a shadow. The
+ * point is that a control feels like it received the touch, not that it
+ * performs.
+ *
+ * Only `transform`, `opacity` and colour animate, all compositor-cheap
+ * and none of them able to move anything else on the page.
+ */
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -15,19 +28,79 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition:
-    transform var(--hd-motion-button) var(--hd-ease-standard),
-    background-color var(--hd-motion-button) var(--hd-ease-standard),
-    border-color var(--hd-motion-button) var(--hd-ease-standard),
-    opacity var(--hd-motion-button) var(--hd-ease-standard);
+    transform var(--hd-motion-fast) var(--hd-ease-standard),
+    background-color var(--hd-motion-fast) var(--hd-ease-standard),
+    border-color var(--hd-motion-fast) var(--hd-ease-standard),
+    color var(--hd-motion-fast) var(--hd-ease-standard),
+    opacity var(--hd-motion-fast) var(--hd-ease-standard);
 }
 
-.button:active {
+/*
+ * Pressed.
+ *
+ * Applies on touch as well as mouse, which matters more: a phone has no
+ * hover, so this is the only feedback a member gets between deciding
+ * and the screen changing.
+ */
+.button:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.button:disabled {
+.button:disabled,
+.button[aria-disabled="true"] {
   opacity: 0.45;
   cursor: not-allowed;
+  transform: none;
+}
+
+/*
+ * Loading.
+ *
+ * The label stays, so the control keeps its width and nothing on the
+ * page moves while a request is in flight. A thin brass rule creeps
+ * across the foot of the button instead — House Dark's own loading
+ * language, and the smallest thing that reads as "working".
+ */
+.button[data-loading="true"] {
+  cursor: progress;
+}
+
+.button[data-loading="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.5;
+  transform-origin: left;
+  animation: button-loading 1.4s var(--hd-ease-standard) infinite;
+}
+
+@keyframes button-loading {
+  0% {
+    transform: scaleX(0);
+  }
+  60% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+/*
+ * The one place a loop is allowed, and only while a request is actually
+ * in flight. Reduced motion gets a steady rule instead: still visibly a
+ * loading state, with nothing moving.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .button[data-loading="true"]::after {
+    animation: none;
+    opacity: 0.5;
+  }
 }
 
 .primary {
@@ -35,18 +108,10 @@
   color: var(--hd-projection-black);
 }
 
-.primary:hover:not(:disabled) {
-  background: #c7b280;
-}
-
 .secondary {
   background: transparent;
   color: var(--hd-ink);
   border-color: var(--hd-rule-strong);
-}
-
-.secondary:hover:not(:disabled) {
-  border-color: var(--hd-ink);
 }
 
 .ghost {
@@ -58,8 +123,33 @@
   padding: 0 var(--hd-space-2);
 }
 
-.ghost:hover:not(:disabled) {
-  color: var(--hd-ink);
+/*
+ * Hover only where there is a pointer that can hover. Without the
+ * query, a tap on a phone leaves the hover style stuck on the control
+ * until something else is touched, which reads as a button that did not
+ * let go.
+ */
+@media (hover: hover) {
+  .primary:hover:not(:disabled) {
+    background: #c7b280;
+  }
+
+  .secondary:hover:not(:disabled) {
+    border-color: var(--hd-ink);
+  }
+
+  .ghost:hover:not(:disabled) {
+    color: var(--hd-ink);
+  }
+}
+
+/* Pressed shades, for touch, where hover never fires. */
+.primary:active:not(:disabled) {
+  background: #a98f57;
+}
+
+.secondary:active:not(:disabled) {
+  border-color: var(--hd-accent);
 }
 
 .fullWidth {

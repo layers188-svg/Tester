@@ -138,6 +138,22 @@
   --hd-hold-long: 900ms;
 
   /*
+   * The three speeds everything else is built from.
+   *
+   * The six verbs above name what a movement *means*; these name how
+   * long an ordinary one *takes*, so a hover state and a list arriving
+   * do not each invent their own number. Reach for these first and for
+   * a verb only when the movement is one of the six.
+   *
+   *   FAST      a control answering a touch
+   *   STANDARD  a piece of the page changing
+   *   SLOW      something being uncovered
+   */
+  --hd-motion-fast: 180ms;
+  --hd-motion-standard: 320ms;
+  --hd-motion-slow: 560ms;
+
+  /*
    * Two curves, deliberately not one. Standard is for things the member
    * asked for and expects to land. Entering is for things arriving on
    * their own — no overshoot anywhere, since the brief forbids bounce.
@@ -168,6 +184,9 @@
     --hd-motion-transform: 0ms;
     --hd-hold: 0ms;
     --hd-hold-long: 0ms;
+    --hd-motion-fast: 0ms;
+    --hd-motion-standard: 0ms;
+    --hd-motion-slow: 0ms;
     --hd-stage-rise: 0px;
     --hd-stage-step: 0ms;
   }

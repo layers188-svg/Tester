@@ -49,7 +49,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           are the navigation (brief §5), so this header carries no links
           of its own beyond returning to Tonight.
         */}
-        <Dimmable as="header" className={styles.header}>
+        <Dimmable as="header" className={`${styles.header} hd-persistent-header`}>
           <Link href="/tonight" className={styles.brand} aria-label="House Dark">
             <Wordmark />
           </Link>

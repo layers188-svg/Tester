@@ -29,6 +29,11 @@ export const MOTION = {
   hold: 420,
   /** HOLD, at a moment that earns a longer one. */
   holdLong: 900,
+
+  /* The three ordinary speeds. See tokens.css for what each is for. */
+  fast: 180,
+  standard: 320,
+  slow: 560,
 } as const;
 
 export type MotionName = keyof typeof MOTION;

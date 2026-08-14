@@ -2,20 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHouseLights } from "./HouseLights";
 import styles from "./AppNav.module.css";
 
 const DESTINATIONS = [
   { href: "/tonight", label: "Tonight", icon: TonightIcon },
-  { href: "/library", label: "Library", icon: LibraryIcon },
+  { href: "/search", label: "Search", icon: SearchIcon },
   { href: "/circle", label: "Circle", icon: CircleIcon },
+  { href: "/library", label: "Library", icon: LibraryIcon },
   { href: "/you", label: "Me", icon: YouIcon },
 ] as const;
 
 /**
- * Exactly four persistent destinations (brief §5). Do not add a fifth —
- * the Programming Desk lives at /desk, reachable from Me for owners,
- * not from this bar.
+ * Five persistent destinations.
+ *
+ * The brief said four and said not to add a fifth. Search was added by
+ * direction on 14 August, and it genuinely could not live inside the
+ * others: Tonight is the house choosing, Circle is a friend choosing,
+ * Library is what you have already seen. "You know the name of a film
+ * and do not want to Google it" had nowhere to go.
+ *
+ * The Programming Desk still does not belong here — it lives at /desk,
+ * reachable from Me for owners.
  */
 export function AppNav({ isOwner }: { isOwner: boolean }) {
   const pathname = usePathname();
@@ -23,15 +32,65 @@ export function AppNav({ isOwner }: { isOwner: boolean }) {
   // opacity: an invisible tab bar that is still tabbable is not dark.
   const { dimmed } = useHouseLights();
 
+  const navRef = useRef<HTMLElement>(null);
+  const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null);
+
+  const isActive = useCallback(
+    (href: string) => pathname === href || pathname.startsWith(`${href}/`),
+    [pathname],
+  );
+
+  /**
+   * Measure where the indicator should sit.
+   *
+   * Read from the DOM rather than computed from an index, because the
+   * five items are not equal widths on desktop, where they lay out to
+   * their labels. Re-measured on resize and on orientation change for
+   * the same reason.
+   */
+  useEffect(() => {
+    const place = () => {
+      const nav = navRef.current;
+      const active = nav?.querySelector<HTMLElement>('[data-active="true"]');
+      if (!nav || !active) {
+        setIndicator(null);
+        return;
+      }
+      const navBox = nav.getBoundingClientRect();
+      const itemBox = active.getBoundingClientRect();
+      setIndicator({ left: itemBox.left - navBox.left, width: itemBox.width });
+    };
+
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [pathname]);
+
   return (
     <nav
-      className={`${styles.nav} hd-dimmable`}
+      ref={navRef}
+      className={`${styles.nav} hd-dimmable hd-persistent-nav`}
       aria-label="Primary"
       data-dimmed={dimmed}
       inert={dimmed}
     >
+      {/*
+        One rule that travels between sections rather than a border
+        destroyed and recreated on each item. Decorative: `aria-current`
+        on the link is what actually announces the active section.
+      */}
+      <span
+        className={styles.indicator}
+        aria-hidden="true"
+        data-hidden={indicator === null}
+        style={{
+          width: indicator ? `${indicator.width}px` : 0,
+          transform: `translate3d(${indicator?.left ?? 0}px, 0, 0)`,
+        }}
+      />
+
       {DESTINATIONS.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href || pathname.startsWith(`${href}/`);
+        const active = isActive(href);
         return (
           <Link
             key={href}
@@ -93,6 +152,20 @@ function LibraryIcon({ active }: IconProps) {
         stroke="currentColor"
         strokeWidth={active ? 2 : 1.5}
         strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function SearchIcon({ active }: IconProps) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6" stroke="currentColor" strokeWidth={active ? 2 : 1.5} />
+      <path
+        d="M15 15l4.5 4.5"
+        stroke="currentColor"
+        strokeWidth={active ? 2 : 1.5}
+        strokeLinecap="round"
       />
     </svg>
   );

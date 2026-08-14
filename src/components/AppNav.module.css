@@ -13,6 +13,7 @@
 }
 
 .item {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -23,14 +24,57 @@
   text-decoration: none;
   color: var(--hd-ink-muted);
   font-family: var(--hd-font-utility);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
+  /* Five tabs rather than four, so the label has less room. Small
+     enough to fit "Library" at 320px without wrapping, and the touch
+     target is the whole 60px item regardless. */
+  font-size: 0.625rem;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  transition: color var(--hd-motion-button) var(--hd-ease-standard);
+  transition: color var(--hd-motion-fast) var(--hd-ease-standard);
 }
 
 .item[data-active="true"] {
   color: var(--hd-accent);
+}
+
+/*
+ * The active indicator, one element that moves.
+ *
+ * A brass rule across the top of the bar, positioned with a transform
+ * on the whole track rather than drawn inside each item. That is the
+ * difference between an indicator that travels to the section you
+ * chose and one that blinks out here and reappears there: the same
+ * object, moving, which is what the rest of the product's motion
+ * language does everywhere else.
+ */
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: var(--hd-accent);
+  pointer-events: none;
+  transition:
+    transform var(--hd-motion-standard) var(--hd-ease-entering),
+    width var(--hd-motion-standard) var(--hd-ease-entering),
+    opacity var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+/* Nothing to point at (a route outside the five) — fade, do not slide
+   to an arbitrary position. */
+.indicator[data-hidden="true"] {
+  opacity: 0;
+}
+
+/* Touch has no hover, so the pressed state is what confirms the tap. */
+.item:active {
+  color: var(--hd-ink);
+}
+
+@media (hover: hover) {
+  .item:hover {
+    color: var(--hd-ink);
+  }
 }
 
 .deskLink {
@@ -53,6 +97,14 @@
     flex: none;
     flex-direction: row;
     min-height: 52px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* On desktop the bar is at the top, so the rule belongs at its foot. */
+  .indicator {
+    top: auto;
+    bottom: 0;
   }
 
   .deskLink {

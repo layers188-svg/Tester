@@ -63,6 +63,25 @@ const serverSchema = z.object({
    * when custom SMTP lands — LAUNCH_CHECKLIST item 2.
    */
   TEST_SIGNIN_KEY: z.string().min(16).optional(),
+
+  /**
+   * Search's two outside services, both optional.
+   *
+   * Optional is the design, not a shortcut. Without TMDB_API_KEY Search
+   * runs against a small local catalogue; without ANTHROPIC_API_KEY it
+   * serves only films the house has already written up. Every other
+   * part of the feature — caching, the exactly-six-word rule, the whole
+   * journey — behaves identically either way, so Search can be reviewed
+   * before anyone signs up for anything, and a key that expires
+   * narrows the catalogue instead of taking a navigation tab down.
+   *
+   * Neither is NEXT_PUBLIC_. Both are read only in server modules
+   * (`src/lib/films/*`, all marked `server-only`), so no key and no
+   * part of the editorial prompt reaches the browser.
+   */
+  TMDB_API_KEY: z.string().min(1).optional(),
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  ANTHROPIC_MODEL: z.string().min(1).optional(),
 });
 
 const clientSchema = serverSchema.pick({
