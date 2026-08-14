@@ -309,6 +309,14 @@ Never show poster art, cast, year, director, genre, synopsis, ratings or title b
 4. Allow edits for five minutes.
 5. Allow deletion at any time.
 6. Add an owner moderation action for spoilers or abuse.
+7. A member may skip. Not everybody has something to say, and a film
+   met in silence is still a film met. Skipping records nothing, opens
+   nothing, and takes nothing away: the Room stays shut, because the
+   rule is that your words come before anyone else's, not that you are
+   made to have any. The prompt stays available whenever they come
+   back to the opening.
+8. Offer the skip quietly, below the primary action and never beside
+   it. It is permitted, not encouraged.
 
 ### Circle
 

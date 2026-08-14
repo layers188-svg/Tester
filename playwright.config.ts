@@ -65,5 +65,20 @@ export default defineConfig({
         url: "http://localhost:3100",
         reuseExistingServer: true,
         timeout: 300_000,
+        env: {
+          /*
+           * Search runs on the house's own 62 films for the suite.
+           *
+           * Not because the wide catalogue is untrusted, but because a
+           * journey that reaches Wikidata is a journey that fails when
+           * Wikidata is slow, rate limits an anonymous caller, or is
+           * simply having a bad afternoon. None of that is a fact about
+           * House Dark, and a test that reports it as one stops meaning
+           * anything. The composition itself is covered in
+           * tests/unit/film-provider.test.ts, where the far side can be
+           * made to fail on purpose.
+           */
+          HOUSE_DARK_WIDE_CATALOGUE: "off",
+        },
       },
 });

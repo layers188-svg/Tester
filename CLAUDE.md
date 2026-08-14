@@ -100,6 +100,22 @@ can meet a film before outside opinion reshapes it.
   writing a reveal the way `/api/reveal/*` does.
 - The response screen shows **nobody else's words**. Anything that
   lists other members belongs behind the submit.
+- A member may **skip** ("Not this time"). Skipping records nothing
+  and opens nothing: the Room stays shut. The rule is that your words
+  come before anyone else's, not that you are obliged to have any.
+  Offer it below the primary action, never beside it.
+- Once a member has revealed, `/tonight` serves **The House**
+  (`src/components/house/TheHouse.tsx`) instead of the reveal card:
+  same route, a state of the evening rather than a place. One hero
+  action matched to where the member has got to, the Room second, then
+  anything under seal, Search, Library, next opening. The House is the
+  only route back to a member's own words, so it must keep carrying
+  "Change your words" into `/opening/[openingId]` — edit and delete
+  live there and nothing else links to them.
+- The member's six words are one object across the whole sequence
+  (`view-transition-name: hd-my-six-words`), which is why the Room
+  server-renders the member's own row rather than waiting for
+  `/api/after-credits`. Only other people's words are worth a wait.
 - The Room has no likes, hearts, scores, stars, replies, sorting,
   rankings, trending, avatars or follower counts, and never will. Those
   mechanics manufacture consensus, which is the thing House Dark is
@@ -127,10 +143,22 @@ rating, a poster or a cast list.
   input to the editorial engine and must never reach a response.
 - One description per film for the whole house — that is the point of
   caching, not a performance trick.
-- Both outside services are optional. Without `TMDB_API_KEY` Search
-  runs on the local catalogue in `src/lib/films/catalogue.ts`; without
-  `ANTHROPIC_API_KEY` it serves only films already written up. Neither
-  is `NEXT_PUBLIC_`.
+- The index is the house's own 62 films first, then a wide catalogue:
+  TMDB when `TMDB_API_KEY` is set, otherwise Wikidata, which needs no
+  account, no key and no payment. `HOUSE_DARK_WIDE_CATALOGUE=off`
+  pins Search to the 62. The composition in `provider.ts` is
+  deliberate: a hand-written six words beats a generated one, and the
+  catalogue is also the floor under a wide provider that fails.
+- **`src/lib/films/wikidata.ts` has never reached the live endpoint.**
+  It was written without outbound network, so its parsing is tested
+  against hand-written payloads and its assumption about the API's
+  shape is not tested at all. Record real responses on a machine with
+  network before trusting it. The e2e suite runs with the wide
+  catalogue off for the same reason plus a better one: a journey that
+  depends on a third party being up stops meaning anything.
+- Both outside services are optional. Without `ANTHROPIC_API_KEY`
+  Search serves only films already written up, whatever the index
+  knows. Neither key is `NEXT_PUBLIC_`.
 
 ## Signed-in navigation
 
