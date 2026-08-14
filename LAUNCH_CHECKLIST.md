@@ -181,10 +181,17 @@ The seed No Trailer has been supplied and is committed as
 because the original filename described the footage closely enough to
 point at the protected title. See that directory's README. What is left:
 
-- The seeded opening still points at a placeholder storage path. Upload
-  the real file through the Programming Desk before running the opening;
-  the Desk rewrites it to a UUID object name so the stored path carries
-  no meaning.
+- **A real No Trailer per opening.** This is the one recurring piece of
+  work the software cannot do. The Desk upload path is verified end to
+  end (owner creates a draft, uploads a real 10 MB mp4 into Supabase
+  Storage, approves, schedules), and the `no-trailer` bucket is live,
+  public, capped at 25 MB and restricted to `video/mp4` and
+  `video/webm`. What it needs is footage: ten seconds, original, and
+  spoiler safe, cut for every night that runs.
+- The seeded openings point at a placeholder storage path. Upload the
+  real file through the Programming Desk before an opening runs; the
+  Desk rewrites it to a UUID object name so the stored path carries no
+  meaning.
 - The home page hero, the Circle product capture and the ritual section
   use empty, clearly named content slots. They contain **no** stock
   photography and **no** generated people, per brief §2 — they stay empty
@@ -201,14 +208,17 @@ Passed. The "Draft — pending review" line is gone from `/terms`,
 
 ## 8. Member-facing content decisions
 
-- The public home page currently shows four **clearly labelled beta
-  demonstration** six-word responses, because no approved real ones
-  exist yet. As soon as real members post and you approve them in
-  `/desk/moderation`, the page switches to those automatically and the
-  demonstration label disappears. No fabricated testimony is used
-  anywhere.
+- The public site is now a single entrance with a moving light and no
+  content of its own, so the demonstration six-word responses that used
+  to sit on the home page are gone. Nothing public shows a member's
+  words, and no fabricated testimony is used anywhere.
 - Verified provider links for the seed film are placeholders and marked
   unverified. Replace and verify them before that opening runs.
+- **The Room will be empty until there are members in it.** It is
+  correct, tested and it says so gracefully ("You are first. Nobody
+  else in the house has spoken."), but the feature does not come alive
+  until item 2 and item 4 let a second person in. Nothing to build; it
+  is waiting on people, not on code.
 
 ---
 
