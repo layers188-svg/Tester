@@ -15,11 +15,23 @@
  * opinion is indistinguishable from a real member to anyone looking at
  * the screen — including, eventually, to us.
  *
- * So every account here is named for what it is: "Fixture 01", "Fixture
- * 02". Nobody reading a screenshot can mistake those for members, and
- * nobody can quote one back as evidence that people liked something.
- * The responses are written to exercise the layout — short ones, long
- * ones, one-word ones — not to simulate a reception.
+ * These accounts carry ordinary first names, by direction on 14 August:
+ * "FIXTURE 01" beside a quotation made the Room impossible to judge as
+ * a design, because the label was louder than the typography it was
+ * there to test.
+ *
+ * That is a real trade against CLAUDE.md rule 5, and it is worth being
+ * clear about. What the rule protects against is fabricated social
+ * proof — a plausible name attached to a plausible opinion, shown to
+ * somebody as evidence that people liked a thing. The safeguards that
+ * actually prevent that are unchanged: every account is addressed at
+ * `room-fixture-`, they exist only where HOUSE_DARK_FIXTURES_OK is set,
+ * and `--clean` removes them by that prefix. None of this may reach a
+ * real member, and no screenshot of it should be shown to anyone as
+ * evidence of reception.
+ *
+ * The responses are still written to exercise the layout — short ones,
+ * long ones, one-word ones — not to simulate a reception.
  *
  * It refuses to run against a project it has not been told is
  * disposable, for the same reason the e2e suite does: brief §18 forbids
@@ -55,16 +67,16 @@ const OWNER_EMAIL = process.env.SEED_OWNER_EMAIL ?? "layers188@gmail.com";
  * Half are marked into the Circle so the two filters differ.
  */
 const RESPONSES = [
-  { body: "I understood him. That worried me.", circle: true },
-  { body: "Greatness should not feel this frightening.", circle: true },
-  { body: "My shoulders hurt just watching that.", circle: true },
-  { body: "Exhausting. Brilliant. I need a minute.", circle: true },
-  { body: "Ambition becomes something uglier under pressure.", circle: false },
-  { body: "Relentless.", circle: false },
-  { body: "Never heard silence used like that.", circle: false },
-  { body: "I did not breathe much.", circle: false },
-  { body: "Wanted to argue with someone afterwards.", circle: false },
-  { body: "Not sure who won.", circle: false },
+  { name: "Sam", body: "I understood him. That worried me.", circle: true },
+  { name: "Freya", body: "Greatness should not feel this frightening.", circle: true },
+  { name: "James", body: "My shoulders hurt just watching that.", circle: true },
+  { name: "Nina", body: "Exhausting. Brilliant. I need a minute.", circle: true },
+  { name: "Theo", body: "Ambition becomes something uglier under pressure.", circle: false },
+  { name: "Priya", body: "Relentless.", circle: false },
+  { name: "Marcus", body: "Never heard silence used like that.", circle: false },
+  { name: "Ade", body: "I did not breathe much.", circle: false },
+  { name: "Rosa", body: "Wanted to argue with someone afterwards.", circle: false },
+  { name: "Bo", body: "Not sure who won.", circle: false },
 ];
 
 const env = Object.fromEntries(
@@ -235,14 +247,14 @@ async function seed() {
       user = data.user;
     }
 
-    // Named for what it is. "Fixture 03" cannot be mistaken for a
-    // member in a screenshot, and cannot be quoted back as evidence
-    // that people liked something.
+    // A first name, so the Room can be judged as a design. The account
+    // is still `room-fixture-NN@housedark.test` and still removable by
+    // that prefix — the label changed, the isolation did not.
     must(
       `profile ${number}`,
       await db.from("profiles").upsert({
         id: user.id,
-        display_name: `Fixture ${number}`,
+        display_name: response.name,
         timezone: "Australia/Melbourne",
         role: "member",
         onboarding_complete: true,
@@ -257,18 +269,32 @@ async function seed() {
       `reveal ${number}`,
       await db.from("reveals").upsert({ user_id: user.id, opening_id: opening.id }),
     );
+    /*
+     * Replace rather than upsert.
+     *
+     * `watches` and `six_word_reviews` both point at either an opening
+     * or a sealed recommendation, so their uniqueness is enforced by a
+     * partial index rather than by a plain unique constraint — and
+     * ON CONFLICT cannot name a partial index. Upserting hit the
+     * surrogate primary key instead and tried to insert a second row
+     * for the same member on the same night. Deleting first is exact,
+     * scoped to one member and one opening, and works whatever shape
+     * the constraint takes.
+     */
+    await db.from("watches").delete().eq("user_id", user.id).eq("opening_id", opening.id);
     must(
       `watch ${number}`,
-      await db.from("watches").upsert({
+      await db.from("watches").insert({
         user_id: user.id,
         opening_id: opening.id,
         state: "watched",
         watched_at: new Date().toISOString(),
       }),
     );
+    await db.from("six_word_reviews").delete().eq("user_id", user.id).eq("opening_id", opening.id);
     must(
       `response ${number}`,
-      await db.from("six_word_reviews").upsert({
+      await db.from("six_word_reviews").insert({
         user_id: user.id,
         opening_id: opening.id,
         body: response.body,

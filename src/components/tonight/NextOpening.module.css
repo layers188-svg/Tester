@@ -33,3 +33,75 @@
      digit changes. */
   font-variant-numeric: tabular-nums;
 }
+
+/*
+ * ---------------------------------------------------------------------
+ * The clock.
+ *
+ * "Saturday · 7:00 PM / SEALED" said when, and nothing about the wait.
+ * A countdown is the one place in House Dark where anticipation is the
+ * content, so it gets real digits — but set as an editorial number in
+ * the house's own type, not as a scoreboard. Tabular figures so nothing
+ * shifts as it ticks, and the unit under each pair so it reads without
+ * a legend.
+ * ---------------------------------------------------------------------
+ */
+.when {
+  display: block;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-4);
+}
+
+.clock {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--hd-space-2);
+  margin: 0;
+  color: var(--hd-ink);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: var(--hd-space-2);
+}
+
+.colon {
+  font-family: var(--hd-font-utility);
+  font-size: 1rem;
+  color: var(--hd-ink-muted);
+  padding-bottom: 0.55rem;
+}
+
+.digits {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: var(--hd-font-editorial);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.unit {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.6rem;
+  color: var(--hd-ink-muted);
+  padding-bottom: 0.15rem;
+}
+
+/* Tonight, before the house opens. The wait is the screen. */
+.wrap[data-large="true"] .digits {
+  font-size: clamp(2.5rem, 11vw, 4rem);
+}
+
+.wrap[data-large="true"] .colon {
+  font-size: 1.5rem;
+  padding-bottom: 1rem;
+}

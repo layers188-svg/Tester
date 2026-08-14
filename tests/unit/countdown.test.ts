@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   HOUSE_OPENS_HOUR,
+  countdownSegments,
   formatRemaining,
   nextHouseOpening,
   remainingUntil,
@@ -12,7 +13,7 @@ const at = (iso: string) => new Date(iso);
 describe("remainingUntil", () => {
   it("breaks the gap into hours, minutes and seconds", () => {
     const r = remainingUntil(at("2026-08-14T19:00:00Z"), at("2026-08-14T16:12:35Z"));
-    expect(r).toEqual({ hours: 2, minutes: 47, seconds: 25, done: false });
+    expect(r).toEqual({ days: 0, hours: 2, minutes: 47, seconds: 25, done: false });
   });
 
   it("is done once the target has passed", () => {
@@ -31,31 +32,66 @@ describe("remainingUntil", () => {
 
 describe("formatRemaining", () => {
   it("pads the minutes so the line does not jump width", () => {
-    expect(formatRemaining({ hours: 3, minutes: 5, seconds: 0, done: false })).toBe("3h 05m");
+    expect(formatRemaining({ days: 0, hours: 3, minutes: 5, seconds: 0, done: false })).toBe(
+      "3h 05m",
+    );
   });
 
   it("drops the hours once there are none", () => {
-    expect(formatRemaining({ hours: 0, minutes: 12, seconds: 30, done: false })).toBe("12m");
+    expect(formatRemaining({ days: 0, hours: 0, minutes: 12, seconds: 30, done: false })).toBe(
+      "12m",
+    );
   });
 
   /** Seconds only inside the last minute: see the note in countdown.ts. */
   it("shows seconds only in the final minute", () => {
-    expect(formatRemaining({ hours: 0, minutes: 0, seconds: 42, done: false })).toBe("42s");
+    expect(formatRemaining({ days: 0, hours: 0, minutes: 0, seconds: 42, done: false })).toBe(
+      "42s",
+    );
   });
 
   it("says what is happening rather than showing zero", () => {
-    expect(formatRemaining({ hours: 0, minutes: 0, seconds: 0, done: true })).toBe("Opening now");
+    expect(formatRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0, done: true })).toBe(
+      "Opening now",
+    );
   });
 });
 
 describe("tickInterval", () => {
-  it("redraws once a minute while minutes are showing", () => {
-    expect(tickInterval({ hours: 2, minutes: 3, seconds: 4, done: false })).toBe(60_000);
-    expect(tickInterval({ hours: 0, minutes: 3, seconds: 4, done: false })).toBe(60_000);
+  it("redraws every second, because the clock shows seconds", () => {
+    // The old rule redrew once a minute until the final sixty seconds,
+    // to avoid waking a phone 21,600 times to change nothing. That was
+    // right about the cost and wrong about what was on screen: a
+    // countdown with a seconds digit that only moves once a minute is
+    // not a quiet countdown, it is a broken one.
+    expect(tickInterval({ days: 0, hours: 2, minutes: 3, seconds: 4, done: false })).toBe(1_000);
+    expect(tickInterval({ days: 0, hours: 0, minutes: 3, seconds: 4, done: false })).toBe(1_000);
+    expect(tickInterval({ days: 0, hours: 0, minutes: 0, seconds: 40, done: false })).toBe(1_000);
   });
 
-  it("speeds up only for the last minute", () => {
-    expect(tickInterval({ hours: 0, minutes: 0, seconds: 40, done: false })).toBe(1_000);
+  it("stops hurrying once the moment has passed", () => {
+    expect(tickInterval({ days: 0, hours: 0, minutes: 0, seconds: 0, done: true })).toBe(60_000);
+  });
+});
+
+describe("countdownSegments", () => {
+  it("splits total hours into days and hours within the day", () => {
+    // `remaining.hours` is the total, which is what formatRemaining
+    // reads. The segments show a member 01 : 04, not 28 hours.
+    const segments = countdownSegments({
+      days: 1,
+      hours: 28,
+      minutes: 9,
+      seconds: 5,
+      done: false,
+    });
+    expect(segments.map((s) => s.value)).toEqual(["01", "04", "09", "05"]);
+    expect(segments.map((s) => s.unit)).toEqual(["Days", "Hours", "Min", "Sec"]);
+  });
+
+  it("pads so the numbers do not change width as they tick", () => {
+    const segments = countdownSegments({ days: 0, hours: 0, minutes: 0, seconds: 7, done: false });
+    expect(segments.every((s) => s.value.length === 2)).toBe(true);
   });
 });
 

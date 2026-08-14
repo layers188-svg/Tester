@@ -24,6 +24,8 @@ export interface Remaining {
   hours: number;
   minutes: number;
   seconds: number;
+  /** Whole days, split out of `hours` so the clock can be read at a glance. */
+  days: number;
   /** True once the target has passed. */
   done: boolean;
 }
@@ -31,10 +33,15 @@ export interface Remaining {
 export function remainingUntil(target: Date | string, now: Date = new Date()): Remaining {
   const at = typeof target === "string" ? new Date(target) : target;
   const ms = at.getTime() - now.getTime();
-  if (!Number.isFinite(ms) || ms <= 0) return { hours: 0, minutes: 0, seconds: 0, done: true };
+  if (!Number.isFinite(ms) || ms <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, done: true };
+  }
 
   const total = Math.floor(ms / 1000);
   return {
+    // `hours` stays the total hours so `formatRemaining` reads the same
+    // as it always did; `days` is the same number split for the segments.
+    days: Math.floor(total / 86_400),
     hours: Math.floor(total / 3600),
     minutes: Math.floor((total % 3600) / 60),
     seconds: total % 60,
@@ -62,13 +69,36 @@ export function formatRemaining(remaining: Remaining): string {
 /**
  * How often the countdown needs to redraw.
  *
- * Once a minute while it is showing minutes, once a second only in the
- * final minute. A one-second interval running for six hours wakes a
- * phone 21,600 times to change nothing.
+ * Every second, now that the clock shows seconds. The old rule redrew
+ * once a minute until the final sixty seconds, on the reasoning that a
+ * phone should not be woken 21,600 times to change nothing — which was
+ * right about the cost and wrong about what was on screen. A countdown
+ * displaying a seconds digit that only moves once a minute is not a
+ * quiet countdown, it is a broken one.
+ *
+ * It is one `setTimeout` rescheduling itself, and it stops when the
+ * component unmounts. That is a cost worth paying for a clock that is
+ * telling the truth.
  */
 export function tickInterval(remaining: Remaining): number {
-  if (remaining.done) return 60_000;
-  return remaining.hours === 0 && remaining.minutes === 0 ? 1_000 : 60_000;
+  return remaining.done ? 60_000 : 1_000;
+}
+
+/**
+ * The countdown as four segments.
+ *
+ * The display form the House and Tonight both use: days, hours,
+ * minutes, seconds, each zero-padded so the numbers do not jump width
+ * as they change. `hours` here is hours *within* the day, unlike
+ * `Remaining.hours`, which is the total.
+ */
+export function countdownSegments(remaining: Remaining): { value: string; unit: string }[] {
+  return [
+    { value: String(remaining.days).padStart(2, "0"), unit: "Days" },
+    { value: String(remaining.hours % 24).padStart(2, "0"), unit: "Hours" },
+    { value: String(remaining.minutes).padStart(2, "0"), unit: "Min" },
+    { value: String(remaining.seconds).padStart(2, "0"), unit: "Sec" },
+  ];
 }
 
 /**

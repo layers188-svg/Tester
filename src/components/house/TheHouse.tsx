@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/Button";
+import { NextOpening } from "@/components/tonight/NextOpening";
 import type { LibraryItem, MySealedRecommendation } from "@/lib/supabase/types";
 import styles from "./TheHouse.module.css";
 
@@ -270,20 +271,22 @@ export function TheHouse({ state }: { state: HouseState }) {
 
         {/* The last thing on the page, and the reason to come back. */}
         <section className={styles.next}>
-          <p className={styles.sectionLabel}>Next opening</p>
+          {/*
+            A live clock, not a date.
+
+            This said "Saturday · 7:00 PM / SEALED", which tells a member
+            when and nothing about the wait — and the wait is the only
+            thing the next Opening can honestly offer them tonight. The
+            same `opensAt` drives the weekday, the time and every digit,
+            so there is no second source to drift against.
+          */}
           {state.next ? (
-            <p className={styles.nextWhen}>
-              <time dateTime={state.next.opensAt}>
-                {new Date(state.next.opensAt).toLocaleDateString(undefined, { weekday: "long" })}
-                {" · "}
-                {new Date(state.next.opensAt).toLocaleTimeString(undefined, {
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </time>
-            </p>
+            <NextOpening opensAt={state.next.opensAt} openingNumber={state.next.openingNumber} />
           ) : (
-            <p className={styles.nextWhen}>Seven, most nights</p>
+            <>
+              <p className={styles.sectionLabel}>Next opening</p>
+              <p className={styles.nextWhen}>Seven, most nights</p>
+            </>
           )}
           <p className={styles.nextSealed}>Sealed</p>
         </section>
