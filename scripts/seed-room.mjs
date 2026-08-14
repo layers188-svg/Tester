@@ -29,6 +29,7 @@
  * ---------------------------------------------------------------------
  *
  *   HOUSE_DARK_FIXTURES_OK=1 node scripts/seed-room.mjs
+ *   HOUSE_DARK_FIXTURES_OK=1 node scripts/seed-room.mjs --opening=9
  *   HOUSE_DARK_FIXTURES_OK=1 node scripts/seed-room.mjs --clean
  */
 import { createClient } from "@supabase/supabase-js";
@@ -108,17 +109,41 @@ function countWords(body) {
   return body.trim().split(/\s+/).filter(Boolean).length;
 }
 
-/** The opening the fixtures respond to: the one that is open right now. */
-async function currentOpening() {
+/**
+ * The opening the fixtures respond to.
+ *
+ * The one that is genuinely open by default — opened and not yet closed,
+ * the same test `isLive()` applies — or whichever number is named with
+ * `--opening=N`. The default used to ignore `closes_at`, which meant it
+ * would happily fill the Room of a night that had already finished while
+ * the house itself was dark.
+ *
+ * Naming one matters because the house hands over at 7pm: a Room seeded
+ * today is empty again tomorrow, and a reviewer who looks after the
+ * changeover meets the empty state this script exists to prevent.
+ */
+async function targetOpening() {
+  const named = process.argv.find((arg) => arg.startsWith("--opening="));
+  if (named) {
+    const number = Number(named.split("=")[1]);
+    const { data, error } = await db
+      .from("openings")
+      .select("id, opening_number, opens_at")
+      .eq("opening_number", number)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  const now = new Date().toISOString();
   const { data, error } = await db
     .from("openings")
-    .select("id, opening_number, opens_at")
-    .lte("opens_at", new Date().toISOString())
+    .select("id, opening_number, opens_at, closes_at")
+    .lte("opens_at", now)
     .order("opens_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(5);
   if (error) throw new Error(error.message);
-  return data;
+  return (data ?? []).find((o) => !o.closes_at || o.closes_at > now) ?? null;
 }
 
 async function clean() {
@@ -151,9 +176,12 @@ async function clean() {
 }
 
 async function seed() {
-  const opening = await currentOpening();
+  const opening = await targetOpening();
   if (!opening) {
-    console.error("\nNo opening is live, so there is no Room to fill. Programme one first.\n");
+    console.error(
+      "\nNo opening is live, so there is no Room to fill. Programme one first,\n" +
+        "or name an existing one with --opening=N.\n",
+    );
     process.exit(1);
   }
   console.log(`Filling the Room for opening ${opening.opening_number}…\n`);
