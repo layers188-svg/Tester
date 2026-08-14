@@ -87,7 +87,20 @@ used instead (brief §2, §23) and the gap is logged in
 
 ## What is genuinely blocked on Logan
 
-Tracked live in `LAUNCH_CHECKLIST.md`; summary: a real Supabase project,
-a Resend account + verified sending domain, a Cloudflare account, a
-domain, the approved logo source file, and the real seed night
-photography/No Trailer footage. Everything else proceeds autonomously.
+Tracked live in `LAUNCH_CHECKLIST.md`, which is the authority — this
+summary has been wrong before by being written once and left.
+
+As of 14 August, one thing blocks a real member signing in: **a Resend
+account**, wired up as Supabase custom SMTP. Until then no six-digit
+code can be delivered, and `/api/test-signin` stands in for sign-in
+behind a key (checklist item 9 — remove it the same day Resend lands).
+
+After that, and only when inviting a second person: a **domain**, so
+Resend can deliver to an address that is not Logan's own.
+
+Recurring rather than blocking: a **real No Trailer** cut for each
+night that runs. The software cannot make one.
+
+Already done, and no longer to be listed here: the Supabase project,
+the Cloudflare account and deploy, the approved logo, and the legal
+review. Everything else proceeds autonomously.

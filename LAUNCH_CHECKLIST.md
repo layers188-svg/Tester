@@ -7,35 +7,43 @@ Each item says exactly what to do, not a general setup lecture.
 
 ---
 
-## 1. Supabase project — blocks everything
+## 1. Supabase project — done, with one step left
 
-Nothing touching the database, auth or storage can be verified until this
-exists. The schema, RLS policies, functions and seed are written and
-waiting.
+The project exists and the product has run against it. The 23 migrations
+are applied, the signed-in journeys have been driven end to end on it,
+`npm run smoke:remote` reads it, its auth settings have been changed
+(item 2), and its three keys are among the eight secrets on the deployed
+worker (item 3).
 
-**Do:** create a project at supabase.com, then from the repo root:
+This item used to open "blocks everything" and tell you to go create a
+project. That was true when it was written and has not been true for
+some time — it contradicted four other sections of this same file.
+Corrected on 14 August rather than left to send you to supabase.com for
+a project you already have.
+
+**What is genuinely left — one command, and it needs Docker:**
+
+```bash
+npx supabase gen types typescript --linked > src/lib/supabase/types.ts
+```
+
+`src/lib/supabase/types.ts` is hand-written to match the migrations.
+Nothing has caught it drifting — `tsc --noEmit` is clean and the 169 RLS
+assertions pass against the real schema — but neither of those compares
+the file to the live database, and only this command does. The CLI runs
+`postgres-meta` as a container, which no build session here can pull
+(see "Environment constraints"), so it wants a machine with Docker. Run
+it after any future migration, not just once.
+
+For reference, the original setup sequence:
 
 ```bash
 npx supabase link --project-ref <ref>
 npm run db:migrate
-npx supabase gen types typescript --linked > src/lib/supabase/types.ts
 ```
 
-The Supabase CLI is now a devDependency, so `npx supabase` works after
+The Supabase CLI is a devDependency, so `npx supabase` works after
 `npm install` — nothing to install globally.
-
-**Then give me:** `NEXT_PUBLIC_SUPABASE_URL`,
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
-
-> `src/lib/supabase/types.ts` is currently hand-written to match the
-> migrations exactly. Regenerating it against the real project is the
-> only way to guarantee it never drifts.
->
-> Run that `gen types` line on a machine with Docker. The CLI generates
-> types by running `postgres-meta` as a container, which the build
-> environment here cannot pull (see "Environment constraints" below), so
-> it is the one step in this item I cannot do for you even once the
-> project exists.
 
 ---
 
@@ -286,6 +294,17 @@ These need no action — noting them so they are not re-litigated:
 - `npm run format:check`, `npm run lint`, `npm run typecheck`,
   `npm run test` (271 unit tests across 27 files), `npm run test:spoiler`
   (33), `npm run build` and `npm run cf:build` all pass.
+- **The build no longer depends on Google Fonts, and that was a real
+  failure, not a precaution.** Commit `e11255a` ran twice on the same
+  SHA — the push event and the pull_request event — and one of the two
+  died fetching Newsreader while the other passed. A build that fails
+  half the time on identical code would eventually have taken down a
+  deploy, not just a check. The nine woff2 files now live in
+  `src/fonts/` and load through `next/font/local`; refresh them with
+  `node scripts/vendor-fonts.mjs`. Verified after the change: the built
+  output contains no `fonts.googleapis.com` or `fonts.gstatic.com`
+  reference, a real browser on the entrance makes zero requests to
+  Google and reports every face loaded, and the 82 journeys still pass.
 - `npm run test:rls` — 169 assertions against a throwaway Postgres with
   every migration applied. Covers all seven brief §17 cases, Library
   title gating, the Room's reveal/watch gate (RM.1–RM.13), and that no
