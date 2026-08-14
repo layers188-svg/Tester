@@ -93,10 +93,22 @@
   border-top: 1px solid var(--hd-rule);
 }
 
-@media (min-width: 48rem) {
+/*
+ * One column, wide, on every size.
+ *
+ * It was two columns above 48rem, which is what made the Library read
+ * as a table: uniform rows, uniform width, uniform weight, a database
+ * with a serif face on. It also fought the records opening in place —
+ * an expanding entry in a two-column grid drags whatever is beside it.
+ *
+ * A printed archive is a single column with a large catalogue number
+ * and a large title, and it gets its variety from what each record
+ * actually is rather than from a grid. That is what the entry states
+ * below do.
+ */
+@media (min-width: 60rem) {
   .list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--hd-space-7);
+    max-width: 58rem;
   }
 }
 
@@ -316,4 +328,59 @@
 
 .entry[data-open="true"] .title {
   color: var(--hd-ink);
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * The archive, at desktop scale.
+ *
+ * No posters, and no apology for it. What a Library entry has is a
+ * number, a title, a date, a state and — if the member said something —
+ * six words. Set large enough, that is plenty: the catalogue number
+ * becomes a real registration mark rather than a bullet, and the title
+ * becomes the object on the row rather than a link inside it.
+ * ---------------------------------------------------------------------
+ */
+@media (min-width: 60rem) {
+  .entry {
+    padding: var(--hd-space-6) 0;
+  }
+
+  /* A registration number, the size a printed index would set it. */
+  .index {
+    font-size: 1.125rem;
+    letter-spacing: 0.08em;
+    padding-top: 0.4rem;
+    min-width: 3ch;
+  }
+
+  .title {
+    font-size: 2.25rem;
+    line-height: 1.05;
+  }
+
+  /* A record the member spoke about carries their words at reading
+     scale once it is open. It is the reason the entry is worth
+     opening, so it is not set as metadata. */
+  .sixWords {
+    font-size: 1.5rem;
+  }
+
+  .entry[data-open="true"] {
+    padding-left: var(--hd-space-6);
+  }
+}
+
+/*
+ * State, expressed as weight rather than as a badge colour.
+ *
+ * A record the member has left words on is the fullest kind of entry in
+ * the archive, so its number is brass even at rest: the eye can find
+ * the nights that meant something without reading a single label.
+ * Sealed entries stay quiet and already read as quieter through the
+ * italic title above.
+ */
+.entry[data-revealed="true"]:has(.sixWords) .index {
+  color: var(--hd-accent);
+  opacity: 1;
 }

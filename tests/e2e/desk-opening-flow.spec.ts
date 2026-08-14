@@ -34,11 +34,16 @@ test.describe("Programming Desk: create and schedule an opening", () => {
       timeout: 60_000,
     });
 
+    // Approving and scheduling each write to the remote project and
+    // then re-render the page from it. Alone that is quick; sharing the
+    // project with the rest of a parallel run it is not, and the
+    // default five seconds reported a slow Desk as a broken one. Same
+    // reasoning as the create assertion above.
     await page.getByRole("button", { name: "Approve" }).click();
-    await expect(page.getByText(/approved: yes/i)).toBeVisible();
+    await expect(page.getByText(/approved: yes/i)).toBeVisible({ timeout: 20_000 });
 
     await page.getByLabel(/opens at/i).fill("2026-12-01T20:00");
     await page.getByRole("button", { name: /move to scheduled/i }).click();
-    await expect(page.getByText(/status:\s*scheduled/i)).toBeVisible();
+    await expect(page.getByText(/status:\s*scheduled/i)).toBeVisible({ timeout: 20_000 });
   });
 });

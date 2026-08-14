@@ -135,20 +135,33 @@
   padding: 0;
 }
 
+/*
+ * A response is the visual material of this page.
+ *
+ * There are no posters here and there never will be, so the only thing
+ * the Room has to compose with is what people wrote and how it is set.
+ * That means scale and position have to do the work an image would
+ * otherwise do — which is the whole reason the page can be interesting
+ * without borrowing anybody's artwork.
+ *
+ * Three rules, all by position, all stable for a given room:
+ *
+ *   every 4n+1  set a step larger, as the page's punctuation
+ *   every 3n    closed with a hairline
+ *   every 4n+3  indented, so the column has an edge rather than a wall
+ *
+ * Stable matters as much as controlled. Randomising per render would
+ * make the same response a different size on every visit, and the page
+ * would flicker between shapes for no reason a member could name.
+ */
 .response {
   padding: var(--hd-space-6) 0;
 }
 
-/*
- * A controlled rhythm, not random variation.
- *
- * Two rules, both by position and both stable for a given room: every
- * third response closes with a hairline, and the first of every four is
- * set a step larger. The page reads as composed rather than as a list,
- * and the same response is the same size every time it is loaded —
- * randomising per render would make the page flicker between shapes on
- * every visit.
- */
+.response:nth-child(4n + 3) {
+  padding-left: var(--hd-space-6);
+}
+
 .response:nth-child(3n)::after {
   content: "";
   display: block;
@@ -160,25 +173,57 @@
 
 .body {
   font-family: var(--hd-font-editorial);
-  font-size: 1.375rem;
-  line-height: 1.35;
+  font-size: 1.5rem;
+  line-height: 1.3;
   color: var(--hd-ink);
   margin: 0 0 var(--hd-space-3);
   text-wrap: pretty;
+  /* Six words at most, so the line can be given room to be a line
+     rather than a paragraph. */
+  max-width: 24ch;
 }
 
 .response:nth-child(4n + 1) .body {
-  font-size: 1.625rem;
-  line-height: 1.25;
+  font-size: 1.875rem;
+  line-height: 1.2;
 }
 
 @media (min-width: 30rem) {
   .body {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .response:nth-child(4n + 1) .body {
-    font-size: 1.875rem;
+    font-size: 2.25rem;
+  }
+}
+
+/*
+ * Desktop lets the quotations be quotations.
+ *
+ * The page was an editorial measure on a phone and the same measure on
+ * a laptop, which made a room of ten people look like a narrow list. It
+ * is still a single column — a grid would turn responses into cards and
+ * invite comparison, which is the thing this page exists to avoid — but
+ * the column is wider and the type is larger, so the words are the
+ * object rather than the container.
+ */
+@media (min-width: 60rem) {
+  .body {
+    font-size: 2.125rem;
+  }
+
+  .response:nth-child(4n + 1) .body {
+    font-size: 3rem;
+  }
+
+  .response:nth-child(4n + 3) {
+    padding-left: var(--hd-space-8);
+  }
+
+  .response {
+    padding-top: var(--hd-space-7);
+    padding-bottom: var(--hd-space-7);
   }
 }
 

@@ -9,6 +9,27 @@
   margin: 0 auto;
 }
 
+/*
+ * The Room gets more room on a laptop.
+ *
+ * Still one column: a grid would turn responses into cards side by
+ * side, and cards invite comparison, which is the mechanic this page
+ * exists to refuse. What widens is the measure, so the quotations can
+ * be set at a scale that makes them the object on the page rather than
+ * a list of lines inside a phone-shaped container.
+ */
+@media (min-width: 60rem) {
+  .page {
+    max-width: 58rem;
+    padding: var(--hd-space-8) var(--hd-space-6) var(--hd-space-8);
+  }
+
+  .title {
+    font-size: clamp(4rem, 8vw, 6rem);
+    line-height: 0.95;
+  }
+}
+
 .eyebrow {
   font-family: var(--hd-font-utility);
   text-transform: uppercase;
