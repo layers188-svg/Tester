@@ -141,8 +141,10 @@
 }
 
 /* The member's own words stay the anchor: largest thing in the Room,
-   here and on the Room page itself. */
+   here and on the Room page itself. Named to match, so entering the
+   Room moves this object up into place rather than replacing it. */
 .roomMine {
+  view-transition-name: hd-my-six-words;
   font-family: var(--hd-font-editorial);
   font-size: clamp(1.5rem, 5.5vw, 2rem);
   line-height: 1.2;

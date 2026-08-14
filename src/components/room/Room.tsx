@@ -33,7 +33,19 @@ type View = "circle" | "house";
  * member has not published, because their own words are always in the
  * result once they have.
  */
-export function Room({ openingId }: { openingId: string }) {
+export function Room({
+  openingId,
+  ownSixWords,
+}: {
+  openingId: string;
+  /**
+   * Rendered on the server, so the member's own words are on screen at
+   * first paint. Everyone else's still arrive with the fetch, which is
+   * the right way round: the wait belongs to the part of the page that
+   * is genuinely other people.
+   */
+  ownSixWords: string | null;
+}) {
   const [responses, setResponses] = useState<RoomResponse[] | null>(null);
   const [view, setView] = useState<View>("circle");
   const [error, setError] = useState<string | null>(null);
@@ -57,24 +69,7 @@ export function Room({ openingId }: { openingId: string }) {
     };
   }, [openingId]);
 
-  if (error) {
-    return (
-      <p className={styles.error} role="alert">
-        {error}
-      </p>
-    );
-  }
-
-  if (responses === null) {
-    return (
-      <p className={styles.loading} aria-busy="true">
-        Opening the room.
-      </p>
-    );
-  }
-
-  const mine = responses.find((r) => r.is_mine) ?? null;
-  const others = responses.filter((r) => !r.is_mine);
+  const others = (responses ?? []).filter((r) => !r.is_mine);
   const circle = others.filter((r) => r.in_my_circle);
   const shown = view === "circle" ? circle : others;
 
@@ -83,10 +78,17 @@ export function Room({ openingId }: { openingId: string }) {
       <p className={styles.eyebrow}>The Room</p>
       <p className={styles.lead}>What stayed with everyone else.</p>
 
-      {mine && (
+      {/*
+        The member's own words first, and never behind a wait. They came
+        from the server with the page, so this is the one part of the
+        Room that is already true before anything is fetched — which is
+        also what lets the words travel here as a single object from the
+        submission moment.
+      */}
+      {ownSixWords && (
         <section className={styles.mine}>
           <p className={styles.mineLabel}>Your six words</p>
-          <p className={styles.mineBody}>{mine.body}</p>
+          <p className={styles.mineBody}>{ownSixWords}</p>
         </section>
       )}
 
@@ -117,7 +119,15 @@ export function Room({ openingId }: { openingId: string }) {
         </button>
       </div>
 
-      {shown.length === 0 ? (
+      {error ? (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      ) : responses === null ? (
+        <p className={styles.loading} aria-busy="true">
+          Opening the room.
+        </p>
+      ) : shown.length === 0 ? (
         /*
          * A sentence, not an empty-state box. The room being quiet is a
          * true thing to say about a night, and it is said in the same

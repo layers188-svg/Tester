@@ -40,6 +40,15 @@ test.describe("mark watched and leave six words", () => {
     await expect(page).toHaveURL(/\/room\//);
     await expect(page.getByText(/what stayed with everyone else/i)).toBeVisible();
     await expect(page.getByText(/i did not see that coming/i)).toBeVisible();
+
+    // The member's own words come with the page, not with the fetch.
+    // Everyone else's are worth waiting for; being shown a loading line
+    // where your own writing should be is the Room asking you to wait
+    // for something you already know. It is also what lets the words
+    // carry across from the submission moment as one object rather than
+    // being redrawn here.
+    const html = await (await page.request.get(`/room/${FIXTURE.openingId}`)).text();
+    expect(html).toContain("I did not see that coming");
   });
 
   // The seventh-word cap is asserted in tests/unit/word-slots.test.tsx.

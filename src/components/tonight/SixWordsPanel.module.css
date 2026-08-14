@@ -41,6 +41,9 @@
   letter-spacing: 0.02em;
 }
 
+/* Coming back to words already left. The same named object as the
+   submission moment and the Room: this branch and that one never
+   render together, so the name is only ever on one element at a time. */
 .ownWord {
   font-family: var(--hd-font-editorial);
   font-size: 1.5rem;
@@ -48,6 +51,7 @@
   color: var(--hd-ink);
   margin: 0 0 var(--hd-space-4);
   text-wrap: balance;
+  view-transition-name: hd-my-six-words;
 }
 
 .ownActions {
@@ -113,7 +117,9 @@
   padding: var(--hd-space-6) 0;
 }
 
-/* The words settle: they arrive already written, and only lift. */
+/* The words settle: they arrive already written, and only lift.
+   Named so that entering the Room carries them upward into "Your six
+   words" instead of redrawing them there. */
 .momentWords {
   font-family: var(--hd-font-editorial);
   font-size: clamp(1.75rem, 6vw, 2.5rem);
@@ -122,6 +128,7 @@
   margin: 0;
   text-wrap: balance;
   animation: settle var(--hd-motion-reveal) var(--hd-ease-entering) backwards;
+  view-transition-name: hd-my-six-words;
 }
 
 @keyframes settle {

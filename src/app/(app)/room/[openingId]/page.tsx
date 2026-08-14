@@ -44,6 +44,26 @@ export default async function RoomPage({ params }: { params: Promise<{ openingId
   if (!opening.has_revealed) redirect("/tonight");
   if (!opening.has_published) redirect("/tonight");
 
+  /*
+   * The member's own words, server-rendered rather than waited for.
+   *
+   * They used to arrive with everybody else's, which meant the Room's
+   * first paint said "Opening the room." where the member's own anchor
+   * should already be — and the words they had just written appeared to
+   * be fetched back from somewhere. They are the one thing on this page
+   * that needs no permission check beyond the row's own author, so
+   * `can_view_six_word_review` returns them directly.
+   *
+   * No spoiler exposure: a six-word review is the member's own writing,
+   * and the title on this page has already been earned by has_revealed.
+   */
+  const { data: own } = await supabase
+    .from("six_word_reviews")
+    .select("body")
+    .eq("user_id", user.id)
+    .eq("opening_id", openingId)
+    .maybeSingle();
+
   return (
     <div className={styles.page}>
       <p className={styles.eyebrow}>Opening {opening.opening_number}</p>
@@ -52,7 +72,7 @@ export default async function RoomPage({ params }: { params: Promise<{ openingId
         {opening.release_year ? <span className={styles.year}> {opening.release_year}</span> : null}
       </h1>
 
-      <Room openingId={openingId} />
+      <Room openingId={openingId} ownSixWords={own?.body ?? null} />
     </div>
   );
 }

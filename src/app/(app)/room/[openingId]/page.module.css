@@ -18,10 +18,14 @@
   margin: 0 0 var(--hd-space-3);
 }
 
+/* The same title object as the one on Tonight and on the House, so
+   arriving here continues the reveal rather than cutting to a new
+   page that happens to name the same film. */
 .title {
   font-size: var(--hd-size-display);
   margin: 0 0 var(--hd-space-7);
   text-wrap: balance;
+  view-transition-name: hd-opening-title;
 }
 
 .year {

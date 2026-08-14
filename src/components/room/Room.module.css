@@ -33,6 +33,20 @@
   margin: 0 0 var(--hd-space-3);
 }
 
+/*
+ * The member's own words, and the last position of a single object.
+ *
+ * They are written in the six slots, they hold alone in the submission
+ * moment, they sit under "Your six words" on the House, and they arrive
+ * here at the top of the Room. `hd-my-six-words` makes all four the
+ * same element to the browser, so the words travel to their place
+ * rather than the page cutting to a copy of them.
+ *
+ * This depends on the body being in the server-rendered HTML. It used
+ * to arrive with the after-credits fetch, which meant the Room's first
+ * paint had a loading line where the anchor should be and the
+ * transition had nothing to match.
+ */
 .mineBody {
   font-family: var(--hd-font-editorial);
   font-size: clamp(1.625rem, 5.5vw, 2.125rem);
@@ -40,6 +54,7 @@
   color: var(--hd-ink);
   margin: 0;
   text-wrap: balance;
+  view-transition-name: hd-my-six-words;
 }
 
 .rule {
