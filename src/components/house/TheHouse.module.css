@@ -418,3 +418,34 @@
   flex-direction: column;
   gap: var(--hd-space-7);
 }
+
+/*
+ * The quiet alternative beside a primary action.
+ *
+ * Present only where a real second choice exists — a member who has
+ * watched but not written can go either way, and offering the form
+ * alone would make an optional thing look required.
+ */
+.heroSecondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  transition: color var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.heroSecondary:hover {
+  color: var(--hd-ink);
+}
+
+.roomActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--hd-space-5);
+}

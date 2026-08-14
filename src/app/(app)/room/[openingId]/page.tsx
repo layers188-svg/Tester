@@ -37,12 +37,19 @@ export default async function RoomPage({ params }: { params: Promise<{ openingId
 
   if (error || !opening) notFound();
 
-  // Two ways in that are not really ways in. A member who never opened
-  // this night has no business reading the room for it, and one who has
-  // not written their own words goes back to write them — which is the
-  // entire product, so it is a redirect rather than a message.
+  // Two ways in that are not really ways in.
+  //
+  // A member who never opened this night has no business reading the
+  // room for it. A member who has not watched it goes back, because the
+  // whole point is that their own reaction to the film forms before
+  // anybody else's words reach them.
+  //
+  // Writing is no longer required. It never was the thing being
+  // protected — watching is when the reaction forms, and publishing was
+  // only the evidence. Demanding the evidence made the Room a toll on
+  // members who genuinely had nothing to say. See migration 0023.
   if (!opening.has_revealed) redirect("/tonight");
-  if (!opening.has_published) redirect("/tonight");
+  if (!opening.has_watched) redirect("/tonight");
 
   /*
    * The member's own words, server-rendered rather than waited for.

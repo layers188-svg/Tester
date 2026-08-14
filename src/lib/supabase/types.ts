@@ -381,10 +381,14 @@ export interface CircleSixWords {
  * are null until this member has personally revealed the opening, which
  * is the same rule every other title-bearing projection follows.
  *
- * `has_revealed` and `has_published` are separate because the two come
- * apart: a member can know what the film was and still not have said
- * anything about it, and that is exactly the state the Room exists to
- * push them out of.
+ * Three flags, because all three come apart. A member can know what the
+ * film was without having watched it; can have watched it without
+ * having written anything; and only the middle one governs entry.
+ *
+ * `has_watched` is the gate (migration 0023): the Room protects the
+ * member's own reaction to the film forming first, and watching is when
+ * that happens. `has_published` decides only whether they have a line
+ * of their own at the top of it.
  */
 export interface RoomOpening {
   opening_number: number;
@@ -392,6 +396,7 @@ export interface RoomOpening {
   release_year: number | null;
   has_revealed: boolean;
   has_published: boolean;
+  has_watched: boolean;
 }
 
 /**

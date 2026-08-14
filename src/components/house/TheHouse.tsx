@@ -49,14 +49,14 @@ export function TheHouse({ state }: { state: HouseState }) {
   const [preview, setPreview] = useState<RoomResponse[] | null>(null);
 
   /**
-   * The Room preview, and only once the member has spoken.
+   * The Room preview, once the member has watched the film.
    *
    * Guarded here to avoid a request that would come back empty, but the
    * guard is not the protection: `get_after_credits` returns nothing to
-   * a member who has not published, whatever this component asks for.
+   * a member who has not watched, whatever this component asks for.
    */
   useEffect(() => {
-    if (!state.hasPublished) return;
+    if (!state.hasWatched) return;
     let cancelled = false;
     void (async () => {
       try {
@@ -72,7 +72,7 @@ export function TheHouse({ state }: { state: HouseState }) {
     return () => {
       cancelled = true;
     };
-  }, [state.hasPublished, state.openingId]);
+  }, [state.hasWatched, state.openingId]);
 
   const others = (preview ?? []).filter((r) => !r.is_mine).slice(0, 3);
 
@@ -89,18 +89,32 @@ export function TheHouse({ state }: { state: HouseState }) {
         {state.releaseYear && <p className={styles.year}>{state.releaseYear}</p>}
         <p className={styles.nowOpen}>Now open</p>
 
+        {/*
+          One action, and only where a second genuinely exists.
+
+          Not watched: the way in, and nothing else — the Room is not
+          offered to somebody who has not seen the film.
+          Watched, nothing written: the invitation to write, with the
+          Room beside it as the quiet alternative, because writing is
+          optional and a hero that only offers the form does not look
+          optional.
+          Written: the Room, alone. There is nothing else to do.
+        */}
         <div className={styles.heroAction}>
-          {!state.hasWatched && (
+          {!state.hasWatched ? (
             <Button variant="primary" href={`/opening/${state.openingId}`}>
               Watch when you&rsquo;re ready
             </Button>
-          )}
-          {state.hasWatched && !state.hasPublished && (
-            <Button variant="primary" href={`/opening/${state.openingId}`}>
-              Leave your six words
-            </Button>
-          )}
-          {state.hasPublished && (
+          ) : !state.hasPublished ? (
+            <>
+              <Button variant="primary" href={`/opening/${state.openingId}`}>
+                Leave your six words
+              </Button>
+              <Link href={`/room/${state.openingId}`} className={styles.heroSecondary}>
+                Skip to the room
+              </Link>
+            </>
+          ) : (
             <Button variant="primary" href={`/room/${state.openingId}`}>
               Enter the room
             </Button>
@@ -117,18 +131,19 @@ export function TheHouse({ state }: { state: HouseState }) {
       <section className={styles.room}>
         <p className={styles.sectionLabel}>The Room</p>
 
-        {!state.hasPublished ? (
+        {!state.hasWatched ? (
           <>
             {/*
               Closed, and honestly closed. Nothing is blurred, teased,
               counted or previewed: a blurred quotation still tells you
               somebody said something long and emphatic, and the whole
-              point is that the member's own reaction forms first.
+              point is that the member meets the film before they meet
+              anybody's opinion of it.
+
+              The gate is the film, not the writing. A member who has
+              watched and chosen not to write is welcome in.
             */}
-            <p className={styles.roomClosed}>Other voices stay outside until yours is in.</p>
-            <Button variant="secondary" href={`/opening/${state.openingId}`}>
-              Leave your six words
-            </Button>
+            <p className={styles.roomClosed}>Other voices wait until you have seen it.</p>
           </>
         ) : (
           <>
@@ -169,9 +184,22 @@ export function TheHouse({ state }: { state: HouseState }) {
               </>
             )}
 
-            <Link href={`/room/${state.openingId}`} className={styles.enter}>
-              Enter the room
-            </Link>
+            <div className={styles.roomActions}>
+              <Link href={`/room/${state.openingId}`} className={styles.enter}>
+                Enter the room
+              </Link>
+              {/*
+                Still open to them, quietly. A member who skipped is not
+                nagged and is not shown an empty "your six words"
+                heading, but the prompt has to stay reachable or the
+                choice becomes permanent by accident.
+              */}
+              {!state.hasPublished && (
+                <Link href={`/opening/${state.openingId}`} className={styles.change}>
+                  Leave your six words
+                </Link>
+              )}
+            </div>
           </>
         )}
       </section>

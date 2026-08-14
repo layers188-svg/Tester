@@ -85,25 +85,38 @@ journeys).
 
 ## The Room (the sequence is the product)
 
-Watch → Mark watched → leave your six words → submit → the room opens
+Watch → Mark watched → leave your six words (or skip) → the room opens
 → read everyone else. **A member must never see another member's
-response before their own is on record.** The product exists so someone
-can meet a film before outside opinion reshapes it.
+response before they have seen the film.** The product exists so
+someone can meet a film before outside opinion reshapes it.
+
+The gate was "before their own is on record" until 14 August. It was
+changed by direction, and the reasoning is worth keeping: what the rule
+protected was never the writing, it was the member's own reaction
+forming first, and watching is when that happens. Publishing was only
+the evidence of it, and demanding evidence made the Room a toll on
+anybody who genuinely had nothing to say.
 
 - Enforced three times over, deliberately: `can_view_six_word_review`
-  (RLS), `get_after_credits` (0017, returns zero rows to a member who
-  has not published), and `/room/[openingId]` redirecting on
-  `has_published`. The UI never decides this on its own.
+  (RLS), `get_after_credits` (0023, returns zero rows to a member who
+  has not watched), and `/room/[openingId]` redirecting on
+  `has_watched`. The UI never decides this on its own. RLS already
+  gated on `has_watched`, so 0023 made the three agree rather than
+  loosening one of them.
 - `get_after_credits` returning nothing is ambiguous by design (shut
   room or empty room). `get_room_opening` (0020) exists because the
   Room page has to tell those apart, and it reads the title without
   writing a reveal the way `/api/reveal/*` does.
 - The response screen shows **nobody else's words**. Anything that
   lists other members belongs behind the submit.
-- A member may **skip** ("Not this time"). Skipping records nothing
-  and opens nothing: the Room stays shut. The rule is that your words
-  come before anyone else's, not that you are obliged to have any.
-  Offer it below the primary action, never beside it.
+- A member may **skip** ("Skip for now"). Skipping records nothing —
+  "did not feel like it tonight" is not a fact worth storing about
+  somebody — but the Room still opens, because they have seen the film.
+  Offer it below the primary action, never beside it, and never nag
+  somebody who took it: no modal, no confirmation, no second ask.
+- A response is **one to six words**, not exactly six (0022). Zero is a
+  skip, not a response. The house's own premise in `film_records` is
+  still exactly six, which is a different rule on purpose.
 - Once a member has revealed, `/tonight` serves **The House**
   (`src/components/house/TheHouse.tsx`) instead of the reveal card:
   same route, a state of the evening rather than a place. One hero

@@ -38,7 +38,7 @@ test.describe("the House after the Opening", () => {
   test("the Room on the House previews nothing before the member has spoken", async ({ page }) => {
     await page.goto("/tonight");
 
-    await expect(page.getByText(/other voices stay outside until yours is in/i)).toBeVisible();
+    await expect(page.getByText(/other voices wait until you have seen it/i)).toBeVisible();
     await expect(page.getByText(/from the house/i)).toHaveCount(0);
 
     // Nothing withheld may be present-but-hidden either: a blurred or
@@ -85,7 +85,7 @@ test.describe("six words can be skipped", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
   signedInAs(PERSONAS.owner);
 
-  test("skipping records nothing and leaves the Room shut", async ({ page }) => {
+  test("skipping records nothing and still opens the Room", async ({ page }) => {
     await page.goto("/tonight");
     await page.getByRole("button", { name: /see tonight.s clue/i }).click();
     await page.getByRole("button", { name: /choose tonight.s film/i }).click({ timeout: 20_000 });
@@ -94,10 +94,26 @@ test.describe("six words can be skipped", () => {
     await expect(page.getByText(/six words after the picture/i)).toBeVisible();
     await page.getByRole("button", { name: /skip for now/i }).click();
 
-    // The prompt goes; nothing is recorded and nothing is unlocked.
+    // The prompt goes and nothing is recorded: "did not feel like it
+    // tonight" is not a fact worth storing about somebody.
     await expect(page.getByText(/six words after the picture/i)).toHaveCount(0);
 
+    /*
+     * And the Room opens anyway.
+     *
+     * This reverses the rule the product shipped with, by direction on
+     * 14 August. What the old rule protected was never the writing — it
+     * was the member's own reaction forming before outside opinion
+     * reshaped it, and watching is when that happens. Publishing was
+     * only the evidence, and demanding evidence made the Room a toll on
+     * anybody who genuinely had nothing to say.
+     *
+     * The protection still stands where it stood: see the journey below,
+     * where a member who has not watched is still turned away and still
+     * gets no title on the way.
+     */
     await page.goto(`/room/${FIXTURE.openingId}`);
-    await expect(page).toHaveURL(/\/tonight/);
+    await expect(page).toHaveURL(/\/room\//);
+    await expect(page.getByText(/see what stayed with everyone else/i)).toBeVisible();
   });
 });

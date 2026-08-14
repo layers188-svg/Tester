@@ -87,16 +87,19 @@ test.describe("mark watched and leave six words", () => {
  *
  * Now that the form no longer lists anyone else's words, /room is the
  * only route to them, which makes it the thing worth attacking. The
- * member persona has never revealed this opening and never written
- * anything about it, which is exactly the state the route has to hold
- * against — including for someone who types the URL rather than
- * following a link to it.
+ * member persona has never revealed this opening and never watched it,
+ * which is exactly the state the route has to hold against — including
+ * for someone who types the URL rather than following a link to it.
+ *
+ * Writing is no longer the gate (migration 0023); watching is. That
+ * makes this journey more important rather than less, because it is now
+ * the only place the remaining rule is asserted from the outside.
  */
-test.describe("the room is shut until you have spoken", () => {
+test.describe("the room is shut until you have seen it", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
   signedInAs(PERSONAS.member);
 
-  test("a member who has not spoken is sent back, and gets no title on the way", async ({
+  test("a member who has not watched is sent back, and gets no title on the way", async ({
     page,
   }) => {
     await page.goto(`/room/${FIXTURE.openingId}`);
@@ -111,7 +114,8 @@ test.describe("the room is shut until you have spoken", () => {
 
     const payload = await response.json();
     // Zero rows is the contract: the caller cannot tell a shut room from
-    // an empty one, and neither can anybody reading this response.
+    // an empty one, and neither can anybody reading this response. The
+    // gate moved from publishing to watching; the ambiguity did not.
     expect(payload.open).toBe(false);
     expect(payload.reviews).toEqual([]);
     expect(await response.text()).not.toMatch(new RegExp(FIXTURE.filmTitle, "i"));
