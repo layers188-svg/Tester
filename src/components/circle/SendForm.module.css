@@ -93,3 +93,27 @@
   font-style: italic;
   font-size: 1.25rem;
 }
+
+/* The sealed preview sits above the form: the object the sender is composing. */
+.preview {
+  margin-bottom: var(--hd-space-7);
+}
+
+.previewLabel {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  text-align: center;
+}
+
+/* Sending: the form is gone and the object has the screen to itself. */
+.sealingStage {
+  min-height: 60dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--hd-space-6) var(--hd-space-4);
+}

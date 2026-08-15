@@ -38,7 +38,11 @@ export default async function StagePage({
 
   const { state } = await searchParams;
   const initial =
-    state === "revealed" || state === "watched" || state === "room" || state === "trust"
+    state === "revealed" ||
+    state === "watched" ||
+    state === "room" ||
+    state === "trust" ||
+    state === "seal"
       ? state
       : "sealed";
 

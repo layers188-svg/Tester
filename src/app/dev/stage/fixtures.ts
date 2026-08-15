@@ -123,3 +123,25 @@ export function stageTrustUs(body: {
   const next = STAGE_RECORDS.find((record) => !seen.has(record.film_id));
   return { recommendation: next ?? null, accepted: false };
 }
+
+/* ------------------------------------------------------------------ */
+/* Circle — receiving under seal                                       */
+/* ------------------------------------------------------------------ */
+
+export const stageRecommendation = {
+  id: "00000000-0000-4000-8000-000000000002",
+  senderDisplayName: "Maya",
+  personalNote: "Watch it before anyone tells you anything about it.",
+  runtimeMinutes: 106,
+  cues: ["Tempo", "Ambition"],
+  revealedAt: null,
+};
+
+export const stageSealedProgress = {
+  watchState: null,
+  hasSkippedReview: false,
+  hasSixWords: false,
+  sixWordsId: null,
+  sixWordsBody: null,
+  sixWordsCreatedAt: null,
+};

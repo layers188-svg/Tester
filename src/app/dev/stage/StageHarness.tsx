@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { TonightExperience } from "@/components/tonight/TonightExperience";
 import { TheRoom } from "@/components/room/TheRoom";
 import { TrustUs } from "@/components/trust/TrustUs";
+import { SealedExperience } from "@/components/circle/SealedExperience";
 import { MotionPreferenceProvider } from "@/lib/motion/reduced-motion";
 import {
   stageOpening,
@@ -13,6 +14,8 @@ import {
   stageVoices,
   stageTerritories,
   stageTrustUs,
+  stageRecommendation,
+  stageSealedProgress,
 } from "./fixtures";
 import styles from "./stage.module.css";
 
@@ -38,7 +41,7 @@ import styles from "./stage.module.css";
  * security-definer function in Postgres.
  */
 
-type StageState = "sealed" | "revealed" | "watched" | "room" | "trust";
+type StageState = "sealed" | "revealed" | "watched" | "room" | "trust" | "seal";
 
 const STATES: { value: StageState; label: string }[] = [
   { value: "sealed", label: "Sealed" },
@@ -46,6 +49,7 @@ const STATES: { value: StageState; label: string }[] = [
   { value: "watched", label: "Watched" },
   { value: "room", label: "The Room" },
   { value: "trust", label: "Trust Us" },
+  { value: "seal", label: "Under Seal" },
 ];
 
 /**
@@ -72,7 +76,7 @@ function installStageFetch() {
         headers: { "Content-Type": "application/json" },
       });
 
-    if (url.includes("/api/reveal/opening/")) {
+    if (url.includes("/api/reveal/")) {
       // A deliberate beat, so the black hold and the network wait are
       // visibly two different things when the sequence is recorded.
       await new Promise((resolve) => setTimeout(resolve, 120));
@@ -134,7 +138,9 @@ export function StageHarness({ initialState }: { initialState: StageState }) {
       </nav>
 
       <main id="hd-main" className={styles.main}>
-        {state === "trust" ? (
+        {state === "seal" ? (
+          <SealedExperience recommendation={stageRecommendation} progress={stageSealedProgress} />
+        ) : state === "trust" ? (
           <TrustUs territories={stageTerritories} />
         ) : state === "room" ? (
           <TheRoom opening={stageRoomOpening} voices={stageVoices} />
