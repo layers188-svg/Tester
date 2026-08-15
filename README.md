@@ -12,10 +12,15 @@ and only then does the conversation open.
 This repository is the **Founding Beta**: free, invitation friendly, with
 no payment, subscription or trial clock.
 
-- Product source of truth: [`docs/HOUSE_DARK_BUILD_BRIEF.md`](docs/HOUSE_DARK_BUILD_BRIEF.md)
+- Product source of truth: [`docs/HOUSE_DARK_BUILD_BRIEF.md`](docs/HOUSE_DARK_BUILD_BRIEF.md),
+  superseded where they differ by the August handover in [`docs/handover/`](docs/handover/)
 - Working contract for contributors and agents: [`CLAUDE.md`](CLAUDE.md)
 - Daily operating guide: [`OPERATIONS.md`](OPERATIONS.md)
 - Remaining external actions: [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md)
+
+**Want to see the motion?** [`docs/REVIEWING_THE_MOTION.md`](docs/REVIEWING_THE_MOTION.md)
+— `npm ci && npm run dev`, then `/dev/stage`. No database, no accounts,
+no `.env`.
 
 ---
 
