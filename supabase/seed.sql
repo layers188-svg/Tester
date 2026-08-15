@@ -153,4 +153,104 @@ values
   ('33333333-3333-4333-8333-333333333333')
 on conflict do nothing;
 
+-- ---------------------------------------------------------------------
+-- Trust Us house records (local development only)
+-- ---------------------------------------------------------------------
+--
+-- The editorial six-word lines and territories from
+-- docs/handover/fixtures.json, so /trust can be exercised locally.
+--
+-- These are demonstration records, not the House's editorial voice.
+-- Production records are written and approved through the Programming
+-- Desk (/desk/records) — nothing is offered to a member until an owner
+-- sets editorial_approved_at, so an unseeded production project shows
+-- Trust Us honestly empty rather than showing these.
+
+insert into films (id, title, release_year, runtime_minutes, rights_notes) values
+  ('f0000001-0000-4000-8000-000000000001', 'Parasite',                    2019, 132, 'Seed content for local development only.'),
+  ('f0000002-0000-4000-8000-000000000002', 'Portrait of a Lady on Fire',  2019, 122, 'Seed content for local development only.'),
+  ('f0000003-0000-4000-8000-000000000003', 'Burning',                     2018, 148, 'Seed content for local development only.'),
+  ('f0000004-0000-4000-8000-000000000004', 'The Florida Project',         2017, 111, 'Seed content for local development only.'),
+  ('f0000005-0000-4000-8000-000000000005', 'In the Mood for Love',        2000,  98, 'Seed content for local development only.'),
+  ('f0000006-0000-4000-8000-000000000006', 'Past Lives',                  2023, 106, 'Seed content for local development only.'),
+  ('f0000007-0000-4000-8000-000000000007', 'Aftersun',                    2022, 102, 'Seed content for local development only.'),
+  ('f0000008-0000-4000-8000-000000000008', 'La La Land',                  2016, 128, 'Seed content for local development only.'),
+  ('f0000009-0000-4000-8000-000000000009', 'Under the Skin',              2013, 108, 'Seed content for local development only.')
+on conflict (id) do nothing;
+
+insert into film_house_records
+  (film_id, six_words_before, territories, pace, intensity, editorial_approved_at, approved_by)
+values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Drummer chases greatness under brutal mentorship',
+    array['Tension','Obsession','Ambition'], 'relentless', 'high', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000001-0000-4000-8000-000000000001', 'Struggling family enters wealthy household''s orbit',
+    array['Power','Tension'], 'building', 'high', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000002-0000-4000-8000-000000000002', 'Painter observes woman she must portray',
+    array['Longing','Memory'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000003-0000-4000-8000-000000000003', 'Young man searches through unsettling absence',
+    array['Jealousy','Tension','Something strange'], 'slow burn', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000004-0000-4000-8000-000000000004', 'Childhood flourishes beside adult instability daily',
+    array['Childhood','Escape'], 'loose', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000005-0000-4000-8000-000000000005', 'Neighbours grow close at impossible moment',
+    array['Longing','Memory'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000006-0000-4000-8000-000000000006', 'Old friends meet across changed lives',
+    array['Longing','Memory'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000007-0000-4000-8000-000000000007', 'Daughter remembers holiday with her father',
+    array['Memory','Childhood'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000008-0000-4000-8000-000000000008', 'Dreamers collide while chasing separate futures',
+    array['Ambition','Longing'], 'buoyant', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000009-0000-4000-8000-000000000009', 'Mysterious woman moves through unfamiliar world',
+    array['Something strange'], 'hypnotic', 'high', now(), '11111111-1111-4111-8111-111111111111')
+on conflict (film_id) do nothing;
+
+-- ---------------------------------------------------------------------
+-- Trust Us house records (local development only)
+-- ---------------------------------------------------------------------
+--
+-- The editorial six-word lines and territories from
+-- docs/handover/fixtures.json, so /trust can be exercised locally.
+--
+-- These are demonstration records, not the House's editorial voice.
+-- Production records are written and approved through the Programming
+-- Desk (/desk/records) — nothing is offered to a member until an owner
+-- sets editorial_approved_at, so an unseeded production project shows
+-- Trust Us honestly empty rather than showing these.
+
+insert into films (id, title, release_year, runtime_minutes, rights_notes) values
+  ('f0000001-0000-4000-8000-000000000001', 'Parasite',                    2019, 132, 'Seed content for local development only.'),
+  ('f0000002-0000-4000-8000-000000000002', 'Portrait of a Lady on Fire',  2019, 122, 'Seed content for local development only.'),
+  ('f0000003-0000-4000-8000-000000000003', 'Burning',                     2018, 148, 'Seed content for local development only.'),
+  ('f0000004-0000-4000-8000-000000000004', 'The Florida Project',         2017, 111, 'Seed content for local development only.'),
+  ('f0000005-0000-4000-8000-000000000005', 'In the Mood for Love',        2000,  98, 'Seed content for local development only.'),
+  ('f0000006-0000-4000-8000-000000000006', 'Past Lives',                  2023, 106, 'Seed content for local development only.'),
+  ('f0000007-0000-4000-8000-000000000007', 'Aftersun',                    2022, 102, 'Seed content for local development only.'),
+  ('f0000008-0000-4000-8000-000000000008', 'La La Land',                  2016, 128, 'Seed content for local development only.'),
+  ('f0000009-0000-4000-8000-000000000009', 'Under the Skin',              2013, 108, 'Seed content for local development only.')
+on conflict (id) do nothing;
+
+insert into film_house_records
+  (film_id, six_words_before, territories, pace, intensity, editorial_approved_at, approved_by)
+values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'Drummer chases greatness under brutal mentorship',
+    array['Tension','Obsession','Ambition'], 'relentless', 'high', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000001-0000-4000-8000-000000000001', 'Struggling family enters wealthy household''s orbit',
+    array['Power','Tension'], 'building', 'high', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000002-0000-4000-8000-000000000002', 'Painter observes woman she must portray',
+    array['Longing','Memory'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000003-0000-4000-8000-000000000003', 'Young man searches through unsettling absence',
+    array['Jealousy','Tension','Something strange'], 'slow burn', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000004-0000-4000-8000-000000000004', 'Childhood flourishes beside adult instability daily',
+    array['Childhood','Escape'], 'loose', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000005-0000-4000-8000-000000000005', 'Neighbours grow close at impossible moment',
+    array['Longing','Memory'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000006-0000-4000-8000-000000000006', 'Old friends meet across changed lives',
+    array['Longing','Memory'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000007-0000-4000-8000-000000000007', 'Daughter remembers holiday with her father',
+    array['Memory','Childhood'], 'measured', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000008-0000-4000-8000-000000000008', 'Dreamers collide while chasing separate futures',
+    array['Ambition','Longing'], 'buoyant', 'medium', now(), '11111111-1111-4111-8111-111111111111'),
+  ('f0000009-0000-4000-8000-000000000009', 'Mysterious woman moves through unfamiliar world',
+    array['Something strange'], 'hypnotic', 'high', now(), '11111111-1111-4111-8111-111111111111')
+on conflict (film_id) do nothing;
+
 commit;

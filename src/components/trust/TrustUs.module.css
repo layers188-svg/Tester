@@ -1,0 +1,353 @@
+.stage {
+  max-width: var(--hd-max-width);
+  margin: 0 auto;
+  padding: var(--hd-space-7) var(--hd-space-4) var(--hd-space-8);
+  min-height: 70dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eyebrow {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.question {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  color: var(--hd-ink);
+}
+
+.lead {
+  margin: 0 0 var(--hd-space-6);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.note {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Territories — words, not filter chips                                */
+/* ------------------------------------------------------------------ */
+
+.territories {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.territory {
+  display: block;
+  width: 100%;
+  min-height: var(--hd-touch-min);
+  padding: var(--hd-space-3) 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--hd-rule);
+  text-align: left;
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+  transition:
+    color var(--hd-motion-fast) var(--hd-ease-house),
+    padding-left var(--hd-motion-standard) var(--hd-ease-house);
+}
+
+/*
+ * The chosen word moves toward the decision line as the others recede
+ * (motion system §12). On hover/focus it steps forward, so the movement
+ * that follows the press is continuous with the one preceding it.
+ */
+.territory:hover,
+.territory:focus-visible {
+  color: var(--hd-ink);
+  padding-left: var(--hd-space-4);
+}
+
+/* ------------------------------------------------------------------ */
+/* The recommendation                                                   */
+/* ------------------------------------------------------------------ */
+
+.chosenTerritory {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--hd-space-4);
+  margin-bottom: var(--hd-space-5);
+}
+
+.chosenTerritory .eyebrow {
+  margin: 0;
+}
+
+/*
+ * The field the recommendation occupies. Overflow is hidden so a film
+ * scrubbing out leaves the frame rather than widening the page.
+ */
+.field {
+  position: relative;
+  overflow: hidden;
+  min-height: 16rem;
+  margin-bottom: var(--hd-space-6);
+}
+
+.card {
+  width: 100%;
+}
+
+/* One film leaves laterally, the next enters from the same direction. */
+.card[data-leaving="true"] {
+  position: absolute;
+  inset: 0;
+  animation: scrub-out var(--hd-motion-slow) var(--hd-ease-house) both;
+}
+
+.card[data-entering="true"] {
+  animation: scrub-in var(--hd-motion-slow) var(--hd-motion-fast) var(--hd-ease-house) both;
+}
+
+/*
+ * Speed-responsive blur, approximated with a keyframe: sharp at rest,
+ * smeared at the fastest part of the movement, sharp again on arrival.
+ */
+@keyframes scrub-out {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    filter: blur(0);
+  }
+  40% {
+    filter: blur(6px);
+  }
+  100% {
+    transform: translate3d(-70%, 0, 0);
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+@keyframes scrub-in {
+  0% {
+    transform: translate3d(70%, 0, 0);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  55% {
+    filter: blur(4px);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.recommends {
+  margin: 0 0 var(--hd-space-4);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+/* The title enters as one confident typographic object. */
+.title {
+  margin: 0 0 var(--hd-space-2);
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(2rem, 8.5vw, 3.5rem);
+  line-height: 1.05;
+  color: var(--hd-ink);
+}
+
+.year {
+  margin: 0 0 var(--hd-space-6);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.2em;
+  color: var(--hd-ink-muted);
+}
+
+.sixWordsLabel {
+  margin: 0 0 var(--hd-space-2);
+  padding-top: var(--hd-space-4);
+  border-top: 1px solid var(--hd-rule);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+/*
+ * The six words mask-reveal after the title has mostly settled
+ * (motion system §12).
+ */
+.sixWords {
+  margin: 0;
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  line-height: 1.35;
+  color: var(--hd-ink);
+  animation: six-words-reveal var(--hd-motion-slow) var(--hd-motion-standard) var(--hd-ease-long)
+    both;
+}
+
+@keyframes six-words-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Actions                                                              */
+/* ------------------------------------------------------------------ */
+
+.actions {
+  display: flex;
+  gap: var(--hd-space-3);
+  flex-wrap: wrap;
+}
+
+.trust,
+.seen {
+  flex: 1 1 8rem;
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-5);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 0;
+  cursor: pointer;
+  transition:
+    background-color var(--hd-motion-fast) var(--hd-ease-house),
+    color var(--hd-motion-fast) var(--hd-ease-house);
+}
+
+.trust {
+  background: var(--hd-accent);
+  border: 1px solid var(--hd-accent);
+  color: var(--hd-projection-black);
+}
+
+.seen {
+  background: transparent;
+  border: 1px solid var(--hd-rule-strong);
+  color: var(--hd-ink);
+}
+
+.seen:hover {
+  border-color: var(--hd-ink);
+}
+
+.trust:disabled,
+.seen:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.quietAction {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: var(--hd-touch-min);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  align-self: flex-start;
+}
+
+.quietAction:hover {
+  color: var(--hd-ink);
+}
+
+/* ------------------------------------------------------------------ */
+/* Accepted — the information closes down                               */
+/* ------------------------------------------------------------------ */
+
+.sealed {
+  padding: var(--hd-space-8) 0;
+  animation: compress var(--hd-motion-cinematic) var(--hd-ease-long) both;
+}
+
+/* Title and six words compress into a small held state, then the line. */
+@keyframes compress {
+  0% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.allYouGet,
+.goBlind {
+  margin: 0;
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(1.75rem, 7.5vw, 3rem);
+  line-height: 1.1;
+  color: var(--hd-ink);
+}
+
+.goBlind {
+  color: var(--hd-accent);
+  margin-bottom: var(--hd-space-6);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: var(--hd-space-4) 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card[data-leaving="true"],
+  .card[data-entering="true"],
+  .sixWords,
+  .sealed {
+    animation: none;
+  }
+  .card[data-leaving="true"] {
+    display: none;
+  }
+}
+
+:root[data-reduced-motion="true"] .card[data-leaving="true"],
+:root[data-reduced-motion="true"] .card[data-entering="true"],
+:root[data-reduced-motion="true"] .sixWords,
+:root[data-reduced-motion="true"] .sealed {
+  animation: none;
+}
+
+:root[data-reduced-motion="true"] .card[data-leaving="true"] {
+  display: none;
+}

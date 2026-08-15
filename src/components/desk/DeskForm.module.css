@@ -62,3 +62,21 @@
   color: var(--hd-cool-green);
   font-size: var(--hd-size-small);
 }
+
+/* Approval is a deliberate tick, not a default — see HouseRecordForm. */
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+  min-height: var(--hd-touch-min);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+}
+
+.checkboxRow input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--hd-accent);
+}

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { TonightExperience } from "@/components/tonight/TonightExperience";
 import { TheRoom } from "@/components/room/TheRoom";
+import { TrustUs } from "@/components/trust/TrustUs";
 import { MotionPreferenceProvider } from "@/lib/motion/reduced-motion";
 import {
   stageOpening,
@@ -10,6 +11,8 @@ import {
   stageReveal,
   stageRoomOpening,
   stageVoices,
+  stageTerritories,
+  stageTrustUs,
 } from "./fixtures";
 import styles from "./stage.module.css";
 
@@ -35,13 +38,14 @@ import styles from "./stage.module.css";
  * security-definer function in Postgres.
  */
 
-type StageState = "sealed" | "revealed" | "watched" | "room";
+type StageState = "sealed" | "revealed" | "watched" | "room" | "trust";
 
 const STATES: { value: StageState; label: string }[] = [
   { value: "sealed", label: "Sealed" },
   { value: "revealed", label: "Revealed" },
   { value: "watched", label: "Watched" },
   { value: "room", label: "The Room" },
+  { value: "trust", label: "Trust Us" },
 ];
 
 /**
@@ -73,6 +77,10 @@ function installStageFetch() {
       // visibly two different things when the sequence is recorded.
       await new Promise((resolve) => setTimeout(resolve, 120));
       return json(stageReveal);
+    }
+    if (url.includes("/api/trust-us")) {
+      const body = init?.body ? JSON.parse(String(init.body)) : {};
+      return json(stageTrustUs(body));
     }
     if (url.includes("/api/watch")) return json({ id: "stage-watch", state: "watched" });
     if (url.includes("/api/six-words/skip")) {
@@ -126,7 +134,9 @@ export function StageHarness({ initialState }: { initialState: StageState }) {
       </nav>
 
       <main id="hd-main" className={styles.main}>
-        {state === "room" ? (
+        {state === "trust" ? (
+          <TrustUs territories={stageTerritories} />
+        ) : state === "room" ? (
           <TheRoom opening={stageRoomOpening} voices={stageVoices} />
         ) : (
           <TonightExperience

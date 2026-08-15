@@ -218,6 +218,29 @@ interface NotificationQueueRow {
   updated_at: string;
 }
 
+interface FilmHouseRecordRow {
+  film_id: string;
+  six_words_before: string;
+  territories: string[];
+  pace: string | null;
+  intensity: string | null;
+  editorial_approved_at: string | null;
+  approved_by: string | null;
+  generated_at: string;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TrustUsResponseRow {
+  id: string;
+  user_id: string;
+  film_id: string;
+  territory: string;
+  response: "seen" | "trusted";
+  created_at: string;
+}
+
 interface AuditLogRow {
   id: string;
   actor_id: string | null;
@@ -298,6 +321,14 @@ export interface RoomVoice {
   /** 'circle' — someone the member shares a Circle with. 'house' — an editor-approved voice from the wider House. */
   source: "circle" | "house";
   created_at: string;
+}
+
+/** One Trust Us recommendation. There is deliberately nothing here to browse with. */
+export interface TrustUsRecommendation {
+  film_id: string;
+  title: string;
+  release_year: number | null;
+  six_words_before: string;
 }
 
 export interface CirclesActivityRow {
@@ -409,6 +440,23 @@ export interface Database {
         }
       >;
       audit_log: Table<AuditLogRow, Partial<AuditLogRow> & { action: string; target_type: string }>;
+      film_house_records: Table<
+        FilmHouseRecordRow,
+        Partial<FilmHouseRecordRow> & {
+          film_id: string;
+          six_words_before: string;
+          territories: string[];
+        }
+      >;
+      trust_us_responses: Table<
+        TrustUsResponseRow,
+        Partial<TrustUsResponseRow> & {
+          user_id: string;
+          film_id: string;
+          territory: string;
+          response: "seen" | "trusted";
+        }
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -452,6 +500,18 @@ export interface Database {
       is_room_eligible: {
         Args: { p_opening_id: string | null; p_sealed_recommendation_id: string | null };
         Returns: boolean;
+      };
+      get_trust_us_recommendation: {
+        Args: { p_territory: string };
+        Returns: TrustUsRecommendation[];
+      };
+      list_trust_us_territories: {
+        Args: Record<string, never>;
+        Returns: { territory: string }[];
+      };
+      record_trust_us_response: {
+        Args: { p_film_id: string; p_territory: string; p_response: "seen" | "trusted" };
+        Returns: undefined;
       };
       get_room_voices: {
         Args: {

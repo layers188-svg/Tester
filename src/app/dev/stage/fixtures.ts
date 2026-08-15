@@ -83,3 +83,43 @@ export const stageVoices: RoomVoice[] = [
   source: source as RoomVoice["source"],
   created_at: new Date(Date.UTC(2026, 7, 15, 20, index)).toISOString(),
 }));
+
+/* ------------------------------------------------------------------ */
+/* Trust Us                                                            */
+/* ------------------------------------------------------------------ */
+
+export const stageTerritories = ["Ambition", "Longing", "Memory", "Something strange"];
+
+const STAGE_RECORDS = [
+  { film_id: "stage-film-1", title: "Territory Film One", release_year: 2001 },
+  { film_id: "stage-film-2", title: "Territory Film Two", release_year: 2002 },
+  { film_id: "stage-film-3", title: "Territory Film Three", release_year: 2003 },
+].map((film, index) => ({
+  ...film,
+  six_words_before: [
+    "One two three four five six",
+    "Two three four five six seven",
+    "Three four five six seven eight",
+  ][index],
+}));
+
+const seen = new Set<string>();
+
+/**
+ * Stands in for get_trust_us_recommendation() with the same contract:
+ * one record or none, never a list, and "Seen it" advances rather than
+ * repeating.
+ */
+export function stageTrustUs(body: {
+  territory?: string;
+  respondTo?: { filmId: string; response: "seen" | "trusted" };
+}) {
+  if (body.respondTo) {
+    seen.add(body.respondTo.filmId);
+    if (body.respondTo.response === "trusted") {
+      return { recommendation: null, accepted: true };
+    }
+  }
+  const next = STAGE_RECORDS.find((record) => !seen.has(record.film_id));
+  return { recommendation: next ?? null, accepted: false };
+}

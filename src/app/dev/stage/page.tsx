@@ -38,7 +38,9 @@ export default async function StagePage({
 
   const { state } = await searchParams;
   const initial =
-    state === "revealed" || state === "watched" || state === "room" ? state : "sealed";
+    state === "revealed" || state === "watched" || state === "room" || state === "trust"
+      ? state
+      : "sealed";
 
   return <StageHarness initialState={initial} />;
 }
