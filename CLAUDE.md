@@ -8,6 +8,15 @@ under seal. Product shorthand: **one film, a few friends, nobody knows.**
 Full product spec lives in `docs/HOUSE_DARK_BUILD_BRIEF.md`. Read it before
 making product decisions. This file is the condensed operating contract.
 
+**`docs/handover/` supersedes both where they conflict.** It is the August
+2026 handover and it changed several earlier assumptions: Tonight never
+reveals the title before the No Trailer finishes; Search is a trust ritual,
+not a catalogue; The Room is Your Review / Your Circle / The House; Circle
+both receives and sends under seal; motion is a product system. Read
+`docs/handover/00_BUILD_BRIEF_FINAL.md` and `01_MOTION_SYSTEM.md` before
+touching Tonight, Search, The Room or any signature transition. The older
+brief stays useful for data modelling and brand history.
+
 ## What this is not
 
 Not a streaming service, film catalogue, review database, ratings product,

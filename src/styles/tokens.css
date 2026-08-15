@@ -85,6 +85,29 @@
   --hd-motion-dim: 360ms;
   --hd-motion-reveal: 560ms;
   --hd-ease-standard: cubic-bezier(0.3, 0, 0.2, 1);
+
+  /*
+   * Motion system tokens (handover docs/handover/01_MOTION_SYSTEM.md §4,
+   * data/motion-tokens.json). One value picked from each documented
+   * range so the House has a single tempo rather than nine hand-tuned
+   * durations. The four roles above stay as they are — they are the
+   * same tempo named for where they are used.
+   *
+   * FAST      150–220  tactile response, small controls
+   * STANDARD  280–360  panel changes, dimming, supporting state
+   * SLOW      450–650  structural composition changes
+   * CINEMATIC 650–900  signature object transformation
+   * HOLD      200–500  black, seal, reveal punctuation
+   */
+  --hd-motion-fast: 180ms;
+  --hd-motion-standard: 320ms;
+  --hd-motion-slow: 540ms;
+  --hd-motion-cinematic: 780ms;
+  --hd-motion-hold: 400ms;
+
+  /* House easing, and the calmer curve for long object movement. */
+  --hd-ease-house: cubic-bezier(0.18, 0.82, 0.18, 1);
+  --hd-ease-long: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -93,5 +116,18 @@
     --hd-motion-panel: 0ms;
     --hd-motion-dim: 0ms;
     --hd-motion-reveal: 0ms;
+
+    --hd-motion-fast: 0ms;
+    --hd-motion-standard: 0ms;
+    --hd-motion-slow: 0ms;
+    --hd-motion-cinematic: 0ms;
+    /*
+     * --hd-motion-hold deliberately survives. It is not an animation:
+     * it is the black between the No Trailer ending and the title
+     * arriving, and the seal's beat before "Sent Under Seal". Motion
+     * principle 9 asks reduced motion to preserve every state change,
+     * and these punctuation beats *are* states. Removing them would
+     * cut the ritual, not the movement.
+     */
   }
 }
