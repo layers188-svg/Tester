@@ -252,6 +252,81 @@ test.describe("The Room: the words are the scenery", () => {
   });
 });
 
+test.describe("Home to The Room", () => {
+  test("the preview is promoted into a layer and carries its quote across", async ({ page }) => {
+    await gotoStage(page, "door");
+
+    const preview = page.locator('[class*="RoomPreview-module"][class*="preview"]');
+    await expect(preview).toBeVisible();
+
+    // The preview shows what the Room will show: the member's own words
+    // and one Circle voice.
+    await expect(preview).toContainText(/the room is open/i);
+    const quote = (await preview.locator('[class*="voice"]').first().innerText()).slice(0, 24);
+    const from = await preview.evaluate((el) => el.getBoundingClientRect().top);
+
+    await preview.click();
+
+    const panel = page.locator('[class*="room-transition-module"][class*="panel"]');
+    const behind = page.locator('[class*="room-transition-module"][class*="behind"]').first();
+
+    // Step 1-2: the preview is promoted, starting from where it was.
+    await expect(panel).toBeVisible();
+    const started = await panel.evaluate((el) => el.getBoundingClientRect().top);
+    expect(Math.abs(started - from), "the layer starts at the preview").toBeLessThan(60);
+
+    await page.waitForTimeout(450);
+
+    // Step 3: Home has moved back and lost contrast. Sampled here
+    // rather than on the first frame — it is a transition, and at the
+    // instant the layer appears it has not started moving yet.
+    const receded = await behind.evaluate((el) => ({
+      scale: new DOMMatrix(getComputedStyle(el).transform).a,
+      opacity: Number(getComputedStyle(el).opacity),
+    }));
+    expect(receded.scale).toBeLessThan(1);
+    expect(receded.opacity).toBeLessThan(0.8);
+
+    const midway = await panel.evaluate((el) => {
+      const rule = el.querySelector('[class*="rule"]')!;
+      const title = el.querySelector('[class*="roomTitle"]')!;
+      return {
+        top: el.getBoundingClientRect().top,
+        rule: new DOMMatrix(getComputedStyle(rule).transform).a,
+        title: Number(getComputedStyle(title).opacity),
+        text: el.textContent ?? "",
+      };
+    });
+
+    // Step 4: it expanded toward the Room stage.
+    expect(from - midway.top, "the layer travels").toBeGreaterThan(200);
+    // Step 5: the quote is still on screen.
+    expect(midway.text).toContain(quote.slice(0, 12));
+    // Steps 6-7: the brass rule extends and THE ROOM resolves.
+    expect(midway.rule).toBeGreaterThan(0.4);
+    expect(midway.title).toBeGreaterThan(0.5);
+
+    // Step 9: the layer hands back, and does not linger.
+    await expect(panel).toHaveCount(0, { timeout: 3000 });
+    await expect(page.getByRole("heading", { name: "The Room" })).toBeVisible();
+    await expect(behind).toHaveJSProperty("dataset.receding", undefined);
+  });
+
+  test("reduced motion goes straight there", async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await gotoStage(page, "door");
+
+    await page.locator('[class*="RoomPreview-module"][class*="preview"]').click();
+
+    // No layer, no travel — but the state change still happens.
+    await expect(page.getByRole("heading", { name: "The Room" })).toBeVisible();
+    await expect(page.locator('[class*="room-transition-module"][class*="panel"]')).toHaveCount(0);
+
+    await context.close();
+  });
+});
+
 test.describe("Trust Us: one film, and never a list", () => {
   test("Seen it scrubs the film out and brings the next in", async ({ page }) => {
     await gotoStage(page, "trust");

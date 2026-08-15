@@ -43,7 +43,8 @@ export default async function StagePage({
     state === "room" ||
     state === "trust" ||
     state === "seal" ||
-    state === "library"
+    state === "library" ||
+    state === "door"
       ? state
       : "sealed";
 

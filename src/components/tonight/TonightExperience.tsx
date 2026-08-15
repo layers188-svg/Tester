@@ -11,6 +11,7 @@ import { isRoomOpen } from "@/lib/opening/eligibility";
 import { noTrailerUrl } from "@/lib/media/storage";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SealedFrame } from "./SealedFrame";
+import { RoomPreview } from "./RoomPreview";
 import { SixWordsAfter } from "./SixWordsAfter";
 import styles from "./TonightExperience.module.css";
 
@@ -72,6 +73,7 @@ export function TonightExperience({
   const [watchState, setWatchState] = useState(progress?.watchState ?? null);
   const [hasSkippedReview, setHasSkippedReview] = useState(progress?.hasSkippedReview ?? false);
   const [hasSixWords, setHasSixWords] = useState(progress?.hasSixWords ?? false);
+  const [ownWords, setOwnWords] = useState(progress?.sixWordsBody ?? null);
   const [contentNotesOpen, setContentNotesOpen] = useState(false);
 
   const revealRequested = useRef(false);
@@ -314,18 +316,21 @@ export function TonightExperience({
               hasSixWords={hasSixWords}
               hasSkipped={hasSkippedReview}
               ownWords={progress?.sixWordsBody ?? null}
-              onSubmitted={() => setHasSixWords(true)}
+              onSubmitted={(body) => {
+                setHasSixWords(true);
+                setOwnWords(body);
+              }}
               onSkipped={() => setHasSkippedReview(true)}
             />
           )}
 
           {roomOpen && (
-            <div className={styles.roomDoor}>
-              <p className={styles.roomLine}>The Room is open.</p>
-              <Button variant="secondary" href={`/tonight/room`}>
-                Enter The Room
-              </Button>
-            </div>
+            <RoomPreview
+              openingId={opening.id}
+              openingNumber={opening.openingNumber}
+              title={reveal.title}
+              ownWords={hasSixWords ? (ownWords ?? progress?.sixWordsBody ?? null) : null}
+            />
           )}
 
           {opening.contentNotes && (

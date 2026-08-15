@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RoomVoice } from "@/lib/supabase/types";
 import type { RoomOpening } from "@/lib/room/queries";
 import { useReducedMotion } from "@/lib/motion/reduced-motion";
+import { useRoomArrival } from "@/lib/motion/room-transition";
 import { anchorFor, placeVoice, sceneHeightVh, windowFor } from "@/lib/room/field";
 import styles from "./TheRoom.module.css";
 
@@ -41,6 +42,10 @@ const MODE_LABELS: Record<Mode, string> = {
 export function TheRoom({ opening, voices }: { opening: RoomOpening; voices: RoomVoice[] }) {
   const reducedMotion = useReducedMotion();
   const [mode, setMode] = useState<Mode>("review");
+
+  // The transition layer hands back as soon as the real Room has
+  // painted (motion system §10 step 9).
+  useRoomArrival();
 
   const circleVoices = useMemo(() => voices.filter((v) => v.source === "circle"), [voices]);
   const houseVoices = useMemo(() => voices.filter((v) => v.source === "house"), [voices]);

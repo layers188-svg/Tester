@@ -7,6 +7,7 @@ import { TrustUs } from "@/components/trust/TrustUs";
 import { SealedExperience } from "@/components/circle/SealedExperience";
 import { LibraryArchive } from "@/components/library/LibraryArchive";
 import { MotionPreferenceProvider } from "@/lib/motion/reduced-motion";
+import { RoomTransitionProvider } from "@/lib/motion/room-transition";
 import {
   stageOpening,
   stageProgress,
@@ -43,12 +44,14 @@ import styles from "./stage.module.css";
  * security-definer function in Postgres.
  */
 
-type StageState = "sealed" | "revealed" | "watched" | "room" | "trust" | "seal" | "library";
+type StageState =
+  "sealed" | "revealed" | "watched" | "door" | "room" | "trust" | "seal" | "library";
 
 const STATES: { value: StageState; label: string }[] = [
   { value: "sealed", label: "Sealed" },
   { value: "revealed", label: "Revealed" },
   { value: "watched", label: "Watched" },
+  { value: "door", label: "Room door" },
   { value: "room", label: "The Room" },
   { value: "trust", label: "Trust Us" },
   { value: "seal", label: "Under Seal" },
@@ -90,6 +93,11 @@ function installStageFetch() {
       return json(stageTrustUs(body));
     }
     if (url.includes("/api/watch")) return json({ id: "stage-watch", state: "watched" });
+    if (url.includes("/api/room/preview")) {
+      return json({
+        voice: { body: stageVoices[0].body, author: stageVoices[0].author_display_name },
+      });
+    }
     if (url.includes("/api/six-words/skip")) {
       return json({ skippedAt: new Date().toISOString() });
     }
@@ -117,6 +125,14 @@ export function StageHarness({ initialState }: { initialState: StageState }) {
         return { ...stageProgress, hasRevealed: true };
       case "watched":
         return { ...stageProgress, hasRevealed: true, watchState: "watched" as const };
+      case "door":
+        return {
+          ...stageProgress,
+          hasRevealed: true,
+          watchState: "watched" as const,
+          hasSixWords: true,
+          sixWordsBody: stageRoomOpening.ownWords,
+        };
       default:
         return stageProgress;
     }
@@ -124,40 +140,42 @@ export function StageHarness({ initialState }: { initialState: StageState }) {
 
   return (
     <MotionPreferenceProvider>
-      <nav className={styles.bar} aria-label="Staging states">
-        <span className={styles.barLabel}>Stage</span>
-        {STATES.map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            className={styles.barButton}
-            data-active={state === value}
-            data-stage-state={value}
-            onClick={() => setState(value)}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
+      <RoomTransitionProvider onNavigate={() => setState("room")}>
+        <nav className={styles.bar} aria-label="Staging states">
+          <span className={styles.barLabel}>Stage</span>
+          {STATES.map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              className={styles.barButton}
+              data-active={state === value}
+              data-stage-state={value}
+              onClick={() => setState(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
 
-      <main id="hd-main" className={styles.main}>
-        {state === "library" ? (
-          <LibraryArchive items={stageLibrary} />
-        ) : state === "seal" ? (
-          <SealedExperience recommendation={stageRecommendation} progress={stageSealedProgress} />
-        ) : state === "trust" ? (
-          <TrustUs territories={stageTerritories} />
-        ) : state === "room" ? (
-          <TheRoom opening={stageRoomOpening} voices={stageVoices} />
-        ) : (
-          <TonightExperience
-            key={state}
-            opening={stageOpening}
-            progress={progress}
-            nextOpeningAt={nextOpeningAt}
-          />
-        )}
-      </main>
+        <main id="hd-main" className={styles.main}>
+          {state === "library" ? (
+            <LibraryArchive items={stageLibrary} />
+          ) : state === "seal" ? (
+            <SealedExperience recommendation={stageRecommendation} progress={stageSealedProgress} />
+          ) : state === "trust" ? (
+            <TrustUs territories={stageTerritories} />
+          ) : state === "room" ? (
+            <TheRoom opening={stageRoomOpening} voices={stageVoices} />
+          ) : (
+            <TonightExperience
+              key={state}
+              opening={stageOpening}
+              progress={progress}
+              nextOpeningAt={nextOpeningAt}
+            />
+          )}
+        </main>
+      </RoomTransitionProvider>
     </MotionPreferenceProvider>
   );
 }

@@ -251,24 +251,6 @@
   flex-wrap: wrap;
 }
 
-/* The Room's door: a brass rule that extends into the layout. */
-.roomDoor {
-  margin: var(--hd-space-6) 0;
-  padding-top: var(--hd-space-5);
-  border-top: 1px solid var(--hd-accent);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--hd-space-3);
-}
-
-.roomLine {
-  margin: 0;
-  font-family: var(--hd-font-editorial);
-  font-size: var(--hd-size-heading);
-  color: var(--hd-ink);
-}
-
 .disclosure {
   margin: var(--hd-space-6) 0 0;
 }

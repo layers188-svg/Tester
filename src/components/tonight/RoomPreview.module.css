@@ -1,0 +1,96 @@
+/*
+ * The Room's door on Tonight. It is a preview, not a card: a brass rule
+ * across House black, the member's own words above it and one Circle
+ * voice below.
+ */
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--hd-space-3);
+  width: 100%;
+  margin: var(--hd-space-6) 0;
+  padding: var(--hd-space-5) var(--hd-space-4);
+  background: var(--hd-house-black);
+  border: 1px solid var(--hd-rule);
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition:
+    border-color var(--hd-motion-standard) var(--hd-ease-house),
+    transform var(--hd-motion-standard) var(--hd-ease-house);
+}
+
+.preview:hover,
+.preview:focus-visible {
+  border-color: var(--hd-accent);
+}
+
+.preview:active {
+  transform: scale(0.995);
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.ownWords {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  line-height: 1.25;
+  color: var(--hd-ink);
+}
+
+.ownWordsEmpty {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--hd-accent);
+  opacity: 0.6;
+}
+
+.voice {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-body);
+  line-height: 1.3;
+  color: var(--hd-ink-muted);
+}
+
+.voiceName {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.voiceEmpty {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.enter {
+  margin-top: var(--hd-space-2);
+  min-height: var(--hd-touch-min);
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
