@@ -106,3 +106,9 @@
   color: var(--hd-ink);
   font-weight: 500;
 }
+
+.addRow {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: var(--hd-space-2);
+}

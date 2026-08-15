@@ -5,6 +5,7 @@ import { TonightExperience } from "@/components/tonight/TonightExperience";
 import { TheRoom } from "@/components/room/TheRoom";
 import { TrustUs } from "@/components/trust/TrustUs";
 import { SealedExperience } from "@/components/circle/SealedExperience";
+import { LibraryArchive } from "@/components/library/LibraryArchive";
 import { MotionPreferenceProvider } from "@/lib/motion/reduced-motion";
 import {
   stageOpening,
@@ -16,6 +17,7 @@ import {
   stageTrustUs,
   stageRecommendation,
   stageSealedProgress,
+  stageLibrary,
 } from "./fixtures";
 import styles from "./stage.module.css";
 
@@ -41,7 +43,7 @@ import styles from "./stage.module.css";
  * security-definer function in Postgres.
  */
 
-type StageState = "sealed" | "revealed" | "watched" | "room" | "trust" | "seal";
+type StageState = "sealed" | "revealed" | "watched" | "room" | "trust" | "seal" | "library";
 
 const STATES: { value: StageState; label: string }[] = [
   { value: "sealed", label: "Sealed" },
@@ -50,6 +52,7 @@ const STATES: { value: StageState; label: string }[] = [
   { value: "room", label: "The Room" },
   { value: "trust", label: "Trust Us" },
   { value: "seal", label: "Under Seal" },
+  { value: "library", label: "Library" },
 ];
 
 /**
@@ -138,7 +141,9 @@ export function StageHarness({ initialState }: { initialState: StageState }) {
       </nav>
 
       <main id="hd-main" className={styles.main}>
-        {state === "seal" ? (
+        {state === "library" ? (
+          <LibraryArchive items={stageLibrary} />
+        ) : state === "seal" ? (
           <SealedExperience recommendation={stageRecommendation} progress={stageSealedProgress} />
         ) : state === "trust" ? (
           <TrustUs territories={stageTerritories} />

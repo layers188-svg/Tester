@@ -241,6 +241,14 @@ interface TrustUsResponseRow {
   created_at: string;
 }
 
+interface LibraryAdditionRow {
+  id: string;
+  user_id: string;
+  film_id: string;
+  watched_at: string | null;
+  created_at: string;
+}
+
 interface AuditLogRow {
   id: string;
   actor_id: string | null;
@@ -291,7 +299,8 @@ export interface CircleMemberName {
 }
 
 export interface LibraryItem {
-  kind: "opening" | "recommendation";
+  /** "added" is a film the member put in themselves (0017_library_additions.sql). */
+  kind: "opening" | "recommendation" | "added";
   target_id: string;
   opening_number: number | null;
   watch_state: WatchState;
@@ -448,6 +457,10 @@ export interface Database {
           territories: string[];
         }
       >;
+      library_additions: Table<
+        LibraryAdditionRow,
+        Partial<LibraryAdditionRow> & { user_id: string; film_id: string }
+      >;
       trust_us_responses: Table<
         TrustUsResponseRow,
         Partial<TrustUsResponseRow> & {
@@ -491,6 +504,16 @@ export interface Database {
         Returns: MySealedRecommendation[];
       };
       get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
+      add_library_film: {
+        Args: {
+          p_title: string;
+          p_release_year: number | null;
+          p_runtime_minutes: number | null;
+          p_watched_at?: string | null;
+        };
+        Returns: string;
+      };
+      remove_library_film: { Args: { p_id: string }; Returns: undefined };
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
       skip_review: {

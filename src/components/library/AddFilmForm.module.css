@@ -1,0 +1,70 @@
+.opener {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: var(--hd-touch-min);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+  padding: var(--hd-space-5) 0;
+  border-top: 1px solid var(--hd-rule);
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.label {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--hd-touch-min);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hd-rule-strong);
+  padding: var(--hd-space-2) 0;
+  margin-bottom: var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-body);
+  color: var(--hd-ink);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-4);
+  margin-top: var(--hd-space-3);
+}
+
+.cancel {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: var(--hd-touch-min);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: 0;
+}

@@ -1,6 +1,6 @@
 import type { OpeningSafe, MemberOpeningProgress } from "@/lib/opening/queries";
 import type { RoomOpening } from "@/lib/room/queries";
-import type { RoomVoice } from "@/lib/supabase/types";
+import type { LibraryItem, RoomVoice } from "@/lib/supabase/types";
 
 /**
  * Staging fixtures, from docs/handover/fixtures.json.
@@ -145,3 +145,54 @@ export const stageSealedProgress = {
   sixWordsBody: null,
   sixWordsCreatedAt: null,
 };
+
+/* ------------------------------------------------------------------ */
+/* Library                                                             */
+/* ------------------------------------------------------------------ */
+
+export const stageLibrary: LibraryItem[] = [
+  {
+    kind: "opening",
+    target_id: "lib-1",
+    opening_number: 7,
+    watch_state: "watched",
+    watched_at: "2026-08-14T20:00:00.000Z",
+    revealed: true,
+    title: STAGE_TITLE,
+    release_year: 2014,
+    six_words: "I understood him. That worried me.",
+  },
+  {
+    kind: "opening",
+    target_id: "lib-2",
+    opening_number: 6,
+    watch_state: "saved",
+    watched_at: "2026-08-13T20:00:00.000Z",
+    revealed: false,
+    title: null,
+    release_year: null,
+    six_words: null,
+  },
+  {
+    kind: "added",
+    target_id: "lib-3",
+    opening_number: null,
+    watch_state: "watched",
+    watched_at: "2026-08-10T20:00:00.000Z",
+    revealed: true,
+    title: "In the Mood for Love",
+    release_year: 2000,
+    six_words: null,
+  },
+  {
+    kind: "added",
+    target_id: "lib-4",
+    opening_number: null,
+    watch_state: "watched",
+    watched_at: "2026-08-02T20:00:00.000Z",
+    revealed: true,
+    title: "Burning",
+    release_year: 2018,
+    six_words: null,
+  },
+];
