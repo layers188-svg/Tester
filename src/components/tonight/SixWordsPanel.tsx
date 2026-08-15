@@ -116,14 +116,14 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
       <div className={styles.panel}>
         <h3>Six words</h3>
         <p className={styles.hint}>
-          Write what you felt. Exactly six words. You will see it before anyone else&rsquo;s.
+          Write what you felt. Up to six words. You will see it before anyone else&rsquo;s.
         </p>
         <textarea
           className={styles.textarea}
           rows={2}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Six words, exactly."
+          placeholder="Up to six words."
         />
         <div className={styles.meta}>
           <span>{wordCount} / 6 words</span>

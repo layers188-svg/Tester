@@ -5,21 +5,30 @@
  */
 
 import type { OpeningStatus, WatchState } from "@/lib/supabase/types";
+import { isRoomOpen, isReviewUndecided } from "./eligibility";
 
 /**
- * Tonight's nine required states (brief §7). "dimming" and
- * "no_trailer_playing" are transient, client-only steps layered on top
- * of "sealed_ready" by the player component — they never touch the
- * server and are not represented in this server-derived state.
+ * Tonight's server-derived state, named after
+ * docs/handover/product-state-machine.json.
+ *
+ * That machine also lists `clue`, `no_trailer_ready`,
+ * `no_trailer_playing` and `reveal_pending`. Those four are transient
+ * steps of the ritual inside one mounted component — they exist for
+ * seconds, never touch the server, and cannot be resumed after a
+ * refresh (a member who reloads mid-No-Trailer is back at `sealed`,
+ * which is correct: the picture has not spoken yet). They live in
+ * TonightExperience, not here.
+ *
+ * `saved` is likewise not a state of the ritual. Saving is something a
+ * member does to a revealed film, not a place they are in the evening.
  */
 export type TonightState =
   | "not_available"
-  | "sealed_ready"
+  | "sealed"
   | "revealed"
-  | "saved"
-  | "watched"
-  | "six_words_requested"
-  | "after_credits_open";
+  | "review_undecided"
+  | "review_skipped"
+  | "review_submitted";
 
 export interface TonightStateInput {
   openingStatus: OpeningStatus | null;
@@ -28,6 +37,7 @@ export interface TonightStateInput {
   hasRevealed: boolean;
   watchState: WatchState | null;
   hasSixWords: boolean;
+  hasSkippedReview?: boolean;
 }
 
 export function computeTonightState({
@@ -37,32 +47,41 @@ export function computeTonightState({
   hasRevealed,
   watchState,
   hasSixWords,
+  hasSkippedReview = false,
 }: TonightStateInput): TonightState {
   const opens = opensAt ? (typeof opensAt === "string" ? new Date(opensAt) : opensAt) : null;
 
   const isOpen = openingStatus === "open" || (openingStatus === "closed" && hasRevealed);
 
   if (!openingStatus || (opens && opens.getTime() > now.getTime()) || !isOpen) {
-    if (openingStatus === "scheduled" || openingStatus === "open" || openingStatus === "closed") {
-      return "not_available";
-    }
     return "not_available";
   }
 
   if (!hasRevealed) {
-    return "sealed_ready";
+    return "sealed";
   }
 
-  if (hasSixWords) {
-    return "after_credits_open";
+  const eligibility = {
+    hasWatched: watchState === "watched",
+    hasSubmittedSixWords: hasSixWords,
+    hasSkippedReview,
+  };
+
+  // Six words on record win over a stale skip: writing them retracts
+  // the skip in the database (0013), and this ordering means the UI
+  // agrees even before that row is re-read.
+  if (isRoomOpen(eligibility)) {
+    return hasSixWords ? "review_submitted" : "review_skipped";
   }
-  if (watchState === "watched") {
-    return "six_words_requested";
-  }
-  if (watchState === "saved" || watchState === "opened_service") {
-    return "saved";
+  if (isReviewUndecided(eligibility)) {
+    return "review_undecided";
   }
   return "revealed";
+}
+
+/** Does this state open The Room? The two review outcomes do; nothing before them does. */
+export function tonightStateOpensRoom(state: TonightState): boolean {
+  return state === "review_skipped" || state === "review_submitted";
 }
 
 /**

@@ -6,9 +6,17 @@ import { NoTrailerPlayer } from "@/components/tonight/NoTrailerPlayer";
 
 /**
  * The No Trailer player is the one screen the whole product turns on,
- * and its failure modes are the dangerous kind: a silent dead end, or a
- * browser refusing an autoplay that carries sound (brief §7 rules 8-10,
- * §16 rule 7).
+ * and its failure modes are the dangerous kind: playback that starts
+ * without being asked, and a broken video that becomes a reveal.
+ *
+ * The rules changed with the August handover
+ * (docs/handover/00_BUILD_BRIEF_FINAL.md §10, motion system §7):
+ * "explicit member press before playback", "No autoplay", and at the
+ * end, black rather than a Continue button. The tests that asserted the
+ * muted-autoplay behaviour are gone with it — the previous design
+ * autoplayed muted precisely because a browser would refuse an
+ * autoplay carrying sound, and with no autoplay at all, that entire
+ * problem and its workaround no longer exist.
  *
  * Rendered with react-dom directly rather than a testing library — the
  * assertions here are plain DOM queries, so the extra dependency would
@@ -36,28 +44,11 @@ function stubMedia({ rejectPlay = false }: { rejectPlay?: boolean } = {}) {
   });
 }
 
-function setReducedMotion(matches: boolean) {
-  Object.defineProperty(window, "matchMedia", {
-    configurable: true,
-    writable: true,
-    value: (query: string) => ({
-      matches,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-      onchange: null,
-    }),
-  });
-}
-
-function render(onComplete = vi.fn()) {
+function render(onEnded = vi.fn()) {
   act(() => {
-    root.render(<NoTrailerPlayer src="https://example.test/abc.mp4" onComplete={onComplete} />);
+    root.render(<NoTrailerPlayer src="https://example.test/abc.mp4" onEnded={onEnded} />);
   });
-  return onComplete;
+  return onEnded;
 }
 
 function buttonLabels(): string[] {
@@ -76,7 +67,6 @@ function clickButton(label: string) {
 }
 
 beforeEach(() => {
-  setReducedMotion(false);
   stubMedia();
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -90,16 +80,41 @@ afterEach(() => {
   container.remove();
 });
 
-describe("NoTrailerPlayer — autoplay and sound", () => {
-  it("starts muted so the browser cannot refuse the autoplay", async () => {
+describe("NoTrailerPlayer — nothing plays until the member asks", () => {
+  it("does not autoplay", () => {
     render();
-    const video = container.querySelector("video")!;
-    // Brief §7 rule 10: autoplay must not depend on sound.
-    expect(video.muted).toBe(true);
-    expect(playMock).toHaveBeenCalled();
+    expect(playMock).not.toHaveBeenCalled();
   });
 
-  it("lets the member turn the room tone on afterwards", () => {
+  it("offers the gate: No Trailer, ten seconds, Play", () => {
+    render();
+    expect(container.textContent).toMatch(/no trailer/i);
+    expect(container.textContent).toMatch(/10 seconds/i);
+    expect(buttonLabels()).toContain("Play");
+  });
+
+  it("plays only on the press", () => {
+    render();
+    clickButton("Play");
+    expect(playMock).toHaveBeenCalledOnce();
+  });
+
+  it("starts from the beginning every time it is pressed", () => {
+    render();
+    const video = container.querySelector("video")!;
+    video.currentTime = 6;
+    clickButton("Play");
+    expect(video.currentTime).toBe(0);
+  });
+});
+
+describe("NoTrailerPlayer — silent by default", () => {
+  it("starts muted", () => {
+    render();
+    expect(container.querySelector("video")!.muted).toBe(true);
+  });
+
+  it("lets the member turn the room tone on", () => {
     render();
     const video = container.querySelector("video")!;
 
@@ -117,89 +132,65 @@ describe("NoTrailerPlayer — autoplay and sound", () => {
 
   it("plays inline rather than going fullscreen on a phone", () => {
     render();
+    expect(container.querySelector("video")!.hasAttribute("playsinline")).toBe(true);
+  });
+});
+
+describe("NoTrailerPlayer — the end of the picture", () => {
+  it("hands straight back to the ritual, with no button in between", () => {
+    const onEnded = render();
     const video = container.querySelector("video")!;
-    expect(video.hasAttribute("playsinline")).toBe(true);
-  });
-});
+    clickButton("Play");
 
-describe("NoTrailerPlayer — a declined autoplay is never a dead end", () => {
-  it("offers a way in when the browser refuses to play", async () => {
-    stubMedia({ rejectPlay: true });
-    render();
-    // Let the rejected play() promise settle.
-    await act(async () => {});
-
-    expect(buttonLabels()).toContain("Play the No Trailer");
-  });
-
-  it("plays when the member asks", async () => {
-    stubMedia({ rejectPlay: true });
-    render();
-    await act(async () => {});
-
-    stubMedia();
-    clickButton("Play the No Trailer");
-    expect(playMock).toHaveBeenCalled();
-  });
-});
-
-describe("NoTrailerPlayer — reduced motion", () => {
-  it("holds on the still frame when the system asks for reduced motion", () => {
-    setReducedMotion(true);
-    render();
-
-    expect(playMock).not.toHaveBeenCalled();
-    // Held at the end state, so Continue is available without motion.
-    expect(buttonLabels()).toContain("Continue");
-  });
-
-  it("exposes an in-app control, so the choice is not buried in an OS panel", () => {
-    render();
-    const control = [...container.querySelectorAll("button")].find(
-      (b) => b.textContent?.trim() === "Reduced motion",
-    )!;
-    expect(control.getAttribute("aria-pressed")).toBe("false");
-
-    clickButton("Reduced motion");
-    expect(control.getAttribute("aria-pressed")).toBe("true");
-  });
-});
-
-describe("NoTrailerPlayer — completion and failure", () => {
-  it("offers replay and continue once the sequence ends", () => {
-    render();
-    const video = container.querySelector("video")!;
     act(() => {
       video.dispatchEvent(new Event("ended"));
     });
 
-    expect(buttonLabels()).toEqual(
-      expect.arrayContaining(["Replay", "Continue", "Sound off", "Reduced motion"]),
-    );
+    expect(onEnded).toHaveBeenCalledOnce();
   });
 
-  it("only advances when the member chooses to continue", () => {
-    const onComplete = render();
+  it("does not end the picture early on its own", () => {
+    const onEnded = render();
+    clickButton("Play");
+    expect(onEnded).not.toHaveBeenCalled();
+  });
+});
+
+describe("NoTrailerPlayer — failure never becomes a reveal", () => {
+  it("offers a retry and says the House stays sealed", () => {
+    const onEnded = render();
     const video = container.querySelector("video")!;
     act(() => {
-      video.dispatchEvent(new Event("ended"));
+      video.dispatchEvent(new Event("error"));
     });
 
-    expect(onComplete).not.toHaveBeenCalled();
-    clickButton("Continue");
-    expect(onComplete).toHaveBeenCalledOnce();
+    expect(buttonLabels()).toContain("Retry");
+    expect(container.textContent).toMatch(/could not play/i);
+    expect(container.textContent).toMatch(/stays sealed/i);
+
+    // §10: "do not silently skip to reveal".
+    expect(onEnded).not.toHaveBeenCalled();
+    expect(container.textContent).not.toMatch(/whiplash/i);
   });
 
-  it("offers a retry on playback failure and never reveals anything", () => {
+  it("a retry returns to the gate rather than a dead end", () => {
     render();
     const video = container.querySelector("video")!;
     act(() => {
       video.dispatchEvent(new Event("error"));
     });
 
-    expect(buttonLabels()).toContain("Try again");
-    // Brief §7 rule 8: a broken video must never reveal a title.
-    expect(container.textContent).not.toMatch(/whiplash/i);
-    expect(container.textContent).toMatch(/could not play/i);
+    clickButton("Retry");
+    expect(buttonLabels()).toContain("Play");
+  });
+
+  it("a play() the browser refuses leaves the gate open", async () => {
+    stubMedia({ rejectPlay: true });
+    render();
+    clickButton("Play");
+    await act(async () => {});
+
+    // Still the gate, still pressable — never a spinner that never resolves.
+    expect(buttonLabels()).toContain("Play");
   });
 });

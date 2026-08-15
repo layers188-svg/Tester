@@ -17,6 +17,7 @@ export interface OpeningSafe {
   availabilityCount: number;
   minimumAccessType: Database["public"]["Tables"]["openings"]["Row"]["minimum_access_type"];
   noTrailerStoragePath: string;
+  noTrailerPosterPath: string | null;
   noTrailerCaptionsPath: string | null;
   contentNotes: string | null;
   cues: string[];
@@ -41,6 +42,7 @@ async function attachCues(
     availabilityCount: opening.availability_count,
     minimumAccessType: opening.minimum_access_type,
     noTrailerStoragePath: opening.no_trailer_storage_path,
+    noTrailerPosterPath: opening.no_trailer_poster_path,
     noTrailerCaptionsPath: opening.no_trailer_captions_path,
     contentNotes: opening.content_notes,
     cues: (cueRows ?? []).map((row) => row.cue),
@@ -80,6 +82,8 @@ export async function getTonightOpening(
 export interface MemberOpeningProgress {
   hasRevealed: boolean;
   watchState: WatchState | null;
+  /** "Skip for now" on record (0013_review_decision.sql) — opens The Room without a review. */
+  hasSkippedReview: boolean;
   hasSixWords: boolean;
   sixWordsId: string | null;
   sixWordsBody: string | null;
@@ -100,7 +104,7 @@ export async function getMemberOpeningProgress(
       .maybeSingle(),
     supabase
       .from("watches")
-      .select("state")
+      .select("state, review_skipped_at")
       .eq("user_id", userId)
       .eq("opening_id", openingId)
       .maybeSingle(),
@@ -115,9 +119,35 @@ export async function getMemberOpeningProgress(
   return {
     hasRevealed: Boolean(reveal),
     watchState: watch?.state ?? null,
+    hasSkippedReview: Boolean(watch?.review_skipped_at),
     hasSixWords: Boolean(review),
     sixWordsId: review?.id ?? null,
     sixWordsBody: review?.body ?? null,
     sixWordsCreatedAt: review?.created_at ?? null,
   };
+}
+
+/**
+ * The canonical `nextOpeningAt` (handover §9: "Use one canonical
+ * nextOpeningAt timestamp… Calculate remaining time from the timestamp
+ * every second. Do not store and decrement a counter.").
+ *
+ * Only openings that are still ahead of us count. `openings` is a safe
+ * table — an opening's time is not its identity — so this is a plain
+ * select rather than an RPC.
+ */
+export async function getNextOpeningAt(
+  supabase: SupabaseClient<Database>,
+  after: Date = new Date(),
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("openings")
+    .select("opens_at")
+    .in("status", ["scheduled", "approved"])
+    .gt("opens_at", after.toISOString())
+    .order("opens_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  return data?.opens_at ?? null;
 }

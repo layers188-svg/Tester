@@ -3,9 +3,21 @@
  * Enforced identically on client and server — the server copy here is
  * the one that actually matters; the client only reuses it for instant
  * feedback.
+ *
+ * The count was exactly six until the August handover, which changed it
+ * to a range (00_BUILD_BRIEF_FINAL.md §3: "Allow 1 to 6 words,
+ * optional"; acceptance test B10-B11: "Submit 1 to 6 words works. Seven
+ * words is rejected"). Six is still the name and still the ceiling. The
+ * floor moved because being told a four-word reaction is incomplete, at
+ * the moment you are asked what stayed with you, is the opposite of
+ * what the prompt is for.
+ *
+ * Mirrored by the six_word_reviews_word_count constraint
+ * (0015_six_words_range.sql), which is the boundary that actually holds.
  */
 
-export const SIX_WORD_REQUIRED_COUNT = 6;
+export const SIX_WORD_MIN_COUNT = 1;
+export const SIX_WORD_MAX_COUNT = 6;
 export const SIX_WORD_MAX_LENGTH = 140;
 
 export interface SixWordValidation {
@@ -38,19 +50,13 @@ export function validateSixWords(rawBody: string): SixWordValidation {
       error: "That is too long for six words.",
     };
   }
-  if (wordCount !== SIX_WORD_REQUIRED_COUNT) {
+  if (wordCount > SIX_WORD_MAX_COUNT) {
+    const over = wordCount - SIX_WORD_MAX_COUNT;
     return {
       valid: false,
       wordCount,
       normalized,
-      error:
-        wordCount < SIX_WORD_REQUIRED_COUNT
-          ? `${SIX_WORD_REQUIRED_COUNT - wordCount} more word${
-              SIX_WORD_REQUIRED_COUNT - wordCount === 1 ? "" : "s"
-            } needed.`
-          : `${wordCount - SIX_WORD_REQUIRED_COUNT} word${
-              wordCount - SIX_WORD_REQUIRED_COUNT === 1 ? "" : "s"
-            } too many.`,
+      error: `${over} word${over === 1 ? "" : "s"} too many.`,
     };
   }
   return { valid: true, wordCount, normalized };

@@ -110,6 +110,24 @@
   --hd-ease-long: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+/*
+ * The member-facing override (src/lib/motion/reduced-motion.tsx) sets
+ * this attribute on <html>. Same rules as the media query below, so
+ * every CSS-only transition in the House obeys the preference without
+ * a single component reading it.
+ */
+:root[data-reduced-motion="true"] {
+  --hd-motion-button: 0ms;
+  --hd-motion-panel: 0ms;
+  --hd-motion-dim: 0ms;
+  --hd-motion-reveal: 0ms;
+
+  --hd-motion-fast: 0ms;
+  --hd-motion-standard: 0ms;
+  --hd-motion-slow: 0ms;
+  --hd-motion-cinematic: 0ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --hd-motion-button: 0ms;

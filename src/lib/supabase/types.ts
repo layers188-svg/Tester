@@ -117,6 +117,8 @@ interface WatchRow {
   sealed_recommendation_id: string | null;
   state: WatchState;
   watched_at: string | null;
+  /** Set by skip_review(): "Skip for now" instead of six words (0013). */
+  review_skipped_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -288,6 +290,16 @@ export interface HouseOpening {
   release_year: number | null;
 }
 
+/** One other member's six words in The Room (0014_room.sql). */
+export interface RoomVoice {
+  id: string;
+  body: string;
+  author_display_name: string;
+  /** 'circle' — someone the member shares a Circle with. 'house' — an editor-approved voice from the wider House. */
+  source: "circle" | "house";
+  created_at: string;
+}
+
 export interface CirclesActivityRow {
   kind: "watched" | "sent";
   actor_id: string;
@@ -433,6 +445,22 @@ export interface Database {
       get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
+      skip_review: {
+        Args: { p_opening_id: string | null; p_sealed_recommendation_id: string | null };
+        Returns: string;
+      };
+      is_room_eligible: {
+        Args: { p_opening_id: string | null; p_sealed_recommendation_id: string | null };
+        Returns: boolean;
+      };
+      get_room_voices: {
+        Args: {
+          p_opening_id: string | null;
+          p_sealed_recommendation_id: string | null;
+          p_limit?: number;
+        };
+        Returns: RoomVoice[];
+      };
     };
   };
 }

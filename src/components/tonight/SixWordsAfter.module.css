@@ -1,0 +1,95 @@
+.panel {
+  margin: var(--hd-space-6) 0;
+  padding-top: var(--hd-space-5);
+  border-top: 1px solid var(--hd-rule);
+}
+
+.eyebrow {
+  margin: 0 0 var(--hd-space-2);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.question {
+  margin: 0 0 var(--hd-space-4);
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  color: var(--hd-ink);
+}
+
+.textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hd-rule-strong);
+  padding: var(--hd-space-3) 0;
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  line-height: 1.4;
+  color: var(--hd-ink);
+  resize: none;
+}
+
+.textarea::placeholder {
+  color: var(--hd-ink-muted);
+  opacity: 0.6;
+}
+
+.count {
+  margin: var(--hd-space-2) 0 var(--hd-space-4);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+.count[data-over] {
+  color: var(--hd-danger-ink);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hd-space-3);
+}
+
+/* The member's own words, as the dominant object. */
+.ownWords {
+  margin: 0;
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
+  line-height: 1.2;
+  color: var(--hd-ink);
+}
+
+.skipped {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.reopen {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: var(--hd-touch-min);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: 0 0 var(--hd-space-3);
+}

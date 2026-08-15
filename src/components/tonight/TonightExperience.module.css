@@ -1,31 +1,70 @@
-.centeredCard {
-  min-height: 60dvh;
+/*
+ * Tonight is one stage with one frame in it. The frame's geometry is
+ * driven entirely by [data-phase] — that is what makes the sealed card
+ * *become* the clue and then the picture, rather than three cards
+ * replacing each other (motion system §1, §6, §7).
+ */
+
+.stage {
+  position: relative;
+  max-width: var(--hd-max-width);
+  margin: 0 auto;
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-8);
+  min-height: 70dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--hd-space-6) var(--hd-space-4);
-  max-width: var(--hd-max-width);
-  margin: 0 auto;
+}
+
+/* The global field dims as the member enters the clue. */
+.stage[data-phase="clue"],
+.stage[data-phase="no_trailer"],
+.stage[data-phase="hold"] {
+  background: var(--hd-projection-black);
+}
+
+/* ------------------------------------------------------------------ */
+/* Supporting information — recedes, it does not cut                    */
+/* ------------------------------------------------------------------ */
+
+.support {
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  transition:
+    opacity var(--hd-motion-standard) var(--hd-ease-house),
+    transform var(--hd-motion-standard) var(--hd-ease-house);
+}
+
+/*
+ * "surrounding information recedes 40 to 80 px" — motion system §6.
+ * 56px, away from the member, with the field dimming over the same
+ * beat.
+ */
+.stage[data-phase="clue"] .support,
+.stage[data-phase="no_trailer"] .support,
+.stage[data-phase="hold"] .support {
+  opacity: 0;
+  transform: translateY(-56px);
+  pointer-events: none;
 }
 
 .eyebrow {
   font-family: var(--hd-font-utility);
   font-size: var(--hd-size-micro);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--hd-accent);
-  margin: 0 0 var(--hd-space-2);
+  margin: 0 0 var(--hd-space-3);
 }
 
-.sealedCard,
-.revealedCard {
-  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
-  max-width: var(--hd-max-width);
-  margin: 0 auto;
+.quietTitle {
+  font-size: var(--hd-size-title);
+  margin-bottom: var(--hd-space-3);
 }
 
 .factList {
-  margin: var(--hd-space-5) 0;
+  margin: var(--hd-space-4) 0 var(--hd-space-5);
   padding: var(--hd-space-4) 0;
   border-top: 1px solid var(--hd-rule);
   border-bottom: 1px solid var(--hd-rule);
@@ -52,89 +91,138 @@
   font-family: var(--hd-font-utility);
 }
 
-.cues {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--hd-space-2);
-  padding: 0;
-  margin: 0 0 var(--hd-space-5);
-}
+/* ------------------------------------------------------------------ */
+/* The frame — one element, five geometries                            */
+/* ------------------------------------------------------------------ */
 
-.cues li {
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+.frame {
+  position: relative;
+  width: 100%;
   border: 1px solid var(--hd-rule-strong);
-  border-radius: 999px;
-  padding: var(--hd-space-1) var(--hd-space-3);
-  color: var(--hd-ink-muted);
+  background: var(--hd-surface);
+  overflow: hidden;
+  transition:
+    transform var(--hd-motion-cinematic) var(--hd-ease-long),
+    max-width var(--hd-motion-cinematic) var(--hd-ease-long),
+    border-color var(--hd-motion-slow) var(--hd-ease-house),
+    background-color var(--hd-motion-slow) var(--hd-ease-house);
+  max-width: 26rem;
+  margin: 0 auto;
+  transform-origin: center;
 }
 
-.disclosure {
-  margin-bottom: var(--hd-space-6);
+/* Sealed: a held object, sitting in the room with everything else. */
+.frame[data-phase="sealed"] {
+  transform: scale(1);
 }
 
-.disclosureButton {
-  background: none;
-  border: 1px solid var(--hd-rule-strong);
-  border-radius: var(--hd-radius-control);
-  color: var(--hd-ink-muted);
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
-  min-height: var(--hd-touch-min);
-  padding: 0 var(--hd-space-4);
-  cursor: pointer;
-}
-
-.disclosureBody {
-  margin-top: var(--hd-space-3);
-  font-size: var(--hd-size-small);
-}
-
-.error {
-  color: var(--hd-danger-ink);
-  font-size: var(--hd-size-small);
-  margin-bottom: var(--hd-space-4);
-}
-
-.dimming {
-  position: fixed;
-  inset: 0;
+/* Clue: the frame comes forward and grows as the room recedes. */
+.frame[data-phase="clue"] {
+  transform: scale(1.06);
+  border-color: var(--hd-accent);
   background: var(--hd-projection-black);
-  animation: dim var(--hd-motion-dim) var(--hd-ease-standard);
-  z-index: 30;
 }
 
-@keyframes dim {
+/* No Trailer: the same frame opens out to playback geometry. */
+.frame[data-phase="no_trailer"] {
+  max-width: 34rem;
+  transform: scale(1);
+  border-color: var(--hd-rule);
+  background: var(--hd-projection-black);
+}
+
+/*
+ * The hold. The frame contracts toward a thin aperture and the border
+ * goes out — motion system §8's "black playback surface contracts into
+ * a thin line or aperture". Nothing is inside it; that is the point.
+ */
+.frame[data-phase="hold"] {
+  max-width: 34rem;
+  border-color: transparent;
+  background: var(--hd-projection-black);
+}
+
+.hold {
+  height: 4rem;
+  background: var(--hd-projection-black);
+  animation: aperture-close var(--hd-motion-hold) var(--hd-ease-long) both;
+}
+
+@keyframes aperture-close {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0.04);
+  }
+}
+
+/*
+ * Reveal: the field grows back out of that aperture and the title is
+ * still, not animated like a trailer card (motion system §8 rule 5).
+ */
+.frame[data-phase="revealed"] {
+  max-width: 34rem;
+  border-color: var(--hd-rule);
+  background: var(--hd-surface);
+}
+
+.revealed {
+  padding: var(--hd-space-7) var(--hd-space-5);
+  text-align: center;
+  animation: field-open var(--hd-motion-slow) var(--hd-ease-long) both;
+}
+
+@keyframes field-open {
+  from {
+    clip-path: inset(48% 0 48% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.title {
+  margin: 0 0 var(--hd-space-2);
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-display);
+  line-height: 1.05;
+  color: var(--hd-ink);
+}
+
+.titleMeta {
+  margin: 0;
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* After the reveal                                                     */
+/* ------------------------------------------------------------------ */
+
+.afterReveal {
+  margin-top: var(--hd-space-6);
+  animation: settle var(--hd-motion-slow) var(--hd-motion-hold) var(--hd-ease-house) both;
+}
+
+/* Lower modules resolve after the title has landed (motion system §9). */
+@keyframes settle {
   from {
     opacity: 0;
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
-}
-
-.trailerStage {
-  display: flex;
-  flex-direction: column;
-  gap: var(--hd-space-4);
-  padding: var(--hd-space-4);
-  max-width: 26rem;
-  margin: 0 auto;
-}
-
-.year {
-  font-family: var(--hd-font-editorial);
-  font-style: italic;
-  color: var(--hd-ink-muted);
-  font-size: 0.6em;
 }
 
 .providers {
   list-style: none;
-  margin: var(--hd-space-4) 0;
+  margin: 0 0 var(--hd-space-5);
   padding: var(--hd-space-4) 0;
   border-top: 1px solid var(--hd-rule);
   border-bottom: 1px solid var(--hd-rule);
@@ -156,14 +244,83 @@
   text-transform: capitalize;
 }
 
-.hint {
-  font-size: var(--hd-size-small);
-}
-
-.actionsRow,
 .watchActions {
   display: flex;
   gap: var(--hd-space-3);
-  margin-bottom: var(--hd-space-4);
+  margin-bottom: var(--hd-space-5);
   flex-wrap: wrap;
+}
+
+/* The Room's door: a brass rule that extends into the layout. */
+.roomDoor {
+  margin: var(--hd-space-6) 0;
+  padding-top: var(--hd-space-5);
+  border-top: 1px solid var(--hd-accent);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--hd-space-3);
+}
+
+.roomLine {
+  margin: 0;
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  color: var(--hd-ink);
+}
+
+.disclosure {
+  margin: var(--hd-space-6) 0 0;
+}
+
+.disclosureButton {
+  background: none;
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-4);
+  cursor: pointer;
+}
+
+.disclosureBody {
+  margin-top: var(--hd-space-3);
+  font-size: var(--hd-size-small);
+}
+
+.failure {
+  margin-top: var(--hd-space-5);
+  text-align: center;
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin-bottom: var(--hd-space-4);
+}
+
+@media (min-width: 48rem) {
+  .stage {
+    max-width: 44rem;
+  }
+}
+
+/*
+ * Reduced motion keeps every one of these state changes and removes
+ * the movement between them. The hold is not listed: it is a state.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hold,
+  .revealed,
+  .afterReveal {
+    animation: none;
+  }
+}
+
+:root[data-reduced-motion="true"] .hold,
+:root[data-reduced-motion="true"] .revealed,
+:root[data-reduced-motion="true"] .afterReveal {
+  animation: none;
 }

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AppNav } from "@/components/AppNav";
+import { MotionPreferenceProvider } from "@/lib/motion/reduced-motion";
 import styles from "./layout.module.css";
 
 /**
@@ -33,11 +34,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .maybeSingle();
 
   return (
-    <div className={styles.shell}>
-      <main id="hd-main" className={styles.main}>
-        {children}
-      </main>
-      <AppNav isOwner={profile?.role === "owner"} />
-    </div>
+    <MotionPreferenceProvider>
+      <div className={styles.shell}>
+        <main id="hd-main" className={styles.main}>
+          {children}
+        </main>
+        <AppNav isOwner={profile?.role === "owner"} />
+      </div>
+    </MotionPreferenceProvider>
   );
 }
