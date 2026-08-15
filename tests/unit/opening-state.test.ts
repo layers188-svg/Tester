@@ -3,6 +3,7 @@ import {
   canTransitionOpeningStatus,
   computeTonightState,
   nextOpeningStatuses,
+  tonightStateOpensRoom,
 } from "@/lib/opening/state";
 
 describe("computeTonightState", () => {
@@ -20,7 +21,7 @@ describe("computeTonightState", () => {
     expect(state).toBe("not_available");
   });
 
-  it("is sealed_ready once open and not revealed", () => {
+  it("is sealed once open and not revealed", () => {
     const state = computeTonightState({
       openingStatus: "open",
       opensAt: "2026-08-11T18:00:00Z",
@@ -29,7 +30,7 @@ describe("computeTonightState", () => {
       watchState: null,
       hasSixWords: false,
     });
-    expect(state).toBe("sealed_ready");
+    expect(state).toBe("sealed");
   });
 
   it("is revealed once revealed with no watch state yet", () => {
@@ -44,7 +45,7 @@ describe("computeTonightState", () => {
     expect(state).toBe("revealed");
   });
 
-  it("is saved once saved for later", () => {
+  it("saving for later is not a state of the evening", () => {
     const state = computeTonightState({
       openingStatus: "open",
       opensAt: "2026-08-11T18:00:00Z",
@@ -53,10 +54,10 @@ describe("computeTonightState", () => {
       watchState: "saved",
       hasSixWords: false,
     });
-    expect(state).toBe("saved");
+    expect(state).toBe("revealed");
   });
 
-  it("is six_words_requested once watched but not yet reviewed", () => {
+  it("is review_undecided once watched but not yet answered", () => {
     const state = computeTonightState({
       openingStatus: "open",
       opensAt: "2026-08-11T18:00:00Z",
@@ -65,10 +66,10 @@ describe("computeTonightState", () => {
       watchState: "watched",
       hasSixWords: false,
     });
-    expect(state).toBe("six_words_requested");
+    expect(state).toBe("review_undecided");
   });
 
-  it("is after_credits_open once six words are on record", () => {
+  it("is review_submitted once six words are on record", () => {
     const state = computeTonightState({
       openingStatus: "open",
       opensAt: "2026-08-11T18:00:00Z",
@@ -77,7 +78,47 @@ describe("computeTonightState", () => {
       watchState: "watched",
       hasSixWords: true,
     });
-    expect(state).toBe("after_credits_open");
+    expect(state).toBe("review_submitted");
+  });
+
+  it("is review_skipped when the member chose Skip for now", () => {
+    const state = computeTonightState({
+      openingStatus: "open",
+      opensAt: "2026-08-11T18:00:00Z",
+      now,
+      hasRevealed: true,
+      watchState: "watched",
+      hasSixWords: false,
+      hasSkippedReview: true,
+    });
+    expect(state).toBe("review_skipped");
+  });
+
+  it("prefers six words over a stale skip", () => {
+    const state = computeTonightState({
+      openingStatus: "open",
+      opensAt: "2026-08-11T18:00:00Z",
+      now,
+      hasRevealed: true,
+      watchState: "watched",
+      hasSixWords: true,
+      hasSkippedReview: true,
+    });
+    expect(state).toBe("review_submitted");
+  });
+});
+
+describe("tonightStateOpensRoom", () => {
+  it("opens on either review outcome", () => {
+    expect(tonightStateOpensRoom("review_submitted")).toBe(true);
+    expect(tonightStateOpensRoom("review_skipped")).toBe(true);
+  });
+
+  it("stays shut everywhere before that", () => {
+    expect(tonightStateOpensRoom("not_available")).toBe(false);
+    expect(tonightStateOpensRoom("sealed")).toBe(false);
+    expect(tonightStateOpensRoom("revealed")).toBe(false);
+    expect(tonightStateOpensRoom("review_undecided")).toBe(false);
   });
 });
 

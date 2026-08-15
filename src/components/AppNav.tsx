@@ -6,15 +6,32 @@ import styles from "./AppNav.module.css";
 
 const DESTINATIONS = [
   { href: "/tonight", label: "Tonight", icon: TonightIcon },
+  { href: "/trust", label: "Trust Us", icon: TrustIcon },
   { href: "/circle", label: "Circle", icon: CircleIcon },
   { href: "/library", label: "Library", icon: LibraryIcon },
   { href: "/you", label: "You", icon: YouIcon },
 ] as const;
 
 /**
- * Exactly four persistent destinations (brief §5). Do not add a fifth —
- * the Programming Desk lives at /desk, reachable from You for owners,
- * not from this bar.
+ * Five persistent destinations, and the fifth needs explaining.
+ *
+ * The older brief (§5) said exactly four, and CLAUDE.md keeps that as a
+ * rule with one exception: do not add a fifth "unless a feature
+ * genuinely cannot live inside these". The August handover then made
+ * Search — really Trust Us — one of the product's member surfaces
+ * (00_BUILD_BRIEF_FINAL.md §2), and it is the exception the rule
+ * anticipated. It cannot live inside Tonight, which is the sealed
+ * nightly opening; inside Circle, which is people; inside Library,
+ * which is the member's own archive; or inside You, which is settings.
+ * Burying it would turn the House's one act of active recommendation
+ * into a submenu.
+ *
+ * The Room is the counter-example and stays out of this bar. It belongs
+ * to a picture the member has watched, opens from Tonight, and would be
+ * a permanently locked tab most of the time.
+ *
+ * The Programming Desk also stays out: /desk is reachable from You for
+ * owners.
  */
 export function AppNav({ isOwner }: { isOwner: boolean }) {
   const pathname = usePathname();
@@ -56,6 +73,23 @@ function TonightIcon({ active }: IconProps) {
         stroke="currentColor"
         strokeWidth={active ? 2 : 1.5}
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* An aperture narrowing to one choice — the House picking a single film. */
+function TrustIcon({ active }: IconProps) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth={active ? 2 : 1.5} />
+      <circle
+        cx="12"
+        cy="12"
+        r="2.5"
+        stroke="currentColor"
+        strokeWidth={active ? 2 : 1.5}
+        fill={active ? "currentColor" : "none"}
       />
     </svg>
   );

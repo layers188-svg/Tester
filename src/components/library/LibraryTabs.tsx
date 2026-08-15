@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import type { CirclesActivityRow, HouseOpening, LibraryItem } from "@/lib/supabase/types";
-import { WATCH_STATE_LABEL } from "@/lib/labels";
+import { NOTHING_UNDER_THAT_TITLE } from "@/lib/library/search";
+import { AddFilmForm } from "./AddFilmForm";
+import { LibraryArchive } from "./LibraryArchive";
 import { EntryField } from "./EntryField";
 import styles from "./LibraryTabs.module.css";
 
@@ -24,13 +25,9 @@ export function LibraryTabs({
   // Search only ever matches items where `title` is populated, and the
   // safe RPCs behind this page only populate `title` for rows the
   // member has personally revealed — so this filter cannot surface a
-  // sealed title (brief §7 Library rule 4-5).
-  const filteredMine = useMemo(() => {
-    if (!query.trim()) return mine;
-    const q = query.trim().toLowerCase();
-    return mine.filter((item) => item.title?.toLowerCase().includes(q));
-  }, [mine, query]);
-
+  // sealed title (brief §7 Library rule 4-5). "Yours" has its own
+  // search inside LibraryArchive, which also matches year and Opening
+  // number.
   const filteredHouse = useMemo(() => {
     if (!query.trim()) return house;
     const q = query.trim().toLowerCase();
@@ -54,43 +51,22 @@ export function LibraryTabs({
         ))}
       </div>
 
-      {(tab === "yours" || tab === "house") && (
+      {tab === "yours" && (
+        <>
+          <div className={styles.addRow}>
+            <AddFilmForm />
+          </div>
+          <LibraryArchive items={mine} />
+        </>
+      )}
+
+      {tab === "house" && (
         <input
           className={styles.search}
           placeholder="Search titles you've revealed"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-      )}
-
-      {tab === "yours" && (
-        <ul className={styles.list}>
-          {filteredMine.length === 0 && <p className={styles.hint}>Nothing here yet.</p>}
-          {filteredMine.map((item) => (
-            <li key={`${item.kind}-${item.target_id}`} className={styles.card}>
-              <EntryField id={item.target_id} revealed={item.revealed} />
-              <div className={styles.cardBody}>
-                <div className={styles.cardHead}>
-                  <span>{item.title ?? "Sealed"}</span>
-                  <span className={styles.badge}>{WATCH_STATE_LABEL[item.watch_state]}</span>
-                </div>
-                {item.six_words && (
-                  <p className={styles.sixWords}>&ldquo;{item.six_words}&rdquo;</p>
-                )}
-                {!item.revealed && item.kind === "opening" && (
-                  <Link href="/tonight" className={styles.link}>
-                    Open tonight&rsquo;s house
-                  </Link>
-                )}
-                {!item.revealed && item.kind === "recommendation" && (
-                  <Link href={`/circle/recommendation/${item.target_id}`} className={styles.link}>
-                    Open the seal
-                  </Link>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
       )}
 
       {tab === "circle" && (
@@ -108,7 +84,11 @@ export function LibraryTabs({
 
       {tab === "house" && (
         <ul className={styles.list}>
-          {filteredHouse.length === 0 && <p className={styles.hint}>Nothing programmed yet.</p>}
+          {filteredHouse.length === 0 && (
+            <p className={styles.hint}>
+              {query.trim().length > 0 ? NOTHING_UNDER_THAT_TITLE : "Nothing programmed yet."}
+            </p>
+          )}
           {filteredHouse.map((opening) => (
             <li key={opening.id} className={styles.card}>
               <EntryField id={opening.id} revealed={opening.revealed} />

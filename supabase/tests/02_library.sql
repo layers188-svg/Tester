@@ -363,3 +363,68 @@ begin
     v_ok and v_cue_count = 2, coalesce(v_error, 'cues stored: ' || coalesce(v_cue_count, 0)));
 end
 $$;
+
+-- =====================================================================
+-- Added films (0017_library_additions.sql)
+-- =====================================================================
+--
+-- Handover §7: "Add a watched film from a broad metadata catalogue."
+-- A member contributes a film without ever holding access to `films`,
+-- exactly as they can when sending under seal — and what they added is
+-- theirs alone.
+
+select tests.act_as(:member_id);
+
+do $$
+declare
+  v_id uuid;
+  v_again uuid;
+begin
+  select add_library_film('Past Lives', 2023, 106) into v_id;
+  perform tests.check('7.A', 'a member can add a watched film',
+    v_id is not null);
+
+  perform tests.check('7.A', 'the added film appears in their Library with its title',
+    exists (
+      select 1 from get_my_library()
+      where kind = 'added' and title = 'Past Lives' and release_year = 2023
+    ));
+
+  perform tests.check('7.A', 'adding does not grant read access to films',
+    (select count(*) from films) = 0);
+
+  select add_library_film('Past Lives', 2023, 106) into v_again;
+  perform tests.check('7.A', 'adding the same film twice does not duplicate it',
+    v_again = v_id
+      and (select count(*) from get_my_library() where kind = 'added' and title = 'Past Lives') = 1);
+
+  -- Tagged dollar quoting: this sits inside a DO block, and reusing the
+  -- outer tag here would close it early. That is true of the comment
+  -- text as well — inside a dollar-quoted string everything is literal,
+  -- so a naked pair of dollars in a comment ends the block.
+  perform tests.check('7.A', 'a film with no title is refused',
+    tests.raises($q$select add_library_film('   ', 2023, 100)$q$));
+end
+$$;
+
+select tests.act_as(:other_id);
+
+select tests.check('7.A', 'another member does not see the added film',
+  not exists (select 1 from get_my_library() where kind = 'added'));
+
+select tests.check('7.A', 'another member cannot read the additions table',
+  (select count(*) from library_additions) = 0);
+
+-- Removing is the member's own, too.
+select tests.act_as(:member_id);
+
+do $$
+declare
+  v_id uuid;
+begin
+  select target_id into v_id from get_my_library() where kind = 'added' limit 1;
+  perform remove_library_film(v_id);
+  perform tests.check('7.A', 'a member can remove a film they added',
+    not exists (select 1 from get_my_library() where kind = 'added'));
+end
+$$;

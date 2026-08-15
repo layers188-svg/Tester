@@ -4,7 +4,26 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
 import { validateCues } from "@/lib/validation/cues";
+import { SealObject, type SealState } from "./SealObject";
 import styles from "./SendForm.module.css";
+
+/**
+ * Send Under Seal (handover 00_BUILD_BRIEF_FINAL.md §6, motion §13).
+ *
+ * The object above the form is the recommendation itself, composed
+ * live. It is what the recipient will receive, so it carries the note
+ * and the cues and never the title — a preview that quietly included
+ * the title would be showing the sender the wrong thing.
+ *
+ * Sending seals that same object: it compresses, the seam closes, there
+ * is a beat, and then the seal mark and SENT UNDER SEAL resolve inside
+ * it. "Do not replace it with a toast as the main feedback" — so the
+ * confirmation is the object, not a line of text where the object was.
+ */
+
+/** Motion §13: 200 to 300ms hold between the seam meeting and the mark. */
+const SEAM_CLOSE_MS = 620;
+const SEAL_HOLD_MS = 260;
 
 interface Recipient {
   userId: string;
@@ -35,7 +54,7 @@ export function SendForm({
   const [scheduledFor, setScheduledFor] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [sealState, setSealState] = useState<SealState>("sealed");
 
   function toggleRecipient(userId: string) {
     setSelected((prev) =>
@@ -77,11 +96,19 @@ export function SendForm({
         const payload = await res.json().catch(() => ({}));
         throw new Error(payload.error ?? "Could not send that.");
       }
-      setSent(true);
+      // The seal closes on the object the sender has been composing.
+      setSealState("sealing");
       setTimeout(() => {
-        router.push("/circle");
-        router.refresh();
-      }, 900);
+        setSealState("held");
+        setTimeout(() => {
+          setSealState("sent");
+          // Long enough to read the mark before the House moves on.
+          setTimeout(() => {
+            router.push("/circle");
+            router.refresh();
+          }, 1400);
+        }, SEAL_HOLD_MS);
+      }, SEAM_CLOSE_MS);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -89,12 +116,42 @@ export function SendForm({
     }
   }
 
-  if (sent) {
-    return <p className={styles.confirmation}>Sent under seal.</p>;
+  const sealedCues = cues.map((cue) => cue.trim()).filter(Boolean);
+  const sealing = sealState !== "sealed";
+
+  // Acceptance test F: the send action stays unavailable until the
+  // inputs it needs actually exist, rather than failing after the press.
+  const ready = filmTitle.trim().length > 0 && selected.length > 0 && !busy;
+
+  if (sealing) {
+    return (
+      <div className={styles.sealingStage}>
+        <SealObject
+          state={sealState}
+          senderName={null}
+          note={personalNote.trim() || null}
+          cues={sealedCues}
+          runtimeMinutes={runtimeMinutes ? Number(runtimeMinutes) : null}
+          recipientCount={selected.length}
+        />
+      </div>
+    );
   }
 
   return (
     <form className={styles.form} onSubmit={submit}>
+      <section className={styles.preview} aria-label="Sealed preview">
+        <p className={styles.previewLabel}>What they will receive</p>
+        <SealObject
+          state="sealed"
+          senderName={null}
+          note={personalNote.trim() || null}
+          cues={sealedCues}
+          runtimeMinutes={runtimeMinutes ? Number(runtimeMinutes) : null}
+          recipientCount={selected.length}
+        />
+      </section>
+
       <label className={styles.label} htmlFor="filmTitle">
         Film
       </label>
@@ -229,8 +286,8 @@ export function SendForm({
 
       {error && <p className={styles.error}>{error}</p>}
 
-      <Button type="submit" variant="primary" fullWidth disabled={busy}>
-        {busy ? "Sending…" : "Send under seal"}
+      <Button type="submit" variant="primary" fullWidth disabled={!ready}>
+        Send under seal
       </Button>
     </form>
   );

@@ -8,6 +8,15 @@ under seal. Product shorthand: **one film, a few friends, nobody knows.**
 Full product spec lives in `docs/HOUSE_DARK_BUILD_BRIEF.md`. Read it before
 making product decisions. This file is the condensed operating contract.
 
+**`docs/handover/` supersedes both where they conflict.** It is the August
+2026 handover and it changed several earlier assumptions: Tonight never
+reveals the title before the No Trailer finishes; Search is a trust ritual,
+not a catalogue; The Room is Your Review / Your Circle / The House; Circle
+both receives and sends under seal; motion is a product system. Read
+`docs/handover/00_BUILD_BRIEF_FINAL.md` and `01_MOTION_SYSTEM.md` before
+touching Tonight, Search, The Room or any signature transition. The older
+brief stays useful for data modelling and brand history.
+
 ## What this is not
 
 Not a streaming service, film catalogue, review database, ratings product,
@@ -85,8 +94,17 @@ journeys).
 
 ## Signed-in navigation
 
-Exactly four tabs: **Tonight, Circle, Library, You.** Don't add a fifth
-unless a feature genuinely cannot live inside these.
+Five tabs: **Tonight, Trust Us, Circle, Library, You.**
+
+Trust Us is the one exception the four-tab rule allowed for. It cannot
+live inside Tonight (the sealed nightly opening), Circle (people),
+Library (the member's own archive) or You (settings), and burying the
+House's one act of active recommendation in a submenu would be the same
+as not having it. Don't add a sixth.
+
+The Room is the counter-example and stays out: it belongs to a picture
+the member has watched, opens from Tonight at `/tonight/room`, and would
+be a permanently locked tab most of the time.
 
 ## Brand
 
@@ -112,6 +130,14 @@ npm run db:reset:local        # DESTRUCTIVE: drops the LOCAL dev database, reapp
                               # migrations, then runs supabase/seed.sql. Never aim
                               # this at a linked/remote project.
 ```
+
+`/dev/stage` is the staging state simulator: it mounts the real
+components with fixture props and stubs the network, so the signature
+motion can be rendered and measured without a Supabase project. It 404s
+outside development. `tests/e2e/motion.spec.ts` drives it and asserts
+geometry rather than class names — run it whenever you touch a signature
+transition, because "the CSS is there" is not evidence that anything
+moves.
 
 See `README.md` for setup, `OPERATIONS.md` for the daily opening workflow,
 and `LAUNCH_CHECKLIST.md` for the only actions still waiting on Logan.

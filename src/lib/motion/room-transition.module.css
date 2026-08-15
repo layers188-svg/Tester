@@ -1,0 +1,150 @@
+/*
+ * The transition layer that carries the Room preview across the route
+ * boundary (motion system §10).
+ */
+
+/* Home moves back and loses contrast — step 3. */
+.behind {
+  transition:
+    transform var(--hd-motion-cinematic) var(--hd-ease-long),
+    opacity var(--hd-motion-slow) var(--hd-ease-house),
+    filter var(--hd-motion-slow) var(--hd-ease-house);
+  transform-origin: center 40%;
+}
+
+.behind[data-receding] {
+  transform: scale(0.965);
+  opacity: 0.45;
+}
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: var(--hd-house-black);
+  opacity: 0;
+  transition: opacity var(--hd-motion-standard) var(--hd-ease-house);
+}
+
+.layer[data-phase="travelling"] {
+  opacity: 1;
+}
+
+.layer[data-phase="leaving"] {
+  opacity: 0;
+}
+
+/*
+ * The promoted preview. Top/left/width/height are written inline from
+ * the captured source rect and then from the Room's target rect, so the
+ * panel travels between two measured boxes rather than playing a
+ * keyframe that happens to look about right.
+ */
+.panel {
+  position: fixed;
+  overflow: hidden;
+  padding: var(--hd-space-4);
+  background: var(--hd-house-black);
+  border: 1px solid var(--hd-rule);
+  transition-property: top, left, width, height, border-color;
+  transition-timing-function: var(--hd-ease-long);
+  /* duration is set inline, from TRAVEL_MS */
+}
+
+.layer[data-phase="travelling"] .panel {
+  border-color: var(--hd-accent);
+}
+
+.eyebrow {
+  margin: 0 0 var(--hd-space-2);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.film {
+  margin: 0 0 var(--hd-space-2);
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  color: var(--hd-ink-muted);
+}
+
+/* THE ROOM resolves as the panel lands — step 7. */
+.roomTitle {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  line-height: 1;
+  color: var(--hd-ink);
+  opacity: 0;
+  transition: opacity var(--hd-motion-slow) var(--hd-motion-fast) var(--hd-ease-house);
+}
+
+.layer[data-phase="travelling"] .roomTitle {
+  opacity: 1;
+}
+
+/* The brass rule extends — step 6. */
+.rule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--hd-motion-cinematic) var(--hd-motion-fast) var(--hd-ease-long);
+}
+
+.layer[data-phase="travelling"] .rule {
+  transform: scaleX(1);
+}
+
+/*
+ * The Circle quote that was visible in the preview. It stays visible
+ * and relocates — step 5 — which is the whole reason this is a shared
+ * element rather than a crossfade.
+ */
+.quote {
+  margin: var(--hd-space-3) 0 0;
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-body);
+  line-height: 1.3;
+  color: var(--hd-ink);
+}
+
+.quoteAuthor {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .behind,
+  .panel,
+  .layer,
+  .roomTitle,
+  .rule {
+    transition: none;
+  }
+  .behind[data-receding] {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+:root[data-reduced-motion="true"] .behind,
+:root[data-reduced-motion="true"] .panel,
+:root[data-reduced-motion="true"] .layer,
+:root[data-reduced-motion="true"] .roomTitle,
+:root[data-reduced-motion="true"] .rule {
+  transition: none;
+}
+
+:root[data-reduced-motion="true"] .behind[data-receding] {
+  transform: none;
+  opacity: 1;
+}

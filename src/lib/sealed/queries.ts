@@ -5,6 +5,8 @@ import type { Database, WatchState } from "@/lib/supabase/types";
 
 export interface SealedProgress {
   watchState: WatchState | null;
+  /** "Skip for now" on record (0013_review_decision.sql). */
+  hasSkippedReview: boolean;
   hasSixWords: boolean;
   sixWordsId: string | null;
   sixWordsBody: string | null;
@@ -19,7 +21,7 @@ export async function getMemberSealedProgress(
   const [{ data: watch }, { data: review }] = await Promise.all([
     supabase
       .from("watches")
-      .select("state")
+      .select("state, review_skipped_at")
       .eq("user_id", userId)
       .eq("sealed_recommendation_id", recommendationId)
       .maybeSingle(),
@@ -33,6 +35,7 @@ export async function getMemberSealedProgress(
 
   return {
     watchState: watch?.state ?? null,
+    hasSkippedReview: Boolean(watch?.review_skipped_at),
     hasSixWords: Boolean(review),
     sixWordsId: review?.id ?? null,
     sixWordsBody: review?.body ?? null,

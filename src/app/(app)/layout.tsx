@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AppNav } from "@/components/AppNav";
+import { MotionPreferenceProvider } from "@/lib/motion/reduced-motion";
+import { RoomTransitionProvider } from "@/lib/motion/room-transition";
 import styles from "./layout.module.css";
 
 /**
@@ -33,11 +35,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .maybeSingle();
 
   return (
-    <div className={styles.shell}>
-      <main id="hd-main" className={styles.main}>
-        {children}
-      </main>
-      <AppNav isOwner={profile?.role === "owner"} />
-    </div>
+    <MotionPreferenceProvider>
+      {/*
+       * The Room's transition layer lives here rather than in a page,
+       * because it has to outlive the route change it causes — see
+       * src/lib/motion/room-transition.tsx.
+       */}
+      <RoomTransitionProvider>
+        <div className={styles.shell}>
+          <main id="hd-main" className={styles.main}>
+            {children}
+          </main>
+          <AppNav isOwner={profile?.role === "owner"} />
+        </div>
+      </RoomTransitionProvider>
+    </MotionPreferenceProvider>
   );
 }

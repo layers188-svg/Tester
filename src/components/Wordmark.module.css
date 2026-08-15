@@ -1,12 +1,46 @@
+/*
+ * Sizing wrapper for the approved identity. The SVG carries the
+ * geometry; these rules only decide how large it sits and in what ink.
+ */
+
 .wordmark {
-  font-family: var(--hd-font-editorial);
-  font-weight: 500;
-  font-size: var(--hd-size-heading);
-  letter-spacing: 0.01em;
+  display: inline-block;
   color: var(--hd-ink);
+  line-height: 0;
+}
+
+.svg {
+  display: block;
+  height: 1.1em;
+  width: auto;
+  /* The approved file's 1800 × 420, widened to 1835 to fit a real word space, keeping the 70-unit margins. */
+  aspect-ratio: 1835 / 420;
+  overflow: visible;
+}
+
+/*
+ * Font metrics restated from the approved file. `font-variation-settings`
+ * is dropped on purpose: next/font serves static Newsreader instances,
+ * so opsz/wght axes do not exist here and the declaration would be
+ * inert. weight 400 and the italic style below reproduce the same two
+ * instances the file asks for.
+ */
+.house,
+.dark {
+  font-family: var(--hd-font-editorial);
+  font-size: 260px;
+  font-weight: 400;
+  letter-spacing: -2px;
 }
 
 .dark {
   font-style: italic;
-  color: var(--hd-accent);
+}
+
+.monogram {
+  display: block;
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1000 / 1200;
+  color: var(--hd-ink);
 }

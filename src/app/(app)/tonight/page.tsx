@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { getServerSupabase } from "@/lib/supabase/server";
-import { getMemberOpeningProgress, getTonightOpening } from "@/lib/opening/queries";
+import {
+  getMemberOpeningProgress,
+  getNextOpeningAt,
+  getTonightOpening,
+} from "@/lib/opening/queries";
 import { TonightExperience } from "@/components/tonight/TonightExperience";
 import styles from "./page.module.css";
 
@@ -18,12 +22,15 @@ export default async function TonightPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const opening = await getTonightOpening(supabase);
+  const [opening, nextOpeningAt] = await Promise.all([
+    getTonightOpening(supabase),
+    getNextOpeningAt(supabase),
+  ]);
 
   if (!opening) {
     return (
       <div className={styles.page}>
-        <TonightExperience opening={null} progress={null} />
+        <TonightExperience opening={null} progress={null} nextOpeningAt={nextOpeningAt} />
       </div>
     );
   }
@@ -32,7 +39,7 @@ export default async function TonightPage() {
 
   return (
     <div className={styles.page}>
-      <TonightExperience opening={opening} progress={progress} />
+      <TonightExperience opening={opening} progress={progress} nextOpeningAt={nextOpeningAt} />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { skipEntryCeremony } from "./helpers";
 
 /**
  * Mobile QA sweep (brief §16 accessibility, §20 rule 14: "Check every
@@ -16,6 +17,12 @@ for (const width of PHONE_WIDTHS) {
     // The project config already supplies the Pixel 7 device; only
     // the width varies here.
     test.use({ viewport: { width, height: 900 } });
+
+    // "/" opens behind the projection aperture; these are checks on the
+    // pages behind it.
+    test.beforeEach(async ({ page }) => {
+      await skipEntryCeremony(page);
+    });
 
     for (const path of PUBLIC_PATHS) {
       test(`${path} has no horizontal overflow`, async ({ page }) => {
@@ -73,6 +80,7 @@ for (const width of PHONE_WIDTHS) {
 
 test.describe("reduced motion", () => {
   test("the home page renders with prefers-reduced-motion set", async ({ page }) => {
+    await skipEntryCeremony(page);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();

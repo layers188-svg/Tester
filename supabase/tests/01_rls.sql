@@ -50,6 +50,25 @@ begin
 end;
 $$;
 
+/*
+ * Did this statement refuse? For the handful of boundaries that raise
+ * rather than filter — a security-definer function that checks
+ * eligibility before returning anything — "zero rows" is the wrong
+ * assertion, because a function that silently returned nothing would
+ * pass it while a broken one that returned everything would too.
+ */
+create or replace function tests.raises(p_sql text)
+returns boolean
+language plpgsql
+as $$
+begin
+  execute p_sql;
+  return false;
+exception when others then
+  return true;
+end;
+$$;
+
 /* Become an authenticated member, exactly as PostgREST would. */
 create or replace function tests.act_as(p_user_id uuid)
 returns void

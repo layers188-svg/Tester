@@ -29,6 +29,7 @@ export default async function DeskLayout({ children }: { children: React.ReactNo
       </header>
       <nav className={styles.nav} aria-label="Programming Desk">
         <Link href="/desk/openings">Openings</Link>
+        <Link href="/desk/records">House records</Link>
         <Link href="/desk/moderation">Moderation</Link>
         <Link href="/desk/emails">Email queue</Link>
         <Link href="/desk/audit">Audit log</Link>

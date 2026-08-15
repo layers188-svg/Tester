@@ -1,0 +1,159 @@
+/*
+ * The seal, and the clue it becomes. Both live inside the one .frame
+ * element owned by TonightExperience, so nothing here positions itself
+ * on the page — these rules only describe what is inside the frame.
+ */
+
+.seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hd-space-3);
+  width: 100%;
+  min-height: 18rem;
+  padding: var(--hd-space-7) var(--hd-space-5);
+  background: transparent;
+  border: none;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  touch-action: none; /* a hold must not become a scroll */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.sealedLine {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-title);
+  line-height: 1.1;
+  color: var(--hd-ink);
+}
+
+.instruction {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+/*
+ * The hold made visible. One brass rule, drawn by the member's own
+ * press — not a spinner, and not a 3px micro-movement (motion principle
+ * 5). --hold is written by the component from rAF, so this tracks the
+ * press exactly rather than running a fixed animation.
+ */
+.holdRule {
+  display: block;
+  width: min(12rem, 60%);
+  height: 1px;
+  margin-top: var(--hd-space-2);
+  background: var(--hd-rule);
+  overflow: hidden;
+}
+
+.holdFill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--hd-accent);
+  transform-origin: left;
+  transform: scaleX(var(--hold, 0));
+}
+
+/* The seal takes the press physically. */
+.seal:active .sealedLine {
+  transform: scale(0.994);
+}
+
+.seal .sealedLine {
+  transition: transform var(--hd-motion-fast) var(--hd-ease-house);
+}
+
+/*
+ * The clue resolves inside the same frame — no new card, no route
+ * change (motion system §6: "safe clue resolves inside the same frame").
+ */
+.opened {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hd-space-3);
+  width: 100%;
+  min-height: 18rem;
+  padding: var(--hd-space-7) var(--hd-space-5);
+  text-align: center;
+}
+
+.clue {
+  margin: 0;
+  font-family: var(--hd-font-utility);
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-ink);
+  animation: clue-resolve var(--hd-motion-slow) var(--hd-ease-house) both;
+}
+
+.clueNote {
+  margin: 0;
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+@keyframes clue-resolve {
+  from {
+    opacity: 0;
+    letter-spacing: 0.42em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.16em;
+  }
+}
+
+.continue {
+  margin-top: var(--hd-space-5);
+  min-height: var(--hd-touch-min);
+  min-width: 9rem;
+  padding: 0 var(--hd-space-6);
+  background: transparent;
+  border: 1px solid var(--hd-accent);
+  color: var(--hd-accent);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--hd-motion-fast) var(--hd-ease-house),
+    color var(--hd-motion-fast) var(--hd-ease-house);
+}
+
+.continue:hover {
+  background: var(--hd-accent);
+  color: var(--hd-projection-black);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clue {
+    animation: none;
+  }
+}
+
+:root[data-reduced-motion="true"] .clue {
+  animation: none;
+}

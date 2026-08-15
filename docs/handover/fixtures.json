@@ -1,0 +1,157 @@
+{
+  "films": [
+    {
+      "id": "whiplash",
+      "title": "Whiplash",
+      "year": 2014,
+      "runtimeMinutes": 106,
+      "sixWordsBefore": "Drummer chases greatness under brutal mentorship.",
+      "themes": ["Tension", "Obsession", "Ambition"],
+      "pace": "relentless",
+      "intensity": "high"
+    },
+    {
+      "id": "parasite",
+      "title": "Parasite",
+      "year": 2019,
+      "runtimeMinutes": 132,
+      "sixWordsBefore": "Struggling family enters wealthy household's orbit.",
+      "themes": ["Power", "Tension"],
+      "pace": "building",
+      "intensity": "high"
+    },
+    {
+      "id": "portrait",
+      "title": "Portrait of a Lady on Fire",
+      "year": 2019,
+      "runtimeMinutes": 122,
+      "sixWordsBefore": "Painter observes woman she must portray.",
+      "themes": ["Longing", "Memory"],
+      "pace": "measured",
+      "intensity": "medium"
+    },
+    {
+      "id": "burning",
+      "title": "Burning",
+      "year": 2018,
+      "runtimeMinutes": 148,
+      "sixWordsBefore": "Young man searches through unsettling absence.",
+      "themes": ["Jealousy", "Tension", "Something strange"],
+      "pace": "slow burn",
+      "intensity": "medium"
+    },
+    {
+      "id": "florida-project",
+      "title": "The Florida Project",
+      "year": 2017,
+      "runtimeMinutes": 111,
+      "sixWordsBefore": "Childhood flourishes beside adult instability daily.",
+      "themes": ["Childhood", "Escape"],
+      "pace": "loose",
+      "intensity": "medium"
+    },
+    {
+      "id": "in-the-mood",
+      "title": "In the Mood for Love",
+      "year": 2000,
+      "runtimeMinutes": 98,
+      "sixWordsBefore": "Neighbours grow close at impossible moment.",
+      "themes": ["Longing", "Memory"],
+      "pace": "measured",
+      "intensity": "medium"
+    },
+    {
+      "id": "past-lives",
+      "title": "Past Lives",
+      "year": 2023,
+      "runtimeMinutes": 106,
+      "sixWordsBefore": "Old friends meet across changed lives.",
+      "themes": ["Longing", "Memory"],
+      "pace": "measured",
+      "intensity": "medium"
+    },
+    {
+      "id": "aftersun",
+      "title": "Aftersun",
+      "year": 2022,
+      "runtimeMinutes": 102,
+      "sixWordsBefore": "Daughter remembers holiday with her father.",
+      "themes": ["Memory", "Childhood"],
+      "pace": "measured",
+      "intensity": "medium"
+    },
+    {
+      "id": "la-la-land",
+      "title": "La La Land",
+      "year": 2016,
+      "runtimeMinutes": 128,
+      "sixWordsBefore": "Dreamers collide while chasing separate futures.",
+      "themes": ["Ambition", "Longing"],
+      "pace": "buoyant",
+      "intensity": "medium"
+    },
+    {
+      "id": "under-the-skin",
+      "title": "Under the Skin",
+      "year": 2013,
+      "runtimeMinutes": 108,
+      "sixWordsBefore": "Mysterious woman moves through unfamiliar world.",
+      "themes": ["Something strange"],
+      "pace": "hypnotic",
+      "intensity": "high"
+    }
+  ],
+  "reviews": {
+    "whiplash": {
+      "yourReview": "I understood him. That worried me.",
+      "circle": [
+        {
+          "member": "Maya",
+          "text": "Greatness should not feel this frightening."
+        },
+        {
+          "member": "Rory",
+          "text": "My shoulders hurt watching that."
+        },
+        {
+          "member": "Aisha",
+          "text": "Pressure turns talent into something darker."
+        },
+        {
+          "member": "Dev",
+          "text": "Every victory felt slightly poisoned."
+        }
+      ],
+      "house": [
+        {
+          "member": "Member 014",
+          "text": "I forgot to breathe near end."
+        },
+        {
+          "member": "Member 021",
+          "text": "Precision becomes its own kind violence."
+        },
+        {
+          "member": "Member 037",
+          "text": "Applause never sounded quite this dangerous."
+        },
+        {
+          "member": "Member 052",
+          "text": "Ambition keeps asking for more blood."
+        }
+      ]
+    }
+  },
+  "themes": [
+    "Tension",
+    "Longing",
+    "Obsession",
+    "Escape",
+    "Power",
+    "Childhood",
+    "Jealousy",
+    "Ambition",
+    "Memory",
+    "Something strange"
+  ]
+}

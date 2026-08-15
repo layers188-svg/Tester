@@ -1,82 +1,84 @@
-.card {
-  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
+/*
+ * Receiving Under Seal. The object does the work — these rules only
+ * place it and the things that resolve around it once it is open.
+ */
+
+.stage {
   max-width: var(--hd-max-width);
   margin: 0 auto;
+  padding: var(--hd-space-7) var(--hd-space-4) var(--hd-space-8);
+  min-height: 70dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: background-color var(--hd-motion-slow) var(--hd-ease-house);
 }
 
-.eyebrow {
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--hd-accent);
+/* The environment darkens as the seal parts (motion §13). */
+.stage[data-state="opening"],
+.stage[data-state="open"] {
+  background: var(--hd-projection-black);
+}
+
+.opened {
+  padding-top: var(--hd-space-5);
+  margin-top: var(--hd-space-5);
+  border-top: 1px solid var(--hd-accent);
+  animation: unfold var(--hd-motion-slow) var(--hd-ease-long) both;
+}
+
+@keyframes unfold {
+  from {
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+.title {
   margin: 0 0 var(--hd-space-2);
-}
-
-.note {
   font-family: var(--hd-font-editorial);
-  font-style: italic;
-  font-size: 1.125rem;
+  font-size: var(--hd-size-title);
+  line-height: 1.1;
   color: var(--hd-ink);
 }
 
-.factList {
-  margin: var(--hd-space-5) 0;
-  padding: var(--hd-space-4) 0;
-  border-top: 1px solid var(--hd-rule);
-  border-bottom: 1px solid var(--hd-rule);
-}
-
-.factList div {
-  display: flex;
-  justify-content: space-between;
-}
-
-.factList dt {
-  color: var(--hd-ink-muted);
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
-}
-
-.factList dd {
-  margin: 0;
-}
-
-.cues {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--hd-space-2);
-  padding: 0;
-  margin: 0 0 var(--hd-space-5);
-}
-
-.cues li {
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
-  text-transform: uppercase;
-  border: 1px solid var(--hd-rule-strong);
-  border-radius: 999px;
-  padding: var(--hd-space-1) var(--hd-space-3);
-  color: var(--hd-ink-muted);
-}
-
-.error {
-  color: var(--hd-danger-ink);
-  font-size: var(--hd-size-small);
-  margin-bottom: var(--hd-space-4);
-}
-
 .year {
-  font-family: var(--hd-font-editorial);
-  font-style: italic;
+  margin: 0;
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.2em;
   color: var(--hd-ink-muted);
-  font-size: 0.6em;
+}
+
+.enterRow {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--hd-space-6);
+}
+
+.afterReveal {
+  margin-top: var(--hd-space-6);
+  animation: settle var(--hd-motion-slow) var(--hd-motion-hold) var(--hd-ease-house) both;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .providers {
   list-style: none;
-  margin: var(--hd-space-4) 0;
+  margin: 0 0 var(--hd-space-5);
   padding: var(--hd-space-4) 0;
   border-top: 1px solid var(--hd-rule);
   border-bottom: 1px solid var(--hd-rule);
@@ -98,13 +100,43 @@
   text-transform: capitalize;
 }
 
-.hint {
-  font-size: var(--hd-size-small);
-}
-
 .actionsRow {
   display: flex;
   gap: var(--hd-space-3);
-  margin-bottom: var(--hd-space-4);
   flex-wrap: wrap;
+  margin-bottom: var(--hd-space-4);
+}
+
+.hint {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.roomNote {
+  margin-top: var(--hd-space-5);
+  padding-top: var(--hd-space-4);
+  border-top: 1px solid var(--hd-rule);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: var(--hd-space-4) 0 0;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opened,
+  .afterReveal {
+    animation: none;
+  }
+}
+
+:root[data-reduced-motion="true"] .opened,
+:root[data-reduced-motion="true"] .afterReveal {
+  animation: none;
 }

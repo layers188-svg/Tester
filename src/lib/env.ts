@@ -9,13 +9,35 @@ import { z } from "zod";
  * §9 for the required variable list.
  */
 
+/**
+ * A sender address, in either form Resend accepts: a bare address, or
+ * a display name in front of one — `House Dark <hello@housedark.com>`.
+ *
+ * `z.string().email()` only accepted the bare form, so the value
+ * .env.example tells an operator to use was rejected and the app
+ * refused to start with a message pointing back at .env.example. The
+ * display-name form is the one House Dark actually wants in a member's
+ * inbox, so it is the form that has to validate.
+ */
+const senderAddress = z
+  .string()
+  .trim()
+  .refine(
+    (value) => {
+      const angled = /^[^<>]*<([^<>\s]+)>$/.exec(value);
+      const address = angled ? angled[1] : value;
+      return z.string().email().safeParse(address).success;
+    },
+    { message: "Expected an email address, optionally as: Name <address@example.com>" },
+  );
+
 const serverSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   RESEND_API_KEY: z.string().min(1),
-  RESEND_FROM_EMAIL: z.string().email(),
+  RESEND_FROM_EMAIL: senderAddress,
   ADMIN_EMAILS: z.string().min(1),
   CRON_SECRET: z.string().min(16),
 });

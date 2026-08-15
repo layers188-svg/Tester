@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1200" viewBox="0 0 1000 1200">
+  <title>House Dark — Approved HD Monogram</title>
+  <desc>House Dark monogram variation II: shared axis / wrapped counter.</desc>
+
+  <!-- Transparent background -->
+
+  <g fill="none" stroke="#E9E0D0" stroke-linecap="square" stroke-linejoin="round">
+    <!-- Shared central spine -->
+    <path d="M555 165 L555 925" stroke-width="24"/>
+    <path d="M505 165 L605 165" stroke-width="13"/>
+    <path d="M505 925 L605 925" stroke-width="13"/>
+
+    <!-- H left stem -->
+    <path d="M330 315 L330 760" stroke-width="24"/>
+    <path d="M290 315 L370 315" stroke-width="13"/>
+    <path d="M290 760 L370 760" stroke-width="13"/>
+
+    <!-- H crossbar -->
+    <path d="M330 535 L555 535" stroke-width="24"/>
+
+    <!-- Wrapped D counter -->
+    <path d="M555 300
+             C705 315, 790 405, 790 540
+             C790 675, 705 765, 555 780"
+          stroke-width="24"/>
+  </g>
+
+  <!-- Registration rule -->
+  <line x1="480" y1="1040" x2="630" y2="1040"
+        stroke="#65131F" stroke-width="12" stroke-linecap="square"/>
+</svg>

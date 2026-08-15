@@ -1,0 +1,181 @@
+/*
+ * The archive. Fine rules and vertical rhythm, no cards — design
+ * system: "It must feel like an archive, not a CMS table", and no
+ * poster wall.
+ */
+
+.archive {
+  margin-top: var(--hd-space-5);
+}
+
+.searchRow {
+  margin-bottom: var(--hd-space-5);
+}
+
+.search {
+  width: 100%;
+  min-height: var(--hd-touch-min);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hd-rule-strong);
+  padding: var(--hd-space-2) 0;
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-body);
+  color: var(--hd-ink);
+}
+
+.search::placeholder {
+  color: var(--hd-ink-muted);
+  opacity: 0.7;
+}
+
+.empty {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  color: var(--hd-ink-muted);
+  padding: var(--hd-space-6) 0;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * The record. Closed it is a row; open it is the same row, grown. The
+ * neighbours are pushed by the growth rather than covered by it, which
+ * is what "surrounding records make room" means.
+ */
+.record {
+  border-bottom: 1px solid var(--hd-rule);
+  transition: padding var(--hd-motion-slow) var(--hd-ease-long);
+}
+
+.record[data-open="true"] {
+  padding: var(--hd-space-4) 0;
+  border-bottom-color: var(--hd-accent);
+}
+
+.recordButton {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-4);
+  width: 100%;
+  min-height: var(--hd-touch-min);
+  padding: var(--hd-space-4) 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.recordText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-1);
+  min-width: 0;
+}
+
+/*
+ * The title is the object that persists and grows — it is the same
+ * element in both states (motion system §14: "title persists").
+ */
+.recordTitle {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-body);
+  line-height: 1.2;
+  color: var(--hd-ink);
+  transform-origin: left center;
+  transition:
+    font-size var(--hd-motion-slow) var(--hd-ease-long),
+    color var(--hd-motion-standard) var(--hd-ease-house);
+}
+
+.record[data-open="true"] .recordTitle {
+  font-size: var(--hd-size-title);
+}
+
+.recordMeta {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+}
+
+/* Metadata resolves after the main title movement. */
+.detail {
+  padding: 0 0 var(--hd-space-4);
+  animation: detail-resolve var(--hd-motion-slow) var(--hd-motion-fast) var(--hd-ease-house) both;
+}
+
+.detail[hidden] {
+  display: none;
+}
+
+@keyframes detail-resolve {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sixWords {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  line-height: 1.35;
+  color: var(--hd-ink);
+}
+
+.sealedNote {
+  margin: 0 0 var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+}
+
+.detailActions {
+  display: flex;
+  gap: var(--hd-space-4);
+  flex-wrap: wrap;
+}
+
+.detailLink {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: var(--hd-touch-min);
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record,
+  .recordTitle,
+  .detail {
+    transition: none;
+    animation: none;
+  }
+}
+
+:root[data-reduced-motion="true"] .record,
+:root[data-reduced-motion="true"] .recordTitle,
+:root[data-reduced-motion="true"] .detail {
+  transition: none;
+  animation: none;
+}

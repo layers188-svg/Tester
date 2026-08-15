@@ -14,19 +14,27 @@ describe("countWords", () => {
 });
 
 describe("validateSixWords", () => {
-  it("accepts exactly six words", () => {
+  it("accepts six words", () => {
     const result = validateSixWords("I did not see that coming");
     expect(result.valid).toBe(true);
     expect(result.wordCount).toBe(6);
   });
 
-  it("rejects fewer than six words", () => {
-    const result = validateSixWords("Too short");
-    expect(result.valid).toBe(false);
-    expect(result.error).toMatch(/more word/);
+  // Handover §3: "Allow 1 to 6 words, optional." A reaction that took
+  // fewer words is not a malformed reaction.
+  it("accepts anything from one word up to six", () => {
+    for (const body of [
+      "Devastating",
+      "Still counting",
+      "Ambition is cruelty",
+      "He never once looked away",
+      "Left the room still counting time",
+    ]) {
+      expect(validateSixWords(body).valid).toBe(true);
+    }
   });
 
-  it("rejects more than six words", () => {
+  it("rejects the seventh word", () => {
     const result = validateSixWords("This sentence definitely has way too many words");
     expect(result.valid).toBe(false);
     expect(result.error).toMatch(/too many/);
