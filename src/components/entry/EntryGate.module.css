@@ -1,0 +1,44 @@
+/*
+ * The House opening from a horizontal slit — the second half of the
+ * enter transition (motion system §5). The composition comes into
+ * focus from the centre line, rather than fading up.
+ */
+
+.house {
+  clip-path: inset(50% 0 50% 0);
+  opacity: 0;
+  transition:
+    clip-path var(--hd-motion-cinematic) var(--hd-ease-long),
+    opacity var(--hd-motion-slow) var(--hd-ease-house);
+}
+
+.house[data-open="true"] {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+}
+
+/*
+ * Once open, the clip must go entirely. A clip-path of inset(0) still
+ * establishes a containing block for fixed positioning, which would
+ * pin the app's fixed navigation to this element instead of the
+ * viewport. `none` is the only value that does not.
+ */
+.house[data-open="true"] {
+  animation: release-clip 1ms var(--hd-motion-cinematic) forwards;
+}
+
+@keyframes release-clip {
+  to {
+    clip-path: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .house {
+    transition: none;
+  }
+}
+
+:root[data-reduced-motion="true"] .house {
+  transition: none;
+}

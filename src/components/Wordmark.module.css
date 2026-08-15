@@ -13,8 +13,8 @@
   display: block;
   height: 1.1em;
   width: auto;
-  /* 1800 × 420 from the approved file. */
-  aspect-ratio: 1800 / 420;
+  /* The approved file's 1800 × 420, widened to 1835 to fit a real word space, keeping the 70-unit margins. */
+  aspect-ratio: 1835 / 420;
   overflow: visible;
 }
 

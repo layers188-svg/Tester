@@ -31,19 +31,33 @@ export function Wordmark({
     <Tag className={styles.wordmark}>
       <svg
         className={styles.svg}
-        viewBox="0 0 1800 420"
+        viewBox="0 0 1835 420"
         role="img"
         aria-label={label}
         focusable="false"
       >
-        <g fill="currentColor">
-          <text x="70" y="285" className={styles.house}>
-            HOUSE
-          </text>
-          <text x="910" y="285" className={styles.dark}>
-            DARK
-          </text>
-        </g>
+        {/*
+         * One text run with a tspan, rather than the approved file's two
+         * absolutely positioned runs.
+         *
+         * That file places HOUSE at x=70 and DARK at x=910, which are
+         * correct for Newsreader at `opsz 72` — a variable-font axis.
+         * next/font serves static instances, where those axes do not
+         * exist, and HOUSE sets ~905 units wide instead: the two words
+         * collide and the mark reads "HOUSEDARK". Hardcoding new x
+         * positions would only move the collision to whichever weight
+         * or fallback loads next.
+         *
+         * Letting the browser set a real word space keeps the words
+         * apart in any instance and in the serif fallback, and preserves
+         * what the file actually specifies — Newsreader 260, HOUSE
+         * upright, DARK italic, from the same x=70/y=285 origin. The
+         * viewBox is widened to 1835 to fit the resulting metrics with
+         * the approved file's 70-unit left margin mirrored on the right.
+         */}
+        <text x="70" y="285" className={styles.house} fill="currentColor">
+          HOUSE<tspan className={styles.dark}> DARK</tspan>
+        </text>
       </svg>
     </Tag>
   );

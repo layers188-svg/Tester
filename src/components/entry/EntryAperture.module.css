@@ -1,0 +1,311 @@
+/*
+ * The projection aperture. Warm light on a near-black ground, a mask
+ * over the approved wordmark, and one line of copy.
+ *
+ * Explicitly not here (motion system §5 "Do not"): film scratches,
+ * sepia, Super 8 jitter, film burn, projector icons, countdown leader,
+ * vintage clichés, heavy grain.
+ */
+
+.entry {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--hd-projection-black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hd-space-6);
+  padding: var(--hd-space-6) var(--hd-space-4);
+  overflow: hidden;
+
+  /* The light's position, moved a little by the pointer. */
+  --light-x: 50%;
+  --light-y: 50%;
+  /* How wide the field is, and how strong. Both open over the timeline. */
+  --light-r: 8%;
+  --light-strength: 0;
+
+  transition:
+    clip-path var(--hd-motion-slow) var(--hd-ease-long),
+    opacity var(--hd-motion-standard) var(--hd-ease-house);
+}
+
+/* 0 to 300ms: pure dark, no UI chrome. */
+.entry[data-phase="dark"] {
+  --light-r: 6%;
+  --light-strength: 0;
+}
+
+/* 300 to 1100ms: the light gently catches. */
+.entry[data-phase="light"] {
+  --light-r: 30%;
+  --light-strength: 0.75;
+}
+
+/* 1100ms on: it settles. */
+.entry[data-phase="settled"] {
+  --light-r: 46%;
+  --light-strength: 1;
+}
+
+/*
+ * Enter: the light narrows and concentrates, then the aperture closes
+ * cleanly around the lit field.
+ */
+.entry[data-phase="closing"] {
+  --light-r: 14%;
+  --light-strength: 1;
+  clip-path: circle(9% at 50% 50%);
+}
+
+/* True black hold. */
+.entry[data-phase="held"] {
+  --light-r: 0%;
+  --light-strength: 0;
+  clip-path: circle(0% at 50% 50%);
+}
+
+.field {
+  position: relative;
+  width: min(100%, 46rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--hd-space-6) 0;
+}
+
+/*
+ * The wordmark, revealed by the light rather than faded in. The mask is
+ * the whole trick: the identity stays exactly as drawn and the field
+ * decides how much of it has been found.
+ */
+.markLayer {
+  position: relative;
+  z-index: 2;
+  color: var(--hd-stock-cream);
+  font-size: clamp(1.75rem, 9vw, 4.5rem);
+
+  -webkit-mask-image: radial-gradient(
+    circle var(--light-r) at var(--light-x) var(--light-y),
+    #000 0%,
+    #000 55%,
+    rgba(0, 0, 0, 0.25) 82%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle var(--light-r) at var(--light-x) var(--light-y),
+    #000 0%,
+    #000 55%,
+    rgba(0, 0, 0, 0.25) 82%,
+    transparent 100%
+  );
+
+  transition:
+    -webkit-mask-image var(--hd-motion-cinematic) var(--hd-ease-long),
+    mask-image var(--hd-motion-cinematic) var(--hd-ease-long);
+}
+
+/* Restrained bloom. A light source, not a glow effect. */
+.bloom {
+  position: absolute;
+  inset: -40%;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--light-r) at var(--light-x) var(--light-y),
+    rgba(233, 224, 208, calc(0.1 * var(--light-strength))) 0%,
+    rgba(185, 161, 108, calc(0.07 * var(--light-strength))) 38%,
+    rgba(149, 100, 51, calc(0.03 * var(--light-strength))) 62%,
+    transparent 80%
+  );
+  transition: background var(--hd-motion-cinematic) var(--hd-ease-long);
+}
+
+/*
+ * Dust, and only inside the light field — which is why it is masked by
+ * the same gradient rather than laid over the whole screen. Extremely
+ * subtle: it should read as air, and never as grain.
+ */
+.dust {
+  position: absolute;
+  inset: -40%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: calc(0.5 * var(--light-strength));
+  background-image:
+    radial-gradient(circle 1px at 18% 26%, rgba(233, 224, 208, 0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 63% 14%, rgba(233, 224, 208, 0.36) 0%, transparent 100%),
+    radial-gradient(circle 1px at 81% 58%, rgba(233, 224, 208, 0.42) 0%, transparent 100%),
+    radial-gradient(circle 1px at 34% 71%, rgba(233, 224, 208, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 1px at 52% 44%, rgba(233, 224, 208, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 1px at 9% 62%, rgba(233, 224, 208, 0.28) 0%, transparent 100%),
+    radial-gradient(circle 1px at 73% 83%, rgba(233, 224, 208, 0.34) 0%, transparent 100%);
+
+  -webkit-mask-image: radial-gradient(
+    circle var(--light-r) at var(--light-x) var(--light-y),
+    #000 0%,
+    transparent 85%
+  );
+  mask-image: radial-gradient(
+    circle var(--light-r) at var(--light-x) var(--light-y),
+    #000 0%,
+    transparent 85%
+  );
+
+  animation: dust-drift 26s linear infinite;
+  transition: opacity var(--hd-motion-cinematic) var(--hd-ease-long);
+}
+
+@keyframes dust-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-3%, -5%, 0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Copy — minimal, because the optical behaviour is the hook            */
+/* ------------------------------------------------------------------ */
+
+.copy {
+  text-align: center;
+  max-width: 26rem;
+}
+
+.kicker,
+.line {
+  margin: 0;
+  opacity: 0;
+  transition: opacity var(--hd-motion-cinematic) var(--hd-ease-house);
+}
+
+.kicker[data-visible="true"],
+.line[data-visible="true"] {
+  opacity: 1;
+}
+
+.kicker {
+  margin-bottom: var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.line {
+  font-family: var(--hd-font-editorial);
+  font-size: var(--hd-size-heading);
+  color: var(--hd-ink);
+}
+
+/* ------------------------------------------------------------------ */
+/* Actions                                                              */
+/* ------------------------------------------------------------------ */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hd-space-4);
+  opacity: 0;
+  transform: translateY(10px);
+  /*
+   * 1100ms (settled) + 300ms delay = on screen from 1400ms, which is
+   * the milestone in §5 — "After 1400 ms ENTER IN THE DARK can appear".
+   */
+  transition:
+    opacity var(--hd-motion-slow) 300ms var(--hd-ease-house),
+    transform var(--hd-motion-slow) 300ms var(--hd-ease-house);
+  pointer-events: none;
+}
+
+.actions[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.enter {
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-7);
+  background: transparent;
+  border: 1px solid var(--hd-accent);
+  border-radius: 0;
+  color: var(--hd-accent);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--hd-motion-fast) var(--hd-ease-house),
+    color var(--hd-motion-fast) var(--hd-ease-house);
+}
+
+.enter:hover {
+  background: var(--hd-accent);
+  color: var(--hd-projection-black);
+}
+
+.aside {
+  background: none;
+  border: none;
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  cursor: pointer;
+}
+
+.aside:hover {
+  color: var(--hd-ink);
+}
+
+/*
+ * Reduced motion: the House is already lit and already open. Every
+ * state the sequence would have arrived at is present from the first
+ * frame — nothing is skipped, only the travel between them.
+ */
+/*
+ * The [data-phase] rules above are attribute selectors, so a bare
+ * `.entry` here would lose to them — a media query adds no specificity.
+ * These have to match on the attribute too.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .entry[data-phase] {
+    --light-r: 140%;
+    --light-strength: 1;
+    transition: none;
+  }
+  .markLayer,
+  .bloom,
+  .dust,
+  .kicker,
+  .line,
+  .actions {
+    transition: none;
+  }
+  .dust {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+:root[data-reduced-motion="true"] .entry[data-phase] {
+  --light-r: 140%;
+  --light-strength: 1;
+  transition: none;
+}
+
+:root[data-reduced-motion="true"] .dust {
+  animation: none;
+  opacity: 0;
+}
