@@ -23,7 +23,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <footer className={styles.footer}>
         <div className={styles.footerBrand}>
           <Wordmark />
-          <p className={styles.footerNote}>Find the joy in not knowing.</p>
+          <p className={styles.footerNote}>Get the excitement of not knowing back.</p>
         </div>
         <nav className={styles.footerNav} aria-label="Legal">
           <Link href="/how-it-works">How it works</Link>

@@ -147,7 +147,13 @@ export function Entrance({ testKey }: { testKey: string | null }) {
 
       <div className={styles.content}>
         <p className={styles.eyebrow}>A private film club</p>
-        <h1 className={styles.headline}>Find the joy in not knowing.</h1>
+        {/*
+         * An offer, not an instruction. "Find the joy" tells a visitor
+         * what to feel; "get it back" says they already had it and
+         * something took it, which is the actual pitch. Changed by
+         * direction on 15 August.
+         */}
+        <h1 className={styles.headline}>Get the excitement of not knowing back.</h1>
         {/*
           Two lines, not four. The old copy argued against trailers,
           reviews, clips and consensus, which made the entrance a

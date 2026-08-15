@@ -3,8 +3,7 @@ import { Entrance } from "@/components/marketing/Entrance";
 
 export const metadata: Metadata = {
   title: "House Dark · a private film club",
-  description:
-    "A film club built around knowing less before you watch. Find the joy in not knowing.",
+  description: "One film. A few friends. Nobody knows.",
 };
 
 /**

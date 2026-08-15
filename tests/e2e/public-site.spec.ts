@@ -2,8 +2,9 @@ import { test, expect } from "@playwright/test";
 
 const PUBLIC_PAGES = [
   // The brand line, which is now the entrance headline rather than an
-  // argument against trailers and reviews.
-  { path: "/", heading: /find the joy in not knowing/i },
+  // argument against trailers and reviews. An offer rather than an
+  // instruction since 15 August.
+  { path: "/", heading: /get the excitement of not knowing back/i },
   { path: "/how-it-works", heading: /how it works/i },
   { path: "/join", heading: /join or sign in/i },
   { path: "/terms", heading: /terms/i },
@@ -76,4 +77,49 @@ test.describe("signed-in routes redirect when unauthenticated", () => {
     await page.goto("/desk");
     await expect(page).toHaveURL(/\/join\?next=\/desk$/);
   });
+});
+
+/**
+ * No em or en dashes in anything a member reads.
+ *
+ * The house rule is about interface copy, so this tests rendered text
+ * rather than source: comments and docs are explicitly unaffected, and
+ * a grep over the repository would fail on both while missing anything
+ * a component builds at runtime.
+ *
+ * Visible text and the accessibility tree only. A dash inside a URL,
+ * a class name or a data attribute is not something anybody reads.
+ */
+test.describe("no em or en dashes in rendered copy", () => {
+  for (const { path } of PUBLIC_PAGES) {
+    test(`${path} recasts rather than punctuates`, async ({ page }) => {
+      await page.goto(path);
+
+      const visibleText = await page.evaluate(() => document.body.innerText);
+      const labels = await page.evaluate(() =>
+        [...document.querySelectorAll("[aria-label],[alt],[title]")]
+          .flatMap((el) => [
+            el.getAttribute("aria-label"),
+            el.getAttribute("alt"),
+            el.getAttribute("title"),
+          ])
+          .filter((value): value is string => Boolean(value))
+          .join(" "),
+      );
+      const documentTitle = await page.title();
+      const metaDescription = await page
+        .locator('meta[name="description"]')
+        .getAttribute("content");
+
+      const read = [visibleText, labels, documentTitle, metaDescription ?? ""].join(" ");
+
+      // Reported together: fixing one dash and rerunning to find the
+      // next is how a sweep gets abandoned half done.
+      const offenders = [...read].filter((character) => character === "—" || character === "–");
+      expect(
+        offenders,
+        `found ${offenders.length} em/en dash(es) in rendered copy on ${path}`,
+      ).toEqual([]);
+    });
+  }
 });
