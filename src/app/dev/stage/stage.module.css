@@ -1,0 +1,46 @@
+/* Dev chrome only. Nothing here is part of the House. */
+
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-2);
+  padding: var(--hd-space-2) var(--hd-space-3);
+  background: rgba(3, 3, 3, 0.92);
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.barLabel {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+  margin-right: var(--hd-space-2);
+}
+
+.barButton {
+  background: none;
+  border: 1px solid var(--hd-rule);
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px var(--hd-space-3);
+  cursor: pointer;
+}
+
+.barButton[data-active="true"] {
+  color: var(--hd-projection-black);
+  background: var(--hd-accent);
+  border-color: var(--hd-accent);
+}
+
+.main {
+  padding-top: 3rem;
+}

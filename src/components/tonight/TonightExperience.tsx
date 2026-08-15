@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { Countdown } from "@/components/Countdown";
 import { MINIMUM_ACCESS_LABEL, PLAYBACK_ACCESS_LABEL } from "@/lib/labels";
 import { isRoomOpen } from "@/lib/opening/eligibility";
+import { noTrailerUrl } from "@/lib/media/storage";
 import { NoTrailerPlayer } from "./NoTrailerPlayer";
 import { SealedFrame } from "./SealedFrame";
 import { SixWordsAfter } from "./SixWordsAfter";
@@ -206,12 +207,12 @@ export function TonightExperience({
 
         {shown === "no_trailer" && (
           <NoTrailerPlayer
-            src={publicStorageUrl(opening.noTrailerStoragePath)}
+            src={noTrailerUrl(opening.noTrailerStoragePath)}
             posterSrc={
-              opening.noTrailerPosterPath ? publicStorageUrl(opening.noTrailerPosterPath) : null
+              opening.noTrailerPosterPath ? noTrailerUrl(opening.noTrailerPosterPath) : null
             }
             captionsSrc={
-              opening.noTrailerCaptionsPath ? publicStorageUrl(opening.noTrailerCaptionsPath) : null
+              opening.noTrailerCaptionsPath ? noTrailerUrl(opening.noTrailerCaptionsPath) : null
             }
             onEnded={handleNoTrailerEnded}
           />
@@ -346,10 +347,4 @@ export function TonightExperience({
       )}
     </div>
   );
-}
-
-/** `path` is the object name within the public "no-trailer" Storage bucket — never a descriptive filename (brief §12). */
-function publicStorageUrl(path: string): string {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  return `${base}/storage/v1/object/public/no-trailer/${path}`;
 }
