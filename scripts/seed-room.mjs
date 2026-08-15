@@ -300,6 +300,21 @@ async function seed() {
         body: response.body,
         word_count: countWords(response.body),
         visibility: "circle",
+        /*
+         * Tagged, so it can never be mistaken for a member.
+         *
+         * These ten are invented people with invented reactions, which
+         * working rule 5 forbids outright and the 15 August brief
+         * repeats under "do not introduce". They exist so the Room can
+         * be judged as a design before there are members in it, and
+         * that is a reason to mark them, not a reason they are allowed.
+         *
+         * `source` (migration 0024) is what makes them removable:
+         *   delete from six_word_reviews where source = 'preview';
+         * removes every one without touching a real response. Do that
+         * before a member ever reads this Room.
+         */
+        source: "preview",
       }),
     );
 
