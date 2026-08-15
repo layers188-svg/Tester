@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { EntryAperture } from "./EntryAperture";
 import apertureStyles from "./EntryAperture.module.css";
@@ -68,6 +68,31 @@ export function EntryGate({ children }: { children: React.ReactNode }) {
   const showEntry = isEntryRoute && !seen;
   const dismiss = useCallback(() => markSeen(), []);
 
+  /*
+   * The House is hidden from assistive tech only once we know the
+   * aperture in front of it is real.
+   *
+   * Rendering `aria-hidden` from the server looked equivalent and was
+   * not: with scripting off, the noscript rule below makes the House
+   * visible again, but no rule can undo an aria-hidden attribute — so a
+   * screen reader was handed a page with nothing in it. Setting it here
+   * means the markup that ships has no aria-hidden at all, and the
+   * attribute only ever appears alongside a working overlay.
+   */
+  const houseRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const house = houseRef.current;
+    if (!house) return;
+    if (showEntry) {
+      house.setAttribute("aria-hidden", "true");
+      house.setAttribute("inert", "");
+    } else {
+      house.removeAttribute("aria-hidden");
+      house.removeAttribute("inert");
+    }
+  }, [showEntry]);
+
   return (
     <>
       {/*
@@ -83,7 +108,7 @@ export function EntryGate({ children }: { children: React.ReactNode }) {
         <style>{`.${apertureStyles.entry}{display:none!important}.${styles.house}{clip-path:none!important;opacity:1!important}`}</style>
       </noscript>
       {showEntry && <EntryAperture onDismiss={dismiss} />}
-      <div className={styles.house} data-open={!showEntry} aria-hidden={showEntry}>
+      <div ref={houseRef} className={styles.house} data-open={!showEntry}>
         {children}
       </div>
     </>

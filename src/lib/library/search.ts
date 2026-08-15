@@ -12,7 +12,7 @@ import type { LibraryItem } from "@/lib/supabase/types";
  * the member has not revealed. The safe RPCs only populate `title` for
  * rows the caller personally revealed, so matching on `title` alone
  * cannot leak — but "Opening 7" must also not become a way to ask
- * "which opening was Whiplash", so an unrevealed row matches on its
+ * "which film was Opening 7", so an unrevealed row matches on its
  * opening number and returns without a title, exactly as it renders.
  */
 

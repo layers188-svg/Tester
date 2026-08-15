@@ -7,6 +7,30 @@ Each item says exactly what to do, not a general setup lecture.
 
 ---
 
+## 0. Film metadata provider — the only new external blocker
+
+The August handover asks the Library to "add a watched film from a broad
+metadata catalogue", and Trust Us to draw its recommendations from real
+film metadata rather than hand-written records.
+
+Everything around it is built and running: `add_library_film()` accepts a
+title and year today, and `film_house_records` holds the editorial
+six-word line per film with its own Programming Desk screen at
+`/desk/records`. What is missing is a catalogue to search.
+
+**Do:** pick a provider (TMDB is the usual one for this) and create an
+API key. It stays server side.
+
+**Then give me:** the key, as `TMDB_API_KEY` or equivalent. It slots in
+ahead of the existing calls — a provider search replaces the two inputs
+in the add-film form and the Desk record form, and nothing downstream
+changes.
+
+Until then the House works: a member types a title, and an owner writes
+the editorial line. Nothing is a placeholder and nothing is faked.
+
+---
+
 ## 1. Supabase project — blocks everything
 
 Nothing touching the database, auth or storage can be verified until this

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { skipEntryCeremony } from "./helpers";
 
 const PUBLIC_PAGES = [
   { path: "/", heading: /best film experiences/i },
@@ -13,6 +14,12 @@ const PUBLIC_PAGES = [
 const FORBIDDEN_TITLE = "Whiplash";
 
 test.describe("public site — mobile viewport", () => {
+  // "/" opens behind the projection aperture. These tests are about the
+  // pages behind it; the entry itself is covered in motion.spec.ts.
+  test.beforeEach(async ({ page }) => {
+    await skipEntryCeremony(page);
+  });
+
   for (const { path, heading } of PUBLIC_PAGES) {
     test(`${path} renders and carries no forbidden title`, async ({ page }) => {
       const response = await page.goto(path);

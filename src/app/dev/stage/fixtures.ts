@@ -16,8 +16,20 @@ import type { LibraryItem, RoomVoice } from "@/lib/supabase/types";
  * are the handover's placeholders.
  */
 
-/** The protected title. It is in the fixture reveal payload and nowhere else. */
-export const STAGE_TITLE = "Whiplash";
+/**
+ * The simulator's protected title.
+ *
+ * Deliberately a title that does not exist. The fixtures used the seed
+ * film's real title, and a production build shipped it inside a client
+ * chunk — the route 404s, but the JavaScript is still downloadable, and
+ * "client JS payloads" is the first place the spoiler rules put off
+ * limits. A title nobody is protecting cannot leak.
+ *
+ * It works exactly as well as a canary: the leak tests assert that
+ * whatever the reveal route returns does not appear before the reveal,
+ * and that property does not care which title it is.
+ */
+export const STAGE_TITLE = "Sundown Arcadia";
 
 export const stageOpening: OpeningSafe = {
   id: "00000000-0000-4000-8000-000000000001",

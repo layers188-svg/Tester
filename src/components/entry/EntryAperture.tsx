@@ -169,9 +169,17 @@ export function EntryAperture({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className={styles.entry} data-phase={shown} role="dialog" aria-label="Enter House Dark">
       <div className={styles.field} ref={fieldRef}>
-        {/* The wordmark is always here and always crisp; the light decides how much of it you see. */}
+        {/*
+         * The wordmark is always here and always crisp; the light
+         * decides how much of it you see.
+         *
+         * Not a heading. A wordmark is the identity, not the page's
+         * title — and the House underneath already has an h1, so making
+         * this one too would put two on the page. The aperture names
+         * itself through role="dialog" and its label.
+         */}
         <div className={styles.markLayer}>
-          <Wordmark tag="h1" />
+          <Wordmark />
         </div>
         <div className={styles.bloom} aria-hidden="true" />
         <div className={styles.dust} aria-hidden="true" />
