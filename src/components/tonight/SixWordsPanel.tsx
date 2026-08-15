@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getBrowserSupabase } from "@/lib/supabase/browser";
+import Link from "next/link";
 import { countWords, validateSixWords, withinEditWindow } from "@/lib/validation/six-words";
+import { MOTION, motionDuration } from "@/lib/motion";
 import { Button } from "@/components/Button";
+import { WordSlots } from "./WordSlots";
 import styles from "./SixWordsPanel.module.css";
 
 interface OwnReview {
@@ -15,55 +17,74 @@ interface OwnReview {
 interface SixWordsPanelProps {
   target: { openingId: string } | { sealedRecommendationId: string };
   initialOwnReview: OwnReview | null;
+  /**
+   * Fired when the member publishes, so the screen around this one can
+   * change without a reload.
+   */
+  onPublished?: () => void;
+  /**
+   * Offered when the member can reasonably move on without writing.
+   * Absent means there is nowhere for them to go yet.
+   */
+  onSkip?: () => void;
 }
 
-interface OtherWord {
-  id: string;
-  body: string;
-}
+/** The submission moment, in the order the member sees it. */
+type Stage = "writing" | "settling" | "yours" | "open";
 
 /**
- * Brief §7 "Six words": the member writes before seeing anyone else's
- * response. Others stay hidden until the member has their own on
- * record — enforced here in the UI and, independently, by
- * can_view_six_word_review in Postgres RLS (never trust the browser
- * alone for that boundary).
+ * Six words, written before the member has read anybody else's.
+ *
+ * This screen used to end with a list of everyone else's words directly
+ * underneath the form. That was the whole product backwards: the member
+ * could read the room with their own words still uncommitted in the
+ * field above. Others now live only in the Room, which is a separate
+ * page reachable only from the end of this sequence.
+ *
+ * The rule is still enforced twice over. `can_view_six_word_review` in
+ * RLS and `get_after_credits` in migration 0017 both refuse to return
+ * anyone else's words to a member who has not published, so removing
+ * the list here is a product decision resting on a database guarantee,
+ * not the guarantee itself.
  */
-export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) {
+export function SixWordsPanel({
+  target,
+  initialOwnReview,
+  onPublished,
+  onSkip,
+}: SixWordsPanelProps) {
   const [own, setOwn] = useState(initialOwnReview);
   const [draft, setDraft] = useState(initialOwnReview?.body ?? "");
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [others, setOthers] = useState<OtherWord[] | null>(null);
+  const [stage, setStage] = useState<Stage>("writing");
 
   const validation = validateSixWords(draft);
   const wordCount = countWords(draft);
 
+  // The Room is per opening. A sealed recommendation has no room to
+  // enter, so its sequence stops at "your words are in".
+  const openingId = "openingId" in target ? target.openingId : null;
+
+  /**
+   * The sequence, once the words are saved:
+   *
+   *   settling  the six words hold, the house dims around them
+   *   yours     a brass rule draws, then "Your words are in."
+   *   open      "The room is open", and a way into it
+   *
+   * Each beat is a state rather than a nested timeout, so leaving
+   * halfway through cancels cleanly and nothing fires into an unmounted
+   * component.
+   */
   useEffect(() => {
-    if (!own) return;
-    let cancelled = false;
-    async function loadOthers() {
-      const supabase = getBrowserSupabase();
-      let query = supabase
-        .from("six_word_reviews")
-        .select("id, body")
-        .eq("moderation_state", "visible")
-        .neq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "");
-
-      query =
-        "openingId" in target
-          ? query.eq("opening_id", target.openingId)
-          : query.eq("sealed_recommendation_id", target.sealedRecommendationId);
-
-      const { data } = await query;
-      if (!cancelled) setOthers((data ?? []).map((row) => ({ id: row.id, body: row.body })));
-    }
-    void loadOthers();
-    return () => {
-      cancelled = true;
-    };
-  }, [own, target]);
+    if (stage === "writing" || stage === "open") return;
+    const next = stage === "settling" ? "yours" : "open";
+    const wait = stage === "settling" ? MOTION.transform : MOTION.holdLong;
+    const timer = setTimeout(() => setStage(next), motionDuration(wait));
+    return () => clearTimeout(timer);
+  }, [stage]);
 
   async function submit() {
     setError(null);
@@ -79,9 +100,12 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
         body: JSON.stringify({
           id: own?.id,
           body: validation.normalized,
-          ...("openingId" in target
-            ? { openingId: target.openingId }
-            : { sealedRecommendationId: target.sealedRecommendationId }),
+          ...(openingId
+            ? { openingId }
+            : {
+                sealedRecommendationId: (target as { sealedRecommendationId: string })
+                  .sealedRecommendationId,
+              }),
         }),
       });
       if (!res.ok) {
@@ -90,6 +114,10 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
       }
       const saved = await res.json();
       setOwn({ id: saved.id, body: saved.body, createdAt: saved.created_at });
+      onPublished?.();
+      // Editing an existing review is a correction, not the moment. Only
+      // a first publication earns the sequence.
+      setStage(editing ? "writing" : "settling");
       setEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -105,41 +133,99 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
       await fetch(`/api/six-words/${own.id}`, { method: "DELETE" });
       setOwn(null);
       setDraft("");
-      setOthers(null);
+      setStage("writing");
     } finally {
       setBusy(false);
     }
   }
 
-  if (!own || editing) {
+  // ------------------------------------------------------------------
+  // The submission moment.
+  // ------------------------------------------------------------------
+  if (own && stage !== "writing") {
     return (
-      <div className={styles.panel}>
-        <h3>Six words</h3>
-        <p className={styles.hint}>
-          Write what you felt. Exactly six words. You will see it before anyone else&rsquo;s.
-        </p>
-        <textarea
-          className={styles.textarea}
-          rows={2}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder="Six words, exactly."
-        />
-        <div className={styles.meta}>
-          <span>{wordCount} / 6 words</span>
-          {error && <span className={styles.error}>{error}</span>}
-        </div>
-        <Button variant="primary" onClick={submit} disabled={busy || !validation.valid}>
-          {busy ? "Saving…" : "Leave your six words"}
-        </Button>
-      </div>
+      <section className={styles.moment} data-stage={stage} aria-live="polite">
+        <p className={styles.momentWords}>{own.body}</p>
+
+        <span className={styles.momentRule} aria-hidden="true" />
+
+        {stage !== "settling" && <p className={styles.momentSaid}>Your words are in.</p>}
+
+        {stage === "open" && (
+          <div className={styles.momentOpen}>
+            <p className={styles.momentRoom}>The room is open</p>
+            {openingId ? (
+              <Button variant="primary" href={`/room/${openingId}`}>
+                Enter the room
+              </Button>
+            ) : (
+              // A sealed recommendation is between two people. There is
+              // no room of strangers to open, and pretending otherwise
+              // would promise a screen that does not exist.
+              <p className={styles.momentPrivate}>
+                This one was sent to you alone, so it stays between you and the sender.
+              </p>
+            )}
+          </div>
+        )}
+      </section>
     );
   }
 
+  // ------------------------------------------------------------------
+  // Writing.
+  // ------------------------------------------------------------------
+  if (!own || editing) {
+    return (
+      <section className={styles.panel}>
+        <p className={styles.eyebrow}>Six words after the picture</p>
+        <p className={styles.lead}>Leave the first thought that stayed with you.</p>
+
+        <WordSlots
+          value={draft}
+          onChange={setDraft}
+          disabled={busy}
+          invalid={Boolean(error)}
+          describedBy={error ? "six-words-count six-words-error" : "six-words-count"}
+        />
+
+        <div className={styles.meta}>
+          <span id="six-words-count">{wordCount} of 6 words</span>
+          {error && (
+            <span className={styles.error} id="six-words-error" role="alert">
+              {error}
+            </span>
+          )}
+        </div>
+
+        <Button variant="primary" fullWidth onClick={submit} disabled={busy || !validation.valid}>
+          {busy ? "Leaving your words…" : "Leave my six words"}
+        </Button>
+
+        {/*
+          Not everybody has something to say, and a film met in silence
+          is still a film met. Skipping costs nothing and takes nothing
+          away: the Room stays shut, because the rule is that your words
+          come before anyone else's, not that you are made to have any.
+          The prompt is still here whenever they come back.
+        */}
+        {onSkip && !editing && (
+          <button type="button" className={styles.skip} onClick={onSkip}>
+            Skip for now
+          </button>
+        )}
+      </section>
+    );
+  }
+
+  // ------------------------------------------------------------------
+  // Already published, arriving fresh.
+  // ------------------------------------------------------------------
   return (
-    <div className={styles.panel}>
-      <h3>Your six words</h3>
-      <p className={styles.ownWord}>&ldquo;{own.body}&rdquo;</p>
+    <section className={styles.panel}>
+      <p className={styles.eyebrow}>Your six words</p>
+      <p className={styles.ownWord}>{own.body}</p>
+
       <div className={styles.ownActions}>
         {withinEditWindow(own.createdAt) && (
           <button type="button" className={styles.linkButton} onClick={() => setEditing(true)}>
@@ -151,20 +237,11 @@ export function SixWordsPanel({ target, initialOwnReview }: SixWordsPanelProps) 
         </button>
       </div>
 
-      <div className={styles.afterCredits}>
-        <h3>After Credits</h3>
-        {others === null ? (
-          <p className={styles.hint}>Loading the conversation…</p>
-        ) : others.length === 0 ? (
-          <p className={styles.hint}>Nobody else has spoken yet. You are first.</p>
-        ) : (
-          <ul className={styles.words}>
-            {others.map((word) => (
-              <li key={word.id}>&ldquo;{word.body}&rdquo;</li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
+      {openingId && (
+        <Link href={`/room/${openingId}`} className={styles.roomLink}>
+          Enter the room
+        </Link>
+      )}
+    </section>
   );
 }

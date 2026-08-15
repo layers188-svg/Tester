@@ -1,0 +1,258 @@
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.lead {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.25rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-7);
+}
+
+/*
+ * The member's own words, first and unmistakably theirs. Set larger
+ * than anyone else's on the page — not as a ranking, but because this
+ * is the one response they already know they agree with, and the page
+ * is arranged around it.
+ */
+.mine {
+  margin-bottom: var(--hd-space-7);
+}
+
+.mineLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+/*
+ * The member's own words, and the last position of a single object.
+ *
+ * They are written in the six slots, they hold alone in the submission
+ * moment, they sit under "Your six words" on the House, and they arrive
+ * here at the top of the Room. `hd-my-six-words` makes all four the
+ * same element to the browser, so the words travel to their place
+ * rather than the page cutting to a copy of them.
+ *
+ * This depends on the body being in the server-rendered HTML. It used
+ * to arrive with the after-credits fetch, which meant the Room's first
+ * paint had a loading line where the anchor should be and the
+ * transition had nothing to match.
+ */
+.mineBody {
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(1.625rem, 5.5vw, 2.125rem);
+  line-height: 1.2;
+  color: var(--hd-ink);
+  margin: 0;
+  text-wrap: balance;
+  view-transition-name: hd-my-six-words;
+}
+
+.rule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  opacity: 0.7;
+  transform-origin: left;
+  margin-bottom: var(--hd-space-6);
+  animation: expand var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+}
+
+@keyframes expand {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
+}
+
+.fromLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-4);
+}
+
+/*
+ * Two views, set as type rather than as a segmented control. A pill
+ * switch would be the one piece of stock app furniture on the page.
+ */
+.views {
+  display: flex;
+  gap: var(--hd-space-5);
+  margin-bottom: var(--hd-space-6);
+}
+
+.view {
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: var(--hd-space-2) 0;
+  min-height: var(--hd-touch-min);
+  cursor: pointer;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.view[data-active="true"] {
+  color: var(--hd-ink);
+  border-bottom-color: var(--hd-accent);
+}
+
+.view:hover {
+  color: var(--hd-ink);
+}
+
+/*
+ * The responses.
+ *
+ * No cards, no borders around anything, no avatars. A page of
+ * quotations: the words carry, the name is a credit line underneath in
+ * the smallest type on the screen, and the space between entries is
+ * what makes each one land separately.
+ */
+.responses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * A response is the visual material of this page.
+ *
+ * There are no posters here and there never will be, so the only thing
+ * the Room has to compose with is what people wrote and how it is set.
+ * That means scale and position have to do the work an image would
+ * otherwise do — which is the whole reason the page can be interesting
+ * without borrowing anybody's artwork.
+ *
+ * Three rules, all by position, all stable for a given room:
+ *
+ *   every 4n+1  set a step larger, as the page's punctuation
+ *   every 3n    closed with a hairline
+ *   every 4n+3  indented, so the column has an edge rather than a wall
+ *
+ * Stable matters as much as controlled. Randomising per render would
+ * make the same response a different size on every visit, and the page
+ * would flicker between shapes for no reason a member could name.
+ */
+.response {
+  padding: var(--hd-space-6) 0;
+}
+
+.response:nth-child(4n + 3) {
+  padding-left: var(--hd-space-6);
+}
+
+.response:nth-child(3n)::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 1px;
+  background: var(--hd-rule);
+  margin-top: var(--hd-space-6);
+}
+
+.body {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-3);
+  text-wrap: pretty;
+  /* Six words at most, so the line can be given room to be a line
+     rather than a paragraph. */
+  max-width: 24ch;
+}
+
+.response:nth-child(4n + 1) .body {
+  font-size: 1.875rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 30rem) {
+  .body {
+    font-size: 1.75rem;
+  }
+
+  .response:nth-child(4n + 1) .body {
+    font-size: 2.25rem;
+  }
+}
+
+/*
+ * Desktop lets the quotations be quotations.
+ *
+ * The page was an editorial measure on a phone and the same measure on
+ * a laptop, which made a room of ten people look like a narrow list. It
+ * is still a single column — a grid would turn responses into cards and
+ * invite comparison, which is the thing this page exists to avoid — but
+ * the column is wider and the type is larger, so the words are the
+ * object rather than the container.
+ */
+@media (min-width: 60rem) {
+  .body {
+    font-size: 2.125rem;
+  }
+
+  .response:nth-child(4n + 1) .body {
+    font-size: 3rem;
+  }
+
+  .response:nth-child(4n + 3) {
+    padding-left: var(--hd-space-8);
+  }
+
+  .response {
+    padding-top: var(--hd-space-7);
+    padding-bottom: var(--hd-space-7);
+  }
+}
+
+/* The credit, and it stays a credit. */
+.who {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.66rem;
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+.quiet {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--hd-ink-muted);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.loading {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  color: var(--hd-ink-muted);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+}

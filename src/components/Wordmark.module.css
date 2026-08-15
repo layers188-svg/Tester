@@ -1,12 +1,31 @@
+/*
+ * Set to match public/brand/wordmark.svg, which is the approved
+ * artwork. Four things changed when that arrived, and each was a
+ * difference from the identity rather than a matter of taste:
+ *
+ *   - Case. The approved wordmark is HOUSE DARK, not House Dark. Done
+ *     with text-transform so the accessible name stays "House Dark".
+ *   - Weight 400, not 500.
+ *   - Letter-spacing negative, not positive. The artwork sets -2 at
+ *     260px, which is -0.0077em.
+ *   - One ink colour. The placeholder set DARK in brass; the approved
+ *     wordmark does not, and brass is a registration colour rather than
+ *     a highlight (brief §8).
+ *
+ * Set as HTML text rather than the SVG on purpose: an SVG does not
+ * carry its font, so <img src="wordmark.svg"> falls back to whatever
+ * serif is to hand. Newsreader is self-hosted for the page, so the text
+ * renders in the real face — and stays selectable and responsive.
+ */
 .wordmark {
   font-family: var(--hd-font-editorial);
-  font-weight: 500;
+  font-weight: 400;
   font-size: var(--hd-size-heading);
-  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  letter-spacing: -0.0077em;
   color: var(--hd-ink);
 }
 
 .dark {
   font-style: italic;
-  color: var(--hd-accent);
 }

@@ -2,17 +2,25 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { validateCues } from "@/lib/validation/cues";
+import { validateRecommendationNote } from "@/lib/validation/six-words";
 import { enqueueNotification } from "@/lib/email/queue";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
 const schema = z.object({
   filmTitle: z.string().trim().min(1).max(200),
   releaseYear: z.number().int().min(1888).max(2100).nullable().optional(),
   runtimeMinutes: z.number().int().min(1).max(1000),
   recipientIds: z.array(z.string().uuid()).min(1),
-  personalNote: z.string().trim().max(500).nullable().optional(),
+  // Length is checked here only as a cheap upper bound; the word
+  // count is enforced below with the same function the form uses.
+  personalNote: z.string().trim().max(200).nullable().optional(),
   cues: z.array(z.string().trim().max(24)).max(3).optional(),
   scheduledFor: z.string().datetime().nullable().optional(),
   circleId: z.string().uuid().nullable().optional(),
+  // Brief §16 rule 3. Minted per compose by the client; a repeat of the
+  // same key returns the recommendation already sent rather than
+  // sending a second one.
+  idempotencyKey: z.string().uuid().optional(),
 });
 
 /**
@@ -36,24 +44,44 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Check the form and try again." }, { status: 400 });
   }
 
+  // Acceptance criterion 8: a private recommendation carries no more
+  // than six words. Enforced server-side regardless of the form.
+  const noteValidation = validateRecommendationNote(parsed.data.personalNote ?? "");
+  if (!noteValidation.valid) {
+    return NextResponse.json({ error: noteValidation.error }, { status: 422 });
+  }
+
   const cueValidation = validateCues(parsed.data.cues ?? []);
   if (!cueValidation.valid) {
     return NextResponse.json({ error: cueValidation.error }, { status: 400 });
   }
 
-  const { data: recommendationId, error } = await supabase.rpc("create_sealed_recommendation", {
+  const { data, error } = await supabase.rpc("create_sealed_recommendation", {
     p_film_title: parsed.data.filmTitle,
     p_release_year: parsed.data.releaseYear ?? null,
     p_runtime_minutes: parsed.data.runtimeMinutes,
     p_recipient_ids: parsed.data.recipientIds,
-    p_personal_note: parsed.data.personalNote ?? null,
+    p_personal_note: noteValidation.normalized || null,
     p_cues: cueValidation.cues,
     p_scheduled_for: parsed.data.scheduledFor ?? null,
     p_circle_id: parsed.data.circleId ?? null,
+    p_idempotency_key: parsed.data.idempotencyKey ?? null,
   });
 
-  if (error || !recommendationId) {
+  const [result] = data ?? [];
+  if (error || !result) {
     return NextResponse.json({ error: error?.message ?? "Could not send that." }, { status: 400 });
+  }
+  const recommendationId = result.recommendation_id;
+
+  // A replayed send is reported as success — the recommendation exists
+  // and the member's intent was honoured — but nothing after this point
+  // runs again: no second email, no second analytics event.
+  if (!result.created) {
+    return NextResponse.json(
+      { id: recommendationId },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   const { data: profile } = await supabase
@@ -71,6 +99,12 @@ export async function POST(request: Request) {
       }),
     ),
   );
+
+  // Brief §15 event 10. This route holds the most dangerous payload in
+  // the product — a plain-text film title the sender typed. None of it
+  // travels: no title, no personal note, no recipient list, and no
+  // recommendation id, which would join straight back to the film.
+  await recordAnalyticsEvent({ event: "recommendation_sent", actorId: user.id });
 
   return NextResponse.json({ id: recommendationId }, { headers: { "Cache-Control": "no-store" } });
 }

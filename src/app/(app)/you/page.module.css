@@ -3,3 +3,42 @@
   max-width: var(--hd-max-width);
   margin: 0 auto;
 }
+
+/*
+ * The Programming Desk, as a tool rather than a tab.
+ *
+ * Set quietly at the foot of Me: an owner knows it is there and a
+ * member never sees it. It was in the tab bar, where "Desk" beside
+ * Tonight, Search, Circle, Library and Me read as debug UI somebody
+ * forgot to remove.
+ */
+.desk {
+  margin-top: var(--hd-space-7);
+  padding-top: var(--hd-space-5);
+  border-top: 1px solid var(--hd-rule);
+}
+
+.deskLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.deskLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hd-touch-min);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-accent);
+  transition: opacity var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.deskLink:hover {
+  opacity: 0.75;
+}

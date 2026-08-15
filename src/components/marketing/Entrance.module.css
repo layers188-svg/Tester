@@ -1,0 +1,278 @@
+/*
+ * The entrance. House Black, one shaft of light, one way in.
+ *
+ * The light is built from two layers that share a position: a warm
+ * glow, and a mask that lets the monogram and one phrase show only
+ * where the light falls. Both are driven by --lx / --ly, set on the
+ * field by an eased rAF loop, so the CSS here has no animation of its
+ * own to fight with.
+ */
+
+.field {
+  --lx: 50%;
+  --ly: 44%;
+  --lw: 30vmax;
+  --lh: 40vmax;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: calc(100dvh - 4.5rem);
+  display: grid;
+  align-items: center;
+  padding: var(--hd-space-8) var(--hd-space-4);
+  background: var(--hd-projection-black);
+}
+
+/* Opening the entry widens the shaft, as if the door has been pushed
+   further open. Nothing else moves. */
+.field.open {
+  --lw: 46vmax;
+  --lh: 72vmax;
+}
+
+.light,
+.field.open {
+  transition:
+    --lw var(--hd-motion-reveal) var(--hd-ease-standard),
+    --lh var(--hd-motion-reveal) var(--hd-ease-standard);
+}
+
+@property --lw {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 30vmax;
+}
+
+@property --lh {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 40vmax;
+}
+
+.light {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/*
+ * The warm falloff. Patina Brass at low alpha, tilted slightly off
+ * vertical so it reads as light entering a room rather than a
+ * spotlight aimed at the viewer.
+ */
+.light::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    ellipse var(--lw) var(--lh) at var(--lx) var(--ly),
+    rgba(185, 161, 108, 0.2) 0%,
+    rgba(185, 161, 108, 0.085) 40%,
+    rgba(185, 161, 108, 0) 74%
+  );
+  transform: rotate(-9deg);
+}
+
+/*
+ * What the light catches. Masked to the same ellipse, so the monogram
+ * and the phrase are fragments rather than a logo and a caption.
+ *
+ * The phrase is held in the lower third rather than centred: centred,
+ * it landed underneath the headline and neither could be read.
+ */
+.lit {
+  position: absolute;
+  inset: 0;
+  color: var(--hd-stock-cream);
+  -webkit-mask-image: radial-gradient(
+    ellipse var(--lw) var(--lh) at var(--lx) var(--ly),
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 42%,
+    transparent 76%
+  );
+  mask-image: radial-gradient(
+    ellipse var(--lw) var(--lh) at var(--lx) var(--ly),
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 42%,
+    transparent 76%
+  );
+}
+
+.monogram {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  width: min(78vmin, 40rem);
+  height: auto;
+  opacity: 0.34;
+}
+
+.phrase {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(3rem, 12vh, 7rem);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 90vw;
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  font-size: clamp(1.1rem, 3.2vw, 1.6rem);
+  color: var(--hd-stock-cream);
+  margin: 0;
+  text-align: center;
+  opacity: 0.9;
+  animation: phrase-in var(--hd-motion-reveal) var(--hd-ease-standard);
+}
+
+@keyframes phrase-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+/* ---- Content, never masked ----------------------------------------- */
+
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 36rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-5);
+}
+
+.headline {
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(2rem, 6.5vw, 3.25rem);
+  line-height: 1.08;
+  margin: 0 0 var(--hd-space-5);
+  text-wrap: balance;
+  color: var(--hd-ink);
+}
+
+.body {
+  color: var(--hd-ink-muted);
+  margin: 0 auto var(--hd-space-7);
+  max-width: 34rem;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hd-space-4);
+}
+
+@media (min-width: 30rem) {
+  .actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--hd-touch-min);
+  padding: var(--hd-space-3) var(--hd-space-6);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.82rem;
+  border-radius: 2px;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--hd-motion-button) var(--hd-ease-standard),
+    color var(--hd-motion-button) var(--hd-ease-standard),
+    border-color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.primary {
+  background: var(--hd-accent);
+  color: var(--hd-house-black);
+  border: 1px solid var(--hd-accent);
+}
+
+.secondary {
+  background: transparent;
+  color: var(--hd-ink-muted);
+  border: 1px solid var(--hd-rule-strong);
+}
+
+.primary:hover {
+  background: var(--hd-ink);
+  border-color: var(--hd-ink);
+}
+
+.secondary:hover {
+  color: var(--hd-ink);
+  border-color: var(--hd-ink);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: 2px solid var(--hd-focus);
+  outline-offset: 3px;
+}
+
+.entry {
+  text-align: left;
+  max-width: 26rem;
+  margin: 0 auto;
+  animation: entry-in var(--hd-motion-reveal) var(--hd-ease-standard);
+}
+
+@keyframes entry-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- Reduced motion ------------------------------------------------- */
+
+/*
+ * A static light treatment: the shaft sits where it falls, does not
+ * follow the pointer, and the phrase does not cycle. Still one phrase,
+ * still one light, just held still.
+ */
+.field.still {
+  --lx: 50%;
+  --ly: 40%;
+}
+
+.field.still .phrase,
+.field.still .entry {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .light,
+  .field.open,
+  .phrase,
+  .entry,
+  .primary,
+  .secondary {
+    transition: none;
+    animation: none;
+  }
+}

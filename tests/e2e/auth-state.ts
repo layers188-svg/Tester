@@ -1,0 +1,84 @@
+import path from "node:path";
+
+/**
+ * Where the global setup writes the signed-in browser states, and the
+ * personas it writes them for.
+ *
+ * These files hold real session cookies. They are gitignored and
+ * regenerated on every run — never commit one, and never point a run at
+ * a project you care about (see global-setup.ts).
+ */
+export const AUTH_DIR = path.join(process.cwd(), "tests", "e2e", ".auth");
+
+export const PERSONAS = {
+  /** In ADMIN_EMAILS, so this one reaches the Programming Desk. */
+  owner: "owner",
+  /** An ordinary member: the one most journeys run as. */
+  member: "member",
+  /** A second member, for anything needing two people in a Circle. */
+  friend: "friend",
+  /**
+   * A complete Library record, and left alone.
+   *
+   * Revealed the fixture opening, watched it and wrote six words about
+   * it, so its Library holds a record with detail to open. It exists
+   * because the personas that already had one are both moving targets:
+   * `expendable` is deleted by the account-deletion journey, and
+   * `friend` gains its six words partway through the six-words journey.
+   * A test that reads a Library needs a Library that is standing still.
+   */
+  archivist: "archivist",
+  /**
+   * Revealed, and left alone.
+   *
+   * The House journeys assert what a member sees *before* they watch or
+   * speak, so they need an account whose Tonight state nothing else
+   * moves. `friend` cannot be it: the six-words journey publishes as
+   * friend, and the two raced for the same starting state.
+   */
+  returning: "returning",
+  /**
+   * Deleted by the account-deletion journey, which is the point. It has
+   * its own persona because that journey destroys the account it runs
+   * as, and files run in parallel — sharing `member` would pull the
+   * ground out from under whatever else was mid-flight.
+   */
+  expendable: "expendable",
+} as const;
+
+export type Persona = (typeof PERSONAS)[keyof typeof PERSONAS];
+
+/**
+ * Ids of the accounts this run created, written by the setup.
+ *
+ * The teardown cannot always look them up: the account-deletion journey
+ * deletes its own persona, and the audit row that records the deletion
+ * outlives it with a null actor. Without the id written down there is
+ * nothing left to match that row on.
+ */
+export const PERSONA_IDS_FILE = path.join(AUTH_DIR, "persona-ids.json");
+
+/**
+ * Row counts taken before the run, for the teardown to compare against.
+ *
+ * Counting every audit_log row and calling any of them residue only
+ * works while the project is empty. The moment Logan approves an
+ * opening the count is legitimately non-zero, and a check that cannot
+ * tell his rows from the suite's would cry wolf forever. A baseline
+ * can: what matters is whether the run left *more* behind than it
+ * found.
+ */
+export const BASELINE_FILE = path.join(AUTH_DIR, "baseline.json");
+
+export function storageStateFor(persona: Persona): string {
+  return path.join(AUTH_DIR, `${persona}.json`);
+}
+
+/**
+ * Addresses the setup creates. The prefix is deliberate: it makes every
+ * account this suite invents obvious in an auth table at a glance, and
+ * gives the teardown something unambiguous to match on.
+ */
+export function emailFor(persona: Persona): string {
+  return `e2e-${persona}@housedark.test`;
+}

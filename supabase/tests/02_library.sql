@@ -135,13 +135,13 @@ declare
   v_error text;
 begin
   begin
-    select create_sealed_recommendation(
+    select recommendation_id into v_rec_id from create_sealed_recommendation(
       'A Film The Member Chose', 2001, 118,
       array['33333333-3333-4333-8333-333333333333']::uuid[],
       'Watch it on a big screen.',
       array['Rain', 'Trains']::text[],
       null, null
-    ) into v_rec_id;
+    );
   exception when others then
     v_ok := false;
     v_error := sqlerrm;
@@ -344,13 +344,13 @@ declare
   v_cue_count integer;
 begin
   begin
-    select create_sealed_recommendation(
+    select recommendation_id into v_rec_id from create_sealed_recommendation(
       'A Film With Repeated Cues', 1999, 100,
       array['33333333-3333-4333-8333-333333333333']::uuid[],
       null,
       array['Rain', 'Rain', 'Trains']::text[],
       null, null
-    ) into v_rec_id;
+    );
   exception when others then
     v_ok := false;
     v_error := sqlerrm;

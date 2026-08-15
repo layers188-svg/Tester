@@ -53,9 +53,15 @@ function setReducedMotion(matches: boolean) {
   });
 }
 
-function render(onComplete = vi.fn()) {
+function render(onComplete = vi.fn(), fallbackCues: string[] = []) {
   act(() => {
-    root.render(<NoTrailerPlayer src="https://example.test/abc.mp4" onComplete={onComplete} />);
+    root.render(
+      <NoTrailerPlayer
+        src="https://example.test/abc.mp4"
+        fallbackCues={fallbackCues}
+        onComplete={onComplete}
+      />,
+    );
   });
   return onComplete;
 }
@@ -191,7 +197,7 @@ describe("NoTrailerPlayer — completion and failure", () => {
   });
 
   it("offers a retry on playback failure and never reveals anything", () => {
-    render();
+    render(vi.fn(), ["Tempo", "Ambition"]);
     const video = container.querySelector("video")!;
     act(() => {
       video.dispatchEvent(new Event("error"));
@@ -200,6 +206,41 @@ describe("NoTrailerPlayer — completion and failure", () => {
     expect(buttonLabels()).toContain("Try again");
     // Brief §7 rule 8: a broken video must never reveal a title.
     expect(container.textContent).not.toMatch(/whiplash/i);
-    expect(container.textContent).toMatch(/could not play/i);
+    expect(container.textContent).toMatch(/will not play/i);
+  });
+
+  it("falls back to the safe cues rather than leaving the member with nothing", () => {
+    // A failed asset must still let the night continue: the same cues
+    // the sealed card showed, and a way forward that is not the title.
+    const onComplete = render(vi.fn(), ["Tempo", "Ambition", "Cruelty"]);
+    act(() => {
+      container.querySelector("video")!.dispatchEvent(new Event("error"));
+    });
+
+    for (const cue of ["Tempo", "Ambition", "Cruelty"]) {
+      expect(container.textContent).toContain(cue);
+    }
+    clickButton("Continue");
+    expect(onComplete).toHaveBeenCalledOnce();
+  });
+
+  it("stops the sample at ten seconds even when the asset runs longer", () => {
+    const onComplete = render();
+    const video = container.querySelector("video")!;
+    Object.defineProperty(video, "duration", { value: 45, configurable: true });
+
+    act(() => {
+      Object.defineProperty(video, "currentTime", { value: 4, configurable: true });
+      video.dispatchEvent(new Event("timeupdate"));
+    });
+    expect(buttonLabels()).not.toContain("Replay");
+
+    act(() => {
+      Object.defineProperty(video, "currentTime", { value: 10.2, configurable: true });
+      video.dispatchEvent(new Event("timeupdate"));
+    });
+    // Ended without the media itself ending: the cap did it.
+    expect(buttonLabels()).toContain("Replay");
+    expect(onComplete).not.toHaveBeenCalled();
   });
 });

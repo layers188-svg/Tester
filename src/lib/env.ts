@@ -9,15 +9,79 @@ import { z } from "zod";
  * §9 for the required variable list.
  */
 
+/**
+ * A sender address in either form Resend accepts: a bare
+ * `hello@example.com`, or `House Dark <hello@example.com>`. The second
+ * is what members actually see in an inbox, and it is the shape
+ * `.env.example` hands out — a plain `z.string().email()` rejects it,
+ * so following the documented setup would stop the app booting.
+ */
+export function parseSenderAddress(value: string): string | null {
+  const named = /^[^<>]*<([^<>]+)>$/.exec(value.trim());
+  const address = (named ? named[1] : value).trim();
+  return z.string().email().safeParse(address).success ? address : null;
+}
+
+const senderEmail = z.string().refine((value) => parseSenderAddress(value) !== null, {
+  message: 'must be an email address, optionally as "House Dark <hello@example.com>"',
+});
+
 const serverSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   RESEND_API_KEY: z.string().min(1),
-  RESEND_FROM_EMAIL: z.string().email(),
+  RESEND_FROM_EMAIL: senderEmail,
   ADMIN_EMAILS: z.string().min(1),
   CRON_SECRET: z.string().min(16),
+
+  /**
+   * TESTING ONLY — the key that unlocks the sign-in bypass. Absent in a
+   * normal deployment, and the bypass does not exist without it.
+   *
+   * It exists because no sign-in code can currently be delivered at
+   * all: Supabase's free tier rate-limits its built-in email to a
+   * couple of messages an hour (`429 over_email_send_rate_limit`) and
+   * refuses to edit the Magic Link template while that provider is in
+   * use, so the email carries a link rather than the six-digit
+   * `{{ .Token }}` the form asks for. `signInWithOtp` throws on the
+   * 429, stranding the form on its first step — the code screen could
+   * not be reached even with a valid code in hand.
+   *
+   * Deliberately NOT `NEXT_PUBLIC_`. The key never enters the client
+   * bundle; `/join` decides whether to offer the bypass from a `?k=`
+   * query parameter, and `/api/test-signin` is what actually checks the
+   * value. So a visitor with no link sees an ordinary join page with no
+   * bypass, no banner, and nothing advertising that either exists —
+   * which is what the 13 August review calls for under launch safety.
+   *
+   * It is still an authentication bypass for whoever holds the link:
+   * they can sign in as any address, including one in ADMIN_EMAILS,
+   * which carries the Programming Desk and protected title data.
+   * Tolerable only while the project holds no real members. Remove it
+   * when custom SMTP lands — LAUNCH_CHECKLIST item 2.
+   */
+  TEST_SIGNIN_KEY: z.string().min(16).optional(),
+
+  /**
+   * Search's two outside services, both optional.
+   *
+   * Optional is the design, not a shortcut. Without TMDB_API_KEY Search
+   * runs against a small local catalogue; without ANTHROPIC_API_KEY it
+   * serves only films the house has already written up. Every other
+   * part of the feature — caching, the exactly-six-word rule, the whole
+   * journey — behaves identically either way, so Search can be reviewed
+   * before anyone signs up for anything, and a key that expires
+   * narrows the catalogue instead of taking a navigation tab down.
+   *
+   * Neither is NEXT_PUBLIC_. Both are read only in server modules
+   * (`src/lib/films/*`, all marked `server-only`), so no key and no
+   * part of the editorial prompt reaches the browser.
+   */
+  TMDB_API_KEY: z.string().min(1).optional(),
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  ANTHROPIC_MODEL: z.string().min(1).optional(),
 });
 
 const clientSchema = serverSchema.pick({

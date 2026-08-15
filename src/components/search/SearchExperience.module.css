@@ -1,0 +1,418 @@
+/*
+ * Search, in the same visual language as the clue: black canvas, one
+ * dominant idea, a lot of air. The page starts nearly empty on purpose
+ * — a poster wall or a row of popular titles would be the product
+ * telling the member what to want, which is the thing House Dark is
+ * built against.
+ */
+.search,
+.film {
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-8);
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.heading {
+  font-size: var(--hd-size-display);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.lead {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.25rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-7);
+}
+
+/*
+ * A rule with type on it, not a rounded box with a magnifying glass.
+ * The field is the one interactive thing on an otherwise empty screen,
+ * so it earns its prominence from position and scale rather than from
+ * chrome.
+ */
+.field {
+  position: relative;
+  border-bottom: 1px solid var(--hd-rule-strong);
+  transition: border-color var(--hd-motion-panel) var(--hd-ease-standard);
+}
+
+.field:focus-within {
+  border-bottom-color: var(--hd-accent);
+}
+
+.input {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--hd-ink);
+  font-family: var(--hd-font-editorial);
+  /* 1rem minimum or iOS zooms the page on focus. */
+  font-size: clamp(1.25rem, 5vw, 1.75rem);
+  line-height: 1.3;
+  padding: var(--hd-space-3) 0;
+  min-height: var(--hd-touch-min);
+}
+
+.input::placeholder {
+  color: rgba(233, 224, 208, 0.35);
+}
+
+.input:focus {
+  outline: none;
+}
+
+/*
+ * The ring is for keyboard focus only.
+ *
+ * `:focus-within` fires on a tap and on a click too, so the ring was
+ * drawing a rectangle around the field the instant anybody touched it
+ * — which is the boxy SaaS search component this design is trying not
+ * to be. `:has(:focus-visible)` narrows it to the case the ring exists
+ * for: someone navigating without a pointer, who needs to be told
+ * where they are. The brass underline already answers the tap.
+ */
+.field:has(:focus-visible) {
+  outline: 2px solid var(--hd-focus);
+  outline-offset: 10px;
+}
+
+.input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/*
+ * Results arrive as a group. One transition on the list, not one per
+ * row: staggering eight titles makes a member wait to read a year.
+ */
+/*
+ * The rows that were not chosen.
+ *
+ * Named so they leave as a group and as a collapse rather than a fade:
+ * the list closes upward while the chosen title travels out of it,
+ * which is what makes the choice look like a reduction rather than a
+ * page swap. See ::view-transition-old below.
+ */
+.results {
+  view-transition-name: hd-search-results;
+  list-style: none;
+  margin: var(--hd-space-5) 0 0;
+  padding: 0;
+  opacity: 0;
+  transform: translate3d(0, calc(var(--hd-stage-rise) * -1), 0);
+  transition:
+    opacity var(--hd-motion-fast) var(--hd-ease-standard),
+    transform var(--hd-motion-fast) var(--hd-ease-entering);
+}
+
+.results[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+.result {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--hd-space-4);
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--hd-rule);
+  padding: var(--hd-space-4) 0;
+  min-height: var(--hd-touch-min);
+  cursor: pointer;
+  text-align: left;
+  color: var(--hd-ink);
+  transition: border-color var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.result:hover,
+.result:focus-visible {
+  border-bottom-color: var(--hd-accent);
+}
+
+.result:active {
+  opacity: 0.7;
+}
+
+.resultTitle {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.resultYear {
+  font-family: var(--hd-font-utility);
+  /*
+   * Barely tracked. The 0.14em the rest of the utility type uses put a
+   * visible gap inside four digits — "2 014" — which reads as a typo
+   * rather than as a year, and the year is the only thing telling two
+   * films with the same name apart.
+   */
+  letter-spacing: 0.02em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.nothing,
+.opening {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-5) 0 0;
+}
+
+.footnote {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-8) 0 0;
+  line-height: 1.8;
+}
+
+.footnoteLink {
+  color: var(--hd-accent);
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * The film.
+ *
+ * The chosen title is the same object the member tapped, continuing.
+ * It arrives already in place; only the material underneath it builds.
+ * ---------------------------------------------------------------------
+ */
+/*
+ * The chosen title, which is the row the member touched.
+ *
+ * `hd-search-title` is the other half of the pairing set up in
+ * SearchExperience.tsx: the browser sees one title that changed size
+ * and position rather than a list disappearing and a heading being
+ * drawn. `settle` is the fallback for browsers with no view
+ * transitions, and is suppressed while one runs or the title would
+ * arrive twice.
+ */
+.filmTitle {
+  view-transition-name: hd-search-title;
+  font-size: var(--hd-size-display);
+  margin: 0 0 var(--hd-space-2);
+  text-wrap: balance;
+  animation: settle var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+}
+
+:root:active-view-transition .filmTitle {
+  animation: none;
+}
+
+.facts {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  /* Loose enough to read as a label, tight enough that "2014" stays
+     one number. See .resultYear. */
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+  animation: settle var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-stage-step);
+}
+
+/* The brass rule extends, and the premise is uncovered behind it. */
+.rule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: left;
+  opacity: 0.7;
+  margin-bottom: var(--hd-space-5);
+  animation: extend var(--hd-motion-slow) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 2);
+}
+
+@keyframes extend {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--hd-stage-rise), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * The hero. One sentence, revealed as one thought behind a mask rather
+ * than typed out — the six words are editorial writing, not a machine
+ * thinking aloud.
+ */
+.premise {
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(1.75rem, 6.5vw, 2.5rem);
+  line-height: 1.2;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-7);
+  text-wrap: balance;
+  animation: uncover var(--hd-motion-slow) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 3);
+}
+
+@keyframes uncover {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+.orientation {
+  display: grid;
+  gap: var(--hd-space-5);
+  margin: 0 0 var(--hd-space-6);
+  animation: settle var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 5);
+}
+
+@media (min-width: 30rem) {
+  .orientation {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--hd-space-4);
+  }
+}
+
+.orientation dt {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  border-top: 1px solid var(--hd-rule);
+  padding-top: var(--hd-space-3);
+  margin-bottom: var(--hd-space-3);
+}
+
+.orientation dd {
+  margin: 0;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.78rem;
+  color: var(--hd-ink);
+}
+
+.territory {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hd-space-2) var(--hd-space-4);
+}
+
+.notes {
+  margin-bottom: var(--hd-space-6);
+}
+
+.notesButton {
+  background: none;
+  border: 1px solid var(--hd-rule-strong);
+  border-radius: var(--hd-radius-control);
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--hd-size-micro);
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-4);
+  cursor: pointer;
+}
+
+.notesBody {
+  margin-top: var(--hd-space-3);
+  font-size: var(--hd-size-small);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hd-space-3);
+  margin-bottom: var(--hd-space-6);
+  animation: settle var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 6);
+}
+
+.again {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: var(--hd-touch-min);
+  cursor: pointer;
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  transition: color var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.again:hover {
+  color: var(--hd-ink);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: var(--hd-space-4) 0 0;
+}
+
+/*
+ * The unselected results collapsing.
+ *
+ * `scaleY` from the top edge, so the list folds up toward the search
+ * field it came from. Declared at the top level of the module because
+ * ::view-transition pseudo-elements live on the document root and are
+ * not scoped to any component's DOM.
+ */
+:global(::view-transition-old(hd-search-results)) {
+  animation: hd-collapse-results var(--hd-motion-standard) var(--hd-ease-standard) both;
+  transform-origin: top center;
+}
+
+:global(::view-transition-new(hd-search-results)) {
+  animation: none;
+}
+
+@keyframes hd-collapse-results {
+  to {
+    opacity: 0;
+    transform: scaleY(0.7) translate3d(0, -12px, 0);
+  }
+}

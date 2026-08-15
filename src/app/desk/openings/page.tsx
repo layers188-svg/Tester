@@ -5,7 +5,7 @@ import { listDeskOpenings } from "@/lib/desk/queries";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Openings — Programming Desk" };
+export const metadata: Metadata = { title: "Openings · Programming Desk" };
 
 export default async function DeskOpeningsPage() {
   const supabase = await getServerSupabase();
@@ -35,7 +35,7 @@ export default async function DeskOpeningsPage() {
               <td>
                 <Link href={`/desk/openings/${o.id}`}>{o.openingNumber}</Link>
               </td>
-              <td>{o.filmTitle ?? "—"}</td>
+              <td>{o.filmTitle ?? "–"}</td>
               <td className={styles.status} data-status={o.status}>
                 {o.status}
               </td>

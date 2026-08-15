@@ -1,13 +1,21 @@
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 
-This licence covers the Newsreader and Barlow Condensed typefaces used
-by House Dark, self hosted via next/font (build brief §8). Both are
-distributed under the SIL Open Font License, Version 1.1.
+This licence covers the Newsreader, Barlow and Barlow Condensed
+typefaces used by House Dark, self hosted via next/font (build brief
+§8). All three are distributed under the SIL Open Font License,
+Version 1.1.
+
+It is not only a citation. The woff2 binaries are committed to this
+repository, in `src/fonts/`, so House Dark redistributes these faces
+rather than merely downloading them — which OFL 1.1 permits, and which
+is why this file travels with them. Barlow was left out of the list
+above until 14 August; it was added for body copy and the licence note
+was not updated with it.
 
 Newsreader — Copyright 2019 The Newsreader Project Authors
 (https://github.com/productiontype/Newsreader)
 
-Barlow Condensed — Copyright 2017 The Barlow Project Authors
+Barlow and Barlow Condensed — Copyright 2017 The Barlow Project Authors
 (https://github.com/jpt/barlow)
 
 -----------------------------------------------------------

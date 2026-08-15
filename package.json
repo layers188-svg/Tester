@@ -19,7 +19,8 @@
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare deploy",
-    "test:rls": "bash scripts/test-rls.sh"
+    "test:rls": "bash scripts/test-rls.sh",
+    "smoke:remote": "node scripts/smoke-remote.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
@@ -42,6 +43,7 @@
     "eslint-config-next": "16.3.0",
     "jsdom": "^30.0.1",
     "prettier": "^3.9.6",
+    "supabase": "^2.113.0",
     "typescript": "^5",
     "vitest": "^4.1.10",
     "wrangler": "^4.120.1"

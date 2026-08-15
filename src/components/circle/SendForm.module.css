@@ -74,6 +74,8 @@
 .checkbox input {
   width: 18px;
   height: 18px;
+  /* Otherwise the browser paints its own blue. See YouForm.module.css. */
+  accent-color: var(--hd-accent);
 }
 
 .circleTag {
@@ -92,4 +94,140 @@
   font-family: var(--hd-font-editorial);
   font-style: italic;
   font-size: 1.25rem;
+}
+
+/* The seal as the recipient will meet it. Oxblood, like the sealed card
+   everywhere else, so the sender recognises what they are sending. */
+.preview {
+  border: 1px solid var(--hd-oxblood);
+  background: color-mix(in srgb, var(--hd-oxblood) 14%, var(--hd-projection-black));
+  padding: var(--hd-space-5);
+  margin: var(--hd-space-5) 0;
+  text-align: center;
+}
+
+.previewLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.66rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-4);
+}
+
+.previewFrom {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.125rem;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.previewNote {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-4);
+}
+
+.previewCues {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--hd-space-2);
+  margin: 0 0 var(--hd-space-4);
+  padding: 0;
+}
+
+.previewCues li {
+  border: 1px solid rgba(233, 224, 208, 0.3);
+  border-radius: 999px;
+  padding: var(--hd-space-2) var(--hd-space-4);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: var(--hd-ink-muted);
+}
+
+.previewCues li[data-empty="true"] {
+  border-style: dashed;
+  color: rgba(233, 224, 208, 0.4);
+}
+
+.previewSeal {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.previewNothing {
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * Sent.
+ *
+ * The form contracts into the seal rather than being replaced by a line
+ * of text. A receipt tells a member the request succeeded; this tells
+ * them what happened to the film — it closed, and somebody else now has
+ * to open it.
+ *
+ * The seal draws itself shut: the arcs come together and the rule
+ * settles, which is SEAL run in the opposite direction from the one the
+ * recipient will see. Then it stops. Nothing pulses, nothing ticks.
+ * ---------------------------------------------------------------------
+ */
+.sentStage {
+  min-height: 50dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hd-space-5);
+}
+
+.sentSeal {
+  width: 4rem;
+  height: 4rem;
+  animation: hd-seal-close var(--hd-motion-unseal) var(--hd-ease-entering) backwards;
+}
+
+@keyframes hd-seal-close {
+  from {
+    /* Arriving from the open state, so the closing is visible as a
+       movement rather than as a graphic that was always shut. */
+    transform: scale(1.15);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.confirmation {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: 0;
+  animation: hd-sent-said var(--hd-motion-standard) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-motion-unseal);
+}
+
+@keyframes hd-sent-said {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

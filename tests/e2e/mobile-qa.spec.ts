@@ -86,6 +86,50 @@ test.describe("reduced motion", () => {
   });
 });
 
+test.describe("form errors reach assistive technology", () => {
+  // Brief §16 accessibility rule 8. Join is the only form reachable
+  // without a session, and it is the first one every member meets.
+  test("a rejected email marks the input invalid and names the reason", async ({ page }) => {
+    // The rejection is forced rather than provoked. Submitting a
+    // deliberately bad address only produces an error if the backend
+    // refuses it — so against a placeholder project this passed because
+    // the request could not be made at all, and against a real one it
+    // failed, because Supabase accepts the address and sends a code.
+    // A test whose result depends on whether the backend is reachable
+    // is testing the backend, not this form. It also stopped the suite
+    // posting sign-in attempts at whatever project happens to be
+    // configured.
+    await page.route("**/auth/v1/otp**", (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "invalid_request", error_description: "Email not allowed." }),
+      }),
+    );
+
+    await page.goto("/join");
+    await page.getByLabel("Email").fill("someone@example.com");
+    await page.getByRole("button", { name: /send my code/i }).click();
+
+    // Scoped to the form: Next mounts its own role="alert" route
+    // announcer on the document, which would match too.
+    const alert = page.locator("form").getByRole("alert");
+    await expect(alert).toBeVisible();
+    await expect(alert).not.toBeEmpty();
+
+    const email = page.getByLabel("Email");
+    await expect(email).toHaveAttribute("aria-invalid", "true");
+
+    // The association is the point: the id the field points at must be
+    // the element carrying the message.
+    const describedBy = await email.getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    const description = page.locator(`#${describedBy}`);
+    await expect(description).toHaveText(await alert.innerText());
+    await expect(description).toHaveAttribute("role", "alert");
+  });
+});
+
 test.describe("keyboard access", () => {
   test("the skip link is the first stop and reaches main content", async ({ page }) => {
     await page.goto("/");

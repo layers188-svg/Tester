@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
 const schema = z.object({ response: z.enum(["attending", "maybe", "declined"]) });
 
@@ -29,5 +30,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (error) {
     return NextResponse.json({ error: "Could not save your response." }, { status: 400 });
   }
+
+  // Brief §15 event 12. The response is the one variant the allowlisted
+  // `detail` column exists for; the screening id stays out of it.
+  await recordAnalyticsEvent({
+    event: "screening_attendance_response",
+    actorId: user.id,
+    detail: parsed.data.response,
+  });
+
   return NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
 }

@@ -3,7 +3,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import styles from "../openings/page.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Email queue — Programming Desk" };
+export const metadata: Metadata = { title: "Email queue · Programming Desk" };
 
 export default async function EmailQueuePage() {
   const supabase = await getServerSupabase();
@@ -36,7 +36,7 @@ export default async function EmailQueuePage() {
               </td>
               <td>{row.attempts}</td>
               <td>{new Date(row.send_at).toLocaleString()}</td>
-              <td>{row.last_error ?? "—"}</td>
+              <td>{row.last_error ?? "–"}</td>
             </tr>
           ))}
         </tbody>

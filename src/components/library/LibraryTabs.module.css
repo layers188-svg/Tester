@@ -17,6 +17,7 @@
   padding: var(--hd-space-3) var(--hd-space-2);
   cursor: pointer;
   min-height: var(--hd-touch-min);
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
 }
 
 .tab[data-active="true"] {
@@ -40,61 +41,222 @@
   color: var(--hd-ink-muted);
 }
 
+/*
+ * The catalogue's line about itself: how many, and how many still
+ * sealed. Set as furniture rather than as a sentence, so it reads as
+ * part of the index rather than as a paragraph about it.
+ */
+.tally {
+  display: flex;
+  align-items: baseline;
+  gap: var(--hd-space-4);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-6) 0 var(--hd-space-3);
+}
+
+.tallySealed {
+  color: var(--hd-accent);
+}
+
+.tallySealed::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 1px;
+  vertical-align: middle;
+  margin-right: var(--hd-space-3);
+  background: var(--hd-rule-strong);
+}
+
+/*
+ * An index, not a grid of cards.
+ *
+ * The entries were bordered boxes on a surface fill, two up — which is
+ * the shape of a shop, and every product that sells things looks like
+ * it. A collection of films someone has actually watched should look
+ * like the back of a catalogue instead: numbered, ruled, one entry per
+ * line, with nothing drawn around anything.
+ *
+ * Two columns from 48rem so a desktop reads as a spread rather than as
+ * one thin column down the middle. The rules do the work at both
+ * sizes, which is why there are no boxes to reflow.
+ */
 .list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  border-top: 1px solid var(--hd-rule);
+}
+
+/*
+ * One column, wide, on every size.
+ *
+ * It was two columns above 48rem, which is what made the Library read
+ * as a table: uniform rows, uniform width, uniform weight, a database
+ * with a serif face on. It also fought the records opening in place —
+ * an expanding entry in a two-column grid drags whatever is beside it.
+ *
+ * A printed archive is a single column with a large catalogue number
+ * and a large title, and it gets its variety from what each record
+ * actually is rather than from a grid. That is what the entry states
+ * below do.
+ */
+@media (min-width: 60rem) {
+  .list {
+    max-width: 58rem;
+  }
+}
+
+/*
+ * An entry answers a touch.
+ *
+ * Motion here is response, not decoration: the rule under an entry
+ * brightens and its number turns brass while a finger is on it, and
+ * nothing moves on its own. A Library that animated its records
+ * continuously would be a carousel, which is the opposite of an
+ * archive.
+ */
+.entry {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--hd-space-4);
+  padding: var(--hd-space-5) 0;
+  border-bottom: 1px solid var(--hd-rule);
+  transition: border-color var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.entry:hover,
+.entry:focus-within {
+  border-bottom-color: var(--hd-rule-strong);
+}
+
+/*
+ * The catalogue number. The single thing that turns a list into an
+ * index. Tabular figures so the column stays straight past nine.
+ */
+.index {
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--hd-ink-muted);
+  padding-top: 0.35rem;
+  opacity: 0.7;
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.entry:hover .index,
+.entry:focus-within .index {
+  color: var(--hd-accent);
+  opacity: 1;
+}
+
+.link:active {
+  opacity: 0.6;
+}
+
+.entryBody {
+  min-width: 0;
+}
+
+/* The title is the object. Everything else on the entry is a caption. */
+.title {
+  display: block;
+  font-family: var(--hd-font-editorial);
+  font-size: 1.3125rem;
+  line-height: 1.2;
+  color: var(--hd-ink);
+  text-wrap: balance;
+}
+
+/* A sealed entry is quieter, and says so through weight rather than
+   through a lock icon it would have to explain. */
+.entry[data-revealed="false"] .title {
+  color: var(--hd-ink-muted);
+  font-style: italic;
+}
+
+.badge {
+  display: block;
+  font-family: var(--hd-font-utility);
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  text-transform: uppercase;
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-2);
+}
+
+.meta {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-2) 0 0;
+}
+
+.sixWordsLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-4) 0 var(--hd-space-2);
+}
+
+.sixWords {
+  font-family: var(--hd-font-editorial);
+  font-style: italic;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--hd-ink);
+  margin: 0;
+  border-left: 1px solid var(--hd-accent);
+  padding-left: var(--hd-space-3);
+}
+
+.sealedNote {
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: var(--hd-space-2) 0 0;
+}
+
+/*
+ * An entry can carry two ways on now (into the room, and passing the
+ * film to someone), so they sit in a row that wraps rather than
+ * stacking as two stray links each with their own top margin.
+ */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--hd-space-5);
+}
+
+.link {
+  color: var(--hd-accent);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: var(--hd-size-micro);
+  /* Reads as a small label and still meets the touch minimum (§16). */
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hd-touch-min);
+}
+
+.activityList {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--hd-space-3);
-}
-
-/*
- * A fine rule between entries rather than a boxed card — the field
- * block carries the weight, so a border around it as well reads as
- * clutter (guidelines: square edges, fine rules, avoid heavy cards).
- */
-.card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--hd-space-4);
-  padding: var(--hd-space-4) 0;
-  border-bottom: 1px solid var(--hd-rule);
-}
-
-.cardBody {
-  flex: 1;
-  min-width: 0;
-}
-
-.cardHead {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--hd-space-3);
-  font-family: var(--hd-font-editorial);
-  font-size: 1.0625rem;
-}
-
-.badge {
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-micro);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--hd-ink-muted);
-  flex-shrink: 0;
-}
-
-.sixWords {
-  font-style: italic;
-  margin: var(--hd-space-2) 0 0;
-}
-
-.link {
-  display: inline-block;
-  margin-top: var(--hd-space-2);
-  color: var(--hd-accent);
-  font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
 }
 
 .activityRow {
@@ -105,4 +267,120 @@
 .activityRow strong {
   color: var(--hd-ink);
   font-weight: 500;
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * The archive record, open and shut.
+ *
+ * Overview to focus, in place. The head is always the record's index
+ * line — number, spine, badge, title — and it is the control. The body
+ * only exists while the record is open, so the list is a list until the
+ * member asks it to be something more, and the entries around the open
+ * one move down rather than being replaced by a different screen.
+ *
+ * The movement itself is the browser's: the toggle runs inside a view
+ * transition, so every sibling that shifts is a snapshot the browser
+ * interpolates. No measuring, no absolute positioning, and closing puts
+ * the record back exactly where it came from because that is simply
+ * where it is.
+ * ---------------------------------------------------------------------
+ */
+.entryHead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hd-space-4);
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  min-height: var(--hd-touch-min);
+  transition: opacity var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+@media (hover: hover) {
+  .entryHead:hover {
+    opacity: 0.72;
+  }
+}
+
+.entryHead:active {
+  opacity: 0.6;
+}
+
+.entryHeadText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-2);
+  min-width: 0;
+}
+
+/* Open records get the page's attention and a brass registration mark
+   at the head, the same way an opened entry in a printed index carries
+   a rule. Nothing else changes colour: this is a state, not a theme. */
+.entry[data-open="true"] {
+  border-left: 1px solid var(--hd-accent);
+  padding-left: var(--hd-space-4);
+}
+
+.entry[data-open="true"] .title {
+  color: var(--hd-ink);
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * The archive, at desktop scale.
+ *
+ * No posters, and no apology for it. What a Library entry has is a
+ * number, a title, a date, a state and — if the member said something —
+ * six words. Set large enough, that is plenty: the catalogue number
+ * becomes a real registration mark rather than a bullet, and the title
+ * becomes the object on the row rather than a link inside it.
+ * ---------------------------------------------------------------------
+ */
+@media (min-width: 60rem) {
+  .entry {
+    padding: var(--hd-space-6) 0;
+  }
+
+  /* A registration number, the size a printed index would set it. */
+  .index {
+    font-size: 1.125rem;
+    letter-spacing: 0.08em;
+    padding-top: 0.4rem;
+    min-width: 3ch;
+  }
+
+  .title {
+    font-size: 2.25rem;
+    line-height: 1.05;
+  }
+
+  /* A record the member spoke about carries their words at reading
+     scale once it is open. It is the reason the entry is worth
+     opening, so it is not set as metadata. */
+  .sixWords {
+    font-size: 1.5rem;
+  }
+
+  .entry[data-open="true"] {
+    padding-left: var(--hd-space-6);
+  }
+}
+
+/*
+ * State, expressed as weight rather than as a badge colour.
+ *
+ * A record the member has left words on is the fullest kind of entry in
+ * the archive, so its number is brass even at rest: the eye can find
+ * the nights that meant something without reading a single label.
+ * Sealed entries stay quiet and already read as quieter through the
+ * italic title above.
+ */
+.entry[data-revealed="true"]:has(.sixWords) .index {
+  color: var(--hd-accent);
+  opacity: 1;
 }

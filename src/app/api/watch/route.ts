@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
+import { openingNumberFor } from "@/lib/analytics/opening-number";
+import type { AnalyticsEvent } from "@/lib/analytics/events";
 
 const bodySchema = z
   .object({
@@ -62,6 +65,18 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: "Could not update watch state." }, { status: 400 });
   }
+
+  // Brief §15 events 6, 7 and 8 are the three watch states.
+  const eventForState: Record<typeof state, AnalyticsEvent> = {
+    saved: "saved_for_later",
+    opened_service: "provider_handoff_selected",
+    watched: "marked_watched",
+  };
+  await recordAnalyticsEvent({
+    event: eventForState[state],
+    actorId: user.id,
+    openingNumber: await openingNumberFor(supabase, openingId),
+  });
 
   return NextResponse.json(
     { id: data.id, state: data.state },

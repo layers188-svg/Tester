@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { getServiceSupabase } from "@/lib/supabase/service";
 import { getAdminEmails } from "@/lib/env";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
 /**
  * Runs once, right after OTP verification. Creates the member's own
@@ -63,6 +64,10 @@ export async function POST(request: Request) {
     const service = getServiceSupabase();
     await service.from("profiles").update({ role: "owner" }).eq("id", user.id);
   }
+
+  // Brief §15 event 1. Recorded here rather than at OTP verification
+  // because this is the point the session is known to be usable.
+  await recordAnalyticsEvent({ event: "sign_in_completed", actorId: user.id });
 
   return NextResponse.json({ ok: true });
 }

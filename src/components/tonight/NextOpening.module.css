@@ -1,0 +1,127 @@
+/*
+ * The countdown, set as a caption rather than as a widget. No box, no
+ * digit tiles, no colon flashing: a line of condensed caps with a
+ * hairline between the label and the number, so it reads like the
+ * board outside a picture house rather than a timer in an app.
+ */
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+}
+
+.label {
+  flex-shrink: 0;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: var(--hd-rule);
+}
+
+.value {
+  color: var(--hd-accent);
+  flex-shrink: 0;
+  /* Tabular figures so the line does not shuffle sideways each time a
+     digit changes. */
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * The clock.
+ *
+ * "Saturday · 7:00 PM / SEALED" said when, and nothing about the wait.
+ * A countdown is the one place in House Dark where anticipation is the
+ * content, so it gets real digits — but set as an editorial number in
+ * the house's own type, not as a scoreboard. Tabular figures so nothing
+ * shifts as it ticks, and the unit under each pair so it reads without
+ * a legend.
+ * ---------------------------------------------------------------------
+ */
+.when {
+  display: block;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-4);
+}
+
+/*
+ * The unit sits under its number, not beside it.
+ *
+ * Beside it, four pairs of digits plus four written-out units plus
+ * three colons came to more than 390px, and a line that will not fit
+ * does not simply clip: the browser widens the layout viewport to
+ * contain it and scales everything down, which moved the fixed tab bar
+ * off the bottom of the screen entirely. The navigation journey caught
+ * it as an unclickable Library tab, which is a strange symptom with a
+ * very ordinary cause.
+ *
+ * Under it, the clock is four narrow columns and fits at 320px.
+ */
+.clock {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hd-space-3);
+  margin: 0;
+  color: var(--hd-ink);
+  flex-wrap: wrap;
+}
+
+.segment {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--hd-space-1, 0.25rem);
+  position: relative;
+}
+
+/* Set between the columns rather than in the flow, so it separates the
+   numbers without adding to the width they have to fit in. */
+.colon {
+  position: absolute;
+  left: calc(var(--hd-space-3) * -1);
+  top: 0;
+  font-family: var(--hd-font-utility);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--hd-ink-muted);
+}
+
+.digits {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: var(--hd-font-editorial);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.375rem, 7vw, 1.75rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.unit {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.6rem;
+  color: var(--hd-ink-muted);
+  padding-bottom: 0.15rem;
+}
+
+/* Tonight, before the house opens. The wait is the screen. */
+.wrap[data-large="true"] .digits {
+  font-size: clamp(2rem, 9vw, 3.25rem);
+}
+
+.wrap[data-large="true"] .colon {
+  font-size: 1.1rem;
+}

@@ -19,6 +19,20 @@ accounts whose email is listed in `ADMIN_EMAILS`.
 4. Under **Authentication → Providers → Email**, confirm email sign-in is
    on and passwords are off. Set the OTP length to 6 and expiry to 300
    seconds.
+5. **Change the email template, or nobody can sign in.** `/join` uses
+   `signInWithOtp` and `verifyOtp` — a six digit code typed into the
+   second step, never a link. Supabase's stock "Magic Link" template
+   sends `{{ .ConfirmationURL }}`, so out of the box a member receives a
+   link and the code screen has nothing to accept. Under
+   **Authentication → Email Templates → Magic Link**, put `{{ .Token }}`
+   in the body. Something like:
+
+   ```
+   Your House Dark code is {{ .Token }}. It expires in five minutes.
+   ```
+
+   Keep the subject and body free of anything about tonight's film —
+   brief §11 covers email subject and preview text too.
 
 ### 2. Resend as Supabase custom SMTP
 

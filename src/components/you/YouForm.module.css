@@ -13,6 +13,18 @@
   gap: var(--hd-space-2);
 }
 
+/*
+ * The rule between sections, not above the first one. The page now
+ * opens with the member's identity and a "Settings" divider that
+ * carries its own rule, so a second rule here drew two lines with a
+ * band of dead space between them.
+ */
+.wrap > .section:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+
 .label {
   font-family: var(--hd-font-utility);
   font-size: var(--hd-size-small);
@@ -47,6 +59,17 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  /* Without this the browser paints its own blue — the one piece of
+     stock component styling anywhere in the product, sitting in a
+     column of six on the You page. JoinForm's checkbox already sets
+     this; these were simply missed. */
+  accent-color: var(--hd-accent);
+}
+
+.error {
+  color: var(--hd-danger-ink);
+  font-size: var(--hd-size-small);
+  margin: var(--hd-space-2) 0 0;
 }
 
 .hint {
@@ -104,4 +127,14 @@
 
 .legalNav a {
   color: var(--hd-ink-muted);
+}
+
+/* The one-line pointer to /why. */
+.sectionNote {
+  color: var(--hd-ink-muted);
+  margin: 0;
+}
+
+.sectionNote a {
+  color: var(--hd-accent);
 }

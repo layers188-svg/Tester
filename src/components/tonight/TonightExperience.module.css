@@ -18,10 +18,43 @@
 }
 
 .sealedCard,
-.revealedCard {
+.revealedCard,
+.waitingCard {
   padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-7);
   max-width: var(--hd-max-width);
   margin: 0 auto;
+}
+
+/*
+ * Before seven.
+ *
+ * The old version of this screen said "Opening not yet available" over
+ * a formatted timestamp, which reads as an error state for a house
+ * that is simply not open yet. It now says the hour, counts to it, and
+ * gives a first-time member something to actually do.
+ */
+.previously {
+  margin-top: var(--hd-space-7);
+  padding-top: var(--hd-space-5);
+  border-top: 1px solid var(--hd-rule);
+}
+
+.previouslyLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+.previouslyLead {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+  max-width: 36ch;
 }
 
 .factList {
@@ -99,30 +132,220 @@
   margin-bottom: var(--hd-space-4);
 }
 
-.dimming {
-  position: fixed;
-  inset: 0;
-  background: var(--hd-projection-black);
-  animation: dim var(--hd-motion-dim) var(--hd-ease-standard);
-  z-index: 30;
+/*
+ * DIM, on the card itself. The shell's half of the same gesture is
+ * `.hd-dimmable` in globals.css; both run on --hd-motion-dim so the
+ * masthead, the tabs and the card go out together rather than in
+ * sequence.
+ *
+ * The transition lives on the card and the staged entry animations
+ * live on its children, deliberately: a running animation pins its own
+ * opacity, so a fade-out declared on the same element would lose to it
+ * for as long as it lasted.
+ */
+.sealedCard {
+  transition: opacity var(--hd-motion-dim) var(--hd-ease-standard);
 }
 
-@keyframes dim {
+/*
+ * DIM. Everything except the clue recedes.
+ *
+ * The card used to fade as one block, which took the clue frame down
+ * with it and meant the thing the member had just asked for was the
+ * first thing to disappear. Now the surrounding editorial goes and the
+ * frame stays, so what is left on the darkening page is the object
+ * that is about to become the film.
+ */
+.sealedCard[data-leaving="true"] > *:not([data-clue-frame]) {
+  opacity: 0;
+  transform: translate3d(0, calc(var(--hd-stage-rise) * -0.5), 0);
+  transition:
+    opacity var(--hd-motion-dim) var(--hd-ease-standard),
+    transform var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+/*
+ * The clue frame: an original House Dark object, and the one that
+ * survives into playback.
+ *
+ * A ruled black field with the safe cues inside it. There is no image
+ * here and there never was: before the title is known the house owns
+ * the visual, so the frame is geometry and type. `hd-clue-frame` is
+ * also on .trailerStage, which is what lets asking for the clue grow
+ * this exact rectangle into the viewport rather than building a second
+ * one somewhere else.
+ */
+.clueFrame {
+  view-transition-name: hd-clue-frame;
+  contain: paint;
+  position: relative;
+  margin: var(--hd-space-6) 0;
+  padding: var(--hd-space-5) var(--hd-space-4);
+  min-height: 9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--hd-space-4);
+  border: 1px solid var(--hd-rule);
+  background: var(--hd-projection-black);
+  transition:
+    transform var(--hd-motion-dim) var(--hd-ease-entering),
+    border-color var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+/* The clue comes closer while the room goes dark. Small: a frame
+   moving toward you, not a card popping forward. */
+.clueFrame[data-leaving="true"] {
+  transform: scale(1.06);
+  border-color: var(--hd-accent);
+}
+
+.clueFrameLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+}
+
+/*
+ * FOCUS. The clue takes the viewport.
+ *
+ * It was a 26rem column in the middle of the page with the masthead
+ * above it and the tab bar below — a video in a layout. Fixed and
+ * full-bleed, with the shell dimmed out behind it, there is nothing
+ * else on screen, which is the entire point of dimming the house
+ * first.
+ */
+.trailerStage {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  /* The clue takes everything left over; the way out takes only what
+     it needs. `minmax(0, 1fr)` rather than `1fr` so the film can
+     actually shrink on a short viewport instead of pushing the control
+     off the bottom of the screen. */
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--hd-space-3);
+  padding: var(--hd-space-4);
+  padding-bottom: calc(var(--hd-space-4) + env(safe-area-inset-bottom, 0px));
+  background: var(--hd-projection-black);
+  /*
+   * The same named object as the clue frame in the sealed card, so the
+   * browser grows one rectangle into the viewport instead of fading a
+   * new screen in over the old one. `focus-in` remains as the fallback
+   * for browsers without view transitions and is suppressed while one
+   * is running, or the frame would scale twice.
+   */
+  view-transition-name: hd-clue-frame;
+  animation: focus-in var(--hd-motion-focus) var(--hd-ease-entering) backwards;
+}
+
+:root:active-view-transition .trailerStage {
+  animation: none;
+}
+
+/*
+ * The way out of the clue. A quiet line, centred, at the bottom of the
+ * dark: present for anyone who wants it and invisible to anyone who
+ * does not. Full touch target despite reading as text (§16).
+ */
+.skip {
+  justify-self: center;
+  background: none;
+  border: none;
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-small);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  min-height: var(--hd-touch-min);
+  padding: 0 var(--hd-space-4);
+  cursor: pointer;
+  transition: color var(--hd-motion-button) var(--hd-ease-standard);
+}
+
+.skip:hover {
+  color: var(--hd-ink);
+}
+
+/*
+ * The frame opens rather than the video appearing. Scale only, from
+ * near-full: anything more reads as a modal popping, which is the
+ * "floating card" motion the brief rules out.
+ */
+@keyframes focus-in {
   from {
     opacity: 0;
+    transform: scale(0.965);
   }
   to {
     opacity: 1;
+    transform: none;
   }
 }
 
-.trailerStage {
+/*
+ * HOLD, made visible. The room is dark, the clue has gone, and for a
+ * beat there is one line of type between two rules that draw
+ * themselves outward. Nothing here is a spinner: a progress indicator
+ * would make this feel like waiting rather than like a pause.
+ */
+.openingStage {
+  /*
+   * HOLD, in the same frame the film just played in.
+   *
+   * `hd-clue-frame` again: the playback surface does not cut away to a
+   * different screen, it empties and goes black with the member still
+   * looking at it. That continuity is what makes the pause read as part
+   * of the film ending rather than as a load.
+   */
+  view-transition-name: hd-clue-frame;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: var(--hd-space-4);
-  padding: var(--hd-space-4);
-  max-width: 26rem;
-  margin: 0 auto;
+  background: var(--hd-projection-black);
+  padding: var(--hd-space-6);
+}
+
+.openingWord {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-ink-muted);
+  margin: 0;
+  padding-left: 0.28em; /* the tracking's trailing space, recentred */
+}
+
+.openingRule {
+  display: block;
+  width: min(14rem, 60vw);
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: center;
+  /* The keyframe's resting value, declared here too: with `backwards`
+     the element returns to its own styles when the animation ends, so
+     the two have to agree or the rule brightens as it finishes. */
+  opacity: 0.7;
+  animation: draw-rule var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+}
+
+@keyframes draw-rule {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
 }
 
 .year {
@@ -166,4 +389,104 @@
   gap: var(--hd-space-3);
   margin-bottom: var(--hd-space-4);
   flex-wrap: wrap;
+}
+
+/*
+ * REVEAL. The title is not placed on the page, it is uncovered on it.
+ *
+ * A brass rule draws across the measure first, and the title wipes in
+ * from the same edge just behind it, so the rule reads as the thing
+ * doing the uncovering. Both are slow — --hd-motion-transform is
+ * nearly a second — because this is the moment the whole product is
+ * built around and it should be allowed to take its time.
+ *
+ * The wipe is clip-path on the existing text node. It changes nothing
+ * about what reaches the browser: the title still arrives only in the
+ * /api/reveal response, and a member who cannot see the animation sees
+ * the finished title, never a missing one.
+ */
+/*
+ * The line that survives the reveal.
+ *
+ * Shared with the upper rule of the black hold through
+ * `hd-reveal-rule`: the brass line dividing the dark travels up and
+ * becomes the rule the title sits under, rather than the hold's rules
+ * vanishing and a new one being drawn somewhere else.
+ */
+.namedRule,
+.revealRule {
+  view-transition-name: hd-reveal-rule;
+}
+
+.revealRule {
+  display: block;
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: left;
+  margin-bottom: var(--hd-space-4);
+  opacity: 0.7; /* see .openingRule */
+  animation: draw-rule var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-stage-step);
+}
+
+.revealTitle {
+  animation: reveal-title var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-step) * 2);
+  /*
+   * The same object as the House's hero title.
+   *
+   * A shared view-transition name means the browser carries this
+   * element into its new position and scale on the next navigation
+   * rather than fading one title out and another in. Reveal → House is
+   * the signature moment of the whole product, and this is what makes
+   * it a recomposition instead of a page load.
+   */
+  view-transition-name: hd-opening-title;
+}
+
+@keyframes reveal-title {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+/* The line under the sealed headline. Sets expectation for the clue:
+   ten seconds, mood only. */
+.sealedLead {
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-6);
+  max-width: 32ch;
+}
+
+/*
+ * The film steps back so the question can be the largest thing.
+ *
+ * Once the member has marked it watched the page is about their
+ * response, so the title reduces to a caption on the evening rather
+ * than the headline of it. It travels there rather than being redrawn:
+ * `.revealTitle` carries `hd-opening-title`, and `setWatch` runs the
+ * change inside a view transition, so this is one object changing size.
+ *
+ * The rule above it goes with it. A brass line at display scale over a
+ * caption-sized title is a rule looking for a heading that has left.
+ */
+.revealedCard[data-responding="true"] .revealTitle {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  color: var(--hd-ink-muted);
+  margin-bottom: var(--hd-space-6);
+}
+
+.revealedCard[data-responding="true"] .revealTitle .year {
+  font-size: 0.75em;
+  display: inline;
+  margin-top: 0;
+}
+
+.revealedCard[data-responding="true"] .revealRule {
+  opacity: 0.35;
 }

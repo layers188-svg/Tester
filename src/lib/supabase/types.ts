@@ -20,6 +20,26 @@ export type ProfileRole = "member" | "moderator" | "owner";
 export type CircleRole = "member" | "organiser";
 export type AttendanceResponse = "invited" | "attending" | "maybe" | "declined";
 export type NotificationStatus = "pending" | "sending" | "sent" | "failed" | "cancelled";
+/**
+ * Mirrors the `analytics_event` enum. Spelled out here rather than
+ * imported from `@/lib/analytics/events` because this file stands in
+ * for generated output — `supabase gen types` would emit the literals.
+ * `tests/unit/analytics.test.ts` asserts the two lists stay identical.
+ */
+export type AnalyticsEventName =
+  | "sign_in_completed"
+  | "opening_viewed"
+  | "dimming_started"
+  | "no_trailer_completed"
+  | "reveal_completed"
+  | "provider_handoff_selected"
+  | "saved_for_later"
+  | "marked_watched"
+  | "six_words_submitted"
+  | "recommendation_sent"
+  | "circle_invitation_accepted"
+  | "screening_attendance_response";
+export type AnalyticsDetailValue = "invited" | "attending" | "maybe" | "declined";
 
 /**
  * Shorthand matching postgrest-js's GenericTable shape
@@ -159,6 +179,7 @@ interface SealedRecommendationRow {
   personal_note: string | null;
   runtime_minutes: number;
   scheduled_for: string | null;
+  idempotency_key: string | null;
   created_at: string;
 }
 
@@ -216,6 +237,24 @@ interface NotificationQueueRow {
   updated_at: string;
 }
 
+/**
+ * A film the member added themselves — see migration 0018. Deliberately
+ * not `films`: that table is the protected side of the spoiler
+ * boundary, and these rows are member-written.
+ */
+interface LibraryEntryRow {
+  id: string;
+  user_id: string;
+  title: string;
+  release_year: number | null;
+  runtime_minutes: number | null;
+  state: WatchState;
+  watched_at: string | null;
+  six_words: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuditLogRow {
   id: string;
   actor_id: string | null;
@@ -224,6 +263,32 @@ interface AuditLogRow {
   target_id: string | null;
   safe_metadata: Record<string, unknown>;
   created_at: string;
+}
+
+/**
+ * Brief §15. Note the absence of any free text column — see
+ * `supabase/migrations/0013_analytics.sql` for why that is the whole
+ * spoiler defence for this table.
+ */
+interface AnalyticsEventRow {
+  id: string;
+  event: AnalyticsEventName;
+  actor_id: string;
+  opening_number: number | null;
+  detail: AnalyticsDetailValue | null;
+  created_at: string;
+}
+
+export interface CreatedRecommendation {
+  recommendation_id: string;
+  /** False when an idempotency key replayed an earlier send (0014). */
+  created: boolean;
+}
+
+export interface AnalyticsSummaryRow {
+  event: AnalyticsEventName;
+  occurrences: number;
+  members: number;
 }
 
 export interface RevealResult {
@@ -294,6 +359,68 @@ export interface CirclesActivityRow {
   actor_display_name: string;
   circle_name: string;
   happened_at: string | null;
+}
+
+/**
+ * A Circle friend's six words — see migration 0019. `body` is null
+ * until the viewer has published their own on that opening; `title` is
+ * null until they have revealed it. The two are independent.
+ */
+export interface CircleSixWords {
+  review_id: string;
+  opening_id: string;
+  opening_number: number;
+  actor_display_name: string;
+  title: string | null;
+  body: string | null;
+  unlocked: boolean;
+}
+
+/**
+ * The Room's header — see migration 0020. `title` and `release_year`
+ * are null until this member has personally revealed the opening, which
+ * is the same rule every other title-bearing projection follows.
+ *
+ * Three flags, because all three come apart. A member can know what the
+ * film was without having watched it; can have watched it without
+ * having written anything; and only the middle one governs entry.
+ *
+ * `has_watched` is the gate (migration 0023): the Room protects the
+ * member's own reaction to the film forming first, and watching is when
+ * that happens. `has_published` decides only whether they have a line
+ * of their own at the top of it.
+ */
+export interface RoomOpening {
+  opening_number: number;
+  title: string | null;
+  release_year: number | null;
+  has_revealed: boolean;
+  has_published: boolean;
+  has_watched: boolean;
+}
+
+/**
+ * The House Dark description of a film, for Search — migration 0021.
+ *
+ * Distinct from `FilmRow`, which is the protected side of the spoiler
+ * boundary. This one is spoiler-safe by construction and readable by
+ * any signed-in member.
+ */
+export interface FilmRecordRow {
+  id: string;
+  provider: string;
+  external_id: string;
+  title: string;
+  release_year: number | null;
+  runtime_minutes: number | null;
+  six_word_plot: string;
+  territory: string[];
+  pace: string | null;
+  intensity: string | null;
+  content_notes: string | null;
+  editorial_state: "generated" | "approved" | "rejected";
+  created_at: string;
+  updated_at: string;
 }
 
 export interface MySealedRecommendation {
@@ -396,7 +523,20 @@ export interface Database {
           payload: Record<string, unknown>;
         }
       >;
+      library_entries: Table<
+        LibraryEntryRow,
+        Pick<LibraryEntryRow, "user_id" | "title"> & Partial<LibraryEntryRow>
+      >;
+      film_records: Table<
+        FilmRecordRow,
+        Pick<FilmRecordRow, "provider" | "external_id" | "title" | "six_word_plot"> &
+          Partial<FilmRecordRow>
+      >;
       audit_log: Table<AuditLogRow, Partial<AuditLogRow> & { action: string; target_type: string }>;
+      analytics_events: Table<
+        AnalyticsEventRow,
+        Partial<AnalyticsEventRow> & { event: AnalyticsEventName; actor_id: string }
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -421,10 +561,36 @@ export interface Database {
           p_cues: string[];
           p_scheduled_for?: string | null;
           p_circle_id?: string | null;
+          /** Repeat sends under one key return the first recommendation (0014). */
+          p_idempotency_key?: string | null;
         };
-        Returns: string;
+        Returns: CreatedRecommendation[];
       };
       get_house_words: { Args: { p_limit?: number }; Returns: { body: string }[] };
+      /**
+       * After Credits — see migration 0017. Returns no rows when the
+       * caller has not published their own six words for the opening,
+       * which is how the caller distinguishes a shut room from an
+       * empty one.
+       */
+      get_after_credits: {
+        Args: { p_opening_id: string };
+        Returns: {
+          review_id: string;
+          body: string;
+          display_name: string;
+          is_mine: boolean;
+          in_my_circle: boolean;
+          written_at: string;
+        }[];
+      };
+      /**
+       * Tonight's opening ordinal for the public home page — see
+       * migration 0016. Returns a bare integer, and null when nothing
+       * is open. Deliberately returns no other column: everything else
+       * on `openings` either is protected or narrows down the film.
+       */
+      get_public_opening_number: { Args: Record<string, never>; Returns: number | null };
       get_circle_member_names: { Args: { p_circle_id: string }; Returns: CircleMemberName[] };
       list_my_sealed_recommendations: {
         Args: Record<string, never>;
@@ -433,6 +599,9 @@ export interface Database {
       get_my_library: { Args: Record<string, never>; Returns: LibraryItem[] };
       get_house_openings: { Args: Record<string, never>; Returns: HouseOpening[] };
       get_my_circles_activity: { Args: Record<string, never>; Returns: CirclesActivityRow[] };
+      get_circle_six_words: { Args: Record<string, never>; Returns: CircleSixWords[] };
+      get_room_opening: { Args: { p_opening_id: string }; Returns: RoomOpening[] };
+      get_analytics_summary: { Args: { p_days?: number }; Returns: AnalyticsSummaryRow[] };
     };
   };
 }

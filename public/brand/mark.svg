@@ -1,5 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="House Dark">
   <title>House Dark</title>
+  <!--
+    The app icon: the approved HD monogram on Projection Black.
+
+    Drawn from public/brand/monogram-inverse.svg, which is the source of
+    record. It is reproduced here rather than referenced because an
+    icon is rasterised in contexts that will not follow a link, and
+    because it is composed onto a background and cropped to the glyph —
+    the registration rule below the monogram disappears at 48px, so it
+    is left out of the icon rather than rendered as a smudge.
+
+    Paths, not text. The wordmark is set in Newsreader and an SVG does
+    not carry its font, so a text-based icon falls back to whatever
+    serif the rasteriser happens to have. This one looks the same
+    everywhere.
+  -->
   <rect width="512" height="512" fill="#030303"/>
-  <text x="256" y="300" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', serif" font-size="220" font-weight="500" fill="#E9E0D0">H<tspan fill="#B9A16C" font-style="italic">D</tspan></text>
+  <g transform="translate(14.4, 12.2) scale(0.447)"
+     fill="none" stroke="#E9E0D0" stroke-linecap="square" stroke-linejoin="round">
+    <!-- Shared central spine -->
+    <path d="M555 165 L555 925" stroke-width="24"/>
+    <path d="M505 165 L605 165" stroke-width="13"/>
+    <path d="M505 925 L605 925" stroke-width="13"/>
+
+    <!-- H left stem -->
+    <path d="M330 315 L330 760" stroke-width="24"/>
+    <path d="M290 315 L370 315" stroke-width="13"/>
+    <path d="M290 760 L370 760" stroke-width="13"/>
+
+    <!-- H crossbar -->
+    <path d="M330 535 L555 535" stroke-width="24"/>
+
+    <!-- Wrapped D counter -->
+    <path d="M555 300
+             C705 315, 790 405, 790 540
+             C790 675, 705 765, 555 780"
+          stroke-width="24"/>
+  </g>
 </svg>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/Wordmark";
-import { Button } from "@/components/Button";
+import { SignInLink } from "@/components/marketing/SignInLink";
 import styles from "./layout.module.css";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
@@ -10,13 +10,11 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <Link href="/" className={styles.brand} aria-label="House Dark home">
           <Wordmark />
         </Link>
+        {/* The entrance carries the calls to action now, so the header
+            only holds identity and a way back. "How it works" moved to
+            the footer with the other reading. */}
         <nav className={styles.nav} aria-label="Primary">
-          <Link href="/how-it-works" className={styles.navLink}>
-            How it works
-          </Link>
-          <Button href="/join" variant="secondary">
-            Join or sign in
-          </Button>
+          <SignInLink label="Sign in" />
         </nav>
       </header>
       <main id="hd-main" className={styles.main}>
@@ -25,9 +23,10 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <footer className={styles.footer}>
         <div className={styles.footerBrand}>
           <Wordmark />
-          <p className={styles.footerNote}>One film. A few friends. Nobody knows.</p>
+          <p className={styles.footerNote}>Get the excitement of not knowing back.</p>
         </div>
         <nav className={styles.footerNav} aria-label="Legal">
+          <Link href="/how-it-works">How it works</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/film-rights">Film rights and service disclaimer</Link>

@@ -83,10 +83,112 @@ RLS) · Resend (custom SMTP + operational/editorial email) · Cloudflare
 (Pages/Workers deploy target) · Vitest (unit) · Playwright (critical
 journeys).
 
+## The Room (the sequence is the product)
+
+Watch → Mark watched → leave your six words (or skip) → the room opens
+→ read everyone else. **A member must never see another member's
+response before they have seen the film.** The product exists so
+someone can meet a film before outside opinion reshapes it.
+
+The gate was "before their own is on record" until 14 August. It was
+changed by direction, and the reasoning is worth keeping: what the rule
+protected was never the writing, it was the member's own reaction
+forming first, and watching is when that happens. Publishing was only
+the evidence of it, and demanding evidence made the Room a toll on
+anybody who genuinely had nothing to say.
+
+- Enforced three times over, deliberately: `can_view_six_word_review`
+  (RLS), `get_after_credits` (0023, returns zero rows to a member who
+  has not watched), and `/room/[openingId]` redirecting on
+  `has_watched`. The UI never decides this on its own. RLS already
+  gated on `has_watched`, so 0023 made the three agree rather than
+  loosening one of them.
+- `get_after_credits` returning nothing is ambiguous by design (shut
+  room or empty room). `get_room_opening` (0020) exists because the
+  Room page has to tell those apart, and it reads the title without
+  writing a reveal the way `/api/reveal/*` does.
+- The response screen shows **nobody else's words**. Anything that
+  lists other members belongs behind the submit.
+- A member may **skip** ("Skip for now"). Skipping records nothing —
+  "did not feel like it tonight" is not a fact worth storing about
+  somebody — but the Room still opens, because they have seen the film.
+  Offer it below the primary action, never beside it, and never nag
+  somebody who took it: no modal, no confirmation, no second ask.
+- A response is **one to six words**, not exactly six (0022). Zero is a
+  skip, not a response. The house's own premise in `film_records` is
+  still exactly six, which is a different rule on purpose.
+- Once a member has revealed, `/tonight` serves **The House**
+  (`src/components/house/TheHouse.tsx`) instead of the reveal card:
+  same route, a state of the evening rather than a place. One hero
+  action matched to where the member has got to, the Room second, then
+  anything under seal, Search, Library, next opening. The House is the
+  only route back to a member's own words, so it must keep carrying
+  "Change your words" into `/opening/[openingId]` — edit and delete
+  live there and nothing else links to them.
+- The member's six words are one object across the whole sequence
+  (`view-transition-name: hd-my-six-words`), which is why the Room
+  server-renders the member's own row rather than waiting for
+  `/api/after-credits`. Only other people's words are worth a wait.
+- The Room has no likes, hearts, scores, stars, replies, sorting,
+  rankings, trending, avatars or follower counts, and never will. Those
+  mechanics manufacture consensus, which is the thing House Dark is
+  built to resist. Response scale varies only by position
+  (`:nth-child`), never randomly.
+
+## Search (six words before)
+
+**Know enough to choose. Nothing enough to spoil it.** A member types a
+title and gets the House Dark version: an exactly-six-word premise,
+three territory words, a pace and an intensity. Never a synopsis, a
+rating, a poster or a cast list.
+
+- "Six words before the picture" (the house describes a film) and "six
+  words after the picture" (a member answers one) are related product
+  language and **separate systems**. `film_records` is the first,
+  `six_word_reviews` the second; they never share a table.
+- `film_records` is **not** `films`. `films` holds what an opening is
+  sealing and is never member-readable; `film_records` is spoiler-safe
+  by construction and readable by any member. Keep them apart.
+- Exactly six words is enforced three times: `validateEditorial`, the
+  `film_records_six_words` check constraint, and a retry when the model
+  miscounts. Never pad or trim a premise to reach six.
+- The source synopsis lives only in `FilmFacts` on the server. It is
+  input to the editorial engine and must never reach a response.
+- One description per film for the whole house — that is the point of
+  caching, not a performance trick.
+- The index is the house's own 62 films first, then a wide catalogue:
+  TMDB when `TMDB_API_KEY` is set, otherwise Wikidata, which needs no
+  account, no key and no payment. `HOUSE_DARK_WIDE_CATALOGUE=off`
+  pins Search to the 62. The composition in `provider.ts` is
+  deliberate: a hand-written six words beats a generated one, and the
+  catalogue is also the floor under a wide provider that fails.
+- **`src/lib/films/wikidata.ts` has never reached the live endpoint.**
+  It was written without outbound network, so its parsing is tested
+  against hand-written payloads and its assumption about the API's
+  shape is not tested at all. Record real responses on a machine with
+  network before trusting it. The e2e suite runs with the wide
+  catalogue off for the same reason plus a better one: a journey that
+  depends on a third party being up stops meaning anything.
+- Both outside services are optional. Without `ANTHROPIC_API_KEY`
+  Search serves only films already written up, whatever the index
+  knows. Neither key is `NEXT_PUBLIC_`.
+
 ## Signed-in navigation
 
-Exactly four tabs: **Tonight, Circle, Library, You.** Don't add a fifth
-unless a feature genuinely cannot live inside these.
+Five tabs: **Tonight, Search, Circle, Library, Me.** Search was added
+by direction on 14 August because it genuinely could not live inside
+the others. Don't add a sixth.
+
+The last tab is labelled "Me" but still routes to `/you`. The label was
+changed by direction on 13 August; the route was not, because renaming
+it would break bookmarks and the signed-out redirects that point there.
+Tests must map label to route explicitly rather than lowercasing the
+label.
+
+## Interface copy
+
+No em dashes in anything a member reads. Recast the sentence rather
+than substituting a hyphen. Comments and docs are unaffected.
 
 ## Brand
 
@@ -94,6 +196,64 @@ Colours, type (Newsreader / Barlow Condensed) and animation timings are
 fixed in `src/styles/tokens.css` — see the brief §8. Brass is a minor
 registration colour, not a luxury effect. No glassmorphism, neon,
 gradients, generic component styling, or stock/generated people.
+
+## Imagery (copyright, non-negotiable)
+
+Never introduce film posters, screenshots, stills, promotional or actor
+photography, or studio artwork. House Dark makes its own visual
+interpretation of every film: original abstract imagery, bespoke No
+Trailer frames, light, texture, typography, spoiler-safe objects,
+material studies, original graphic composition.
+
+Before the title is known, House Dark owns the visual. After the
+reveal a film may influence the visual language, but only through
+original House Dark assets. A Library entry gets a flat palette spine
+(`EntryField`), never a thumbnail; a sealed one gets an empty frame,
+because the colour is derived from the row id and giving a sealed row
+one would mean the page knew something it may not know.
+
+## Motion vocabulary
+
+Six verbs, defined in `src/styles/tokens.css` and mirrored in
+`src/lib/motion.ts`. Everything that moves is one of them; if a new
+animation is none of them, it is decoration and does not belong.
+
+- **DIM** — the room around the clue goes dark. The shell obeys it via
+  `HouseLights` + `.hd-dimmable`, and dimmed chrome is also `inert`.
+- **FOCUS** — the clue frame expands to become the dominant object.
+- **PLAY** — ten seconds, no conventional player chrome. The sound and
+  reduced-motion controls stay: they are accessibility, not transport.
+- **HOLD** — a deliberate pause at a moment that earns one.
+- **REVEAL** — the page transforms into the answer; a brass rule draws
+  and the title wipes in behind it. Never a navigation to a results
+  screen.
+- **SEAL / UNSEAL** — `SealMark` moves between closed and broken. The
+  same object in both states, never two graphics swapped.
+
+Slow, confident, restrained. No fade-up-on-scroll, parallax, floating
+cards, bouncing UI, or WebGL spectacle.
+
+Three ordinary speeds sit under the six verbs: `--hd-motion-fast`
+(180ms, a control answering a touch), `--hd-motion-standard` (320ms, a
+piece of the page changing) and `--hd-motion-slow` (560ms, something
+uncovered). Reach for a verb only when the movement is one of the six.
+
+Motion happens because the member did something, never because they
+scrolled, and it stops when the interaction does. The one permitted
+loop is the rule on a loading button, and only while a request is
+actually in flight.
+
+Two rules that are easy to get wrong:
+
+1. Timings live in **both** `tokens.css` and `motion.ts` because a
+   sequence is half CSS transition and half `setTimeout`.
+   `tests/unit/motion.test.ts` fails if they drift.
+2. Staged entry uses `animation-fill-mode: backwards`, never `both`.
+   With `both` the resting state before the animation starts is the
+   `from` keyframe, so anything that stops the animation running leaves
+   the content permanently invisible. Any `setTimeout` in a sequence
+   goes through `motionDuration()` so reduced motion drops the pause as
+   well as the movement.
 
 ## Commands
 

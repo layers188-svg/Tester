@@ -1,0 +1,61 @@
+/*
+ * The Room reads like a page of quotations in a film journal, so it
+ * keeps an editorial measure rather than widening into a grid. The
+ * responses are the only content; everything above them is a masthead.
+ */
+.page {
+  padding: var(--hd-space-6) var(--hd-space-4) var(--hd-space-8);
+  max-width: 38rem;
+  margin: 0 auto;
+}
+
+/*
+ * The Room gets more room on a laptop.
+ *
+ * Still one column: a grid would turn responses into cards side by
+ * side, and cards invite comparison, which is the mechanic this page
+ * exists to refuse. What widens is the measure, so the quotations can
+ * be set at a scale that makes them the object on the page rather than
+ * a list of lines inside a phone-shaped container.
+ */
+@media (min-width: 60rem) {
+  .page {
+    max-width: 58rem;
+    padding: var(--hd-space-8) var(--hd-space-6) var(--hd-space-8);
+  }
+
+  .title {
+    font-size: clamp(4rem, 8vw, 6rem);
+    line-height: 0.95;
+  }
+}
+
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
+}
+
+/* The same title object as the one on Tonight and on the House, so
+   arriving here continues the reveal rather than cutting to a new
+   page that happens to name the same film. */
+.title {
+  font-size: var(--hd-size-display);
+  margin: 0 0 var(--hd-space-7);
+  text-wrap: balance;
+  view-transition-name: hd-opening-title;
+}
+
+.year {
+  font-style: italic;
+  color: var(--hd-ink-muted);
+  font-size: 0.5em;
+  /* Sits on the title's baseline rather than beside it as a parenthesis:
+     the year is a caption on the film, not part of its name. */
+  display: block;
+  margin-top: var(--hd-space-2);
+  letter-spacing: 0.04em;
+}

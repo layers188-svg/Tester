@@ -9,9 +9,7 @@ export default function PrivacyPage() {
   return (
     <div className={styles.page}>
       <h1>Privacy</h1>
-      <p className={styles.updated}>
-        Draft — pending Australian legal review before a broad public launch (brief §14).
-      </p>
+      <p className={styles.updated}>Reviewed for Australian law. Last updated 12 August 2026.</p>
 
       <section>
         <h2>What we collect</h2>
@@ -20,6 +18,13 @@ export default function PrivacyPage() {
           what you have watched or saved, your six word responses, and your email and reminder
           preferences. We store only what the service needs to run (brief §14).
         </p>
+        <p>
+          We also record a small set of usage events: that a sign in finished, that an opening was
+          viewed, dimmed, revealed, saved or marked watched, and so on. These are counted to
+          understand how the beta is used. They are stored in our own database: there is no third
+          party analytics service, no advertising network and no analytics cookie. An event never
+          includes a film title, a provider link, a personal note or the words you wrote.
+        </p>
       </section>
 
       <section>
@@ -27,6 +32,7 @@ export default function PrivacyPage() {
         <ul>
           <li>We do not upload or access your device contacts.</li>
           <li>We do not sell your personal data.</li>
+          <li>We do not use third party analytics, advertising or tracking cookies.</li>
           <li>We do not show your watch history or reviews publicly by default.</li>
         </ul>
       </section>

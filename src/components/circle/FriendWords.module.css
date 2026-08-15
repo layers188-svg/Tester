@@ -1,0 +1,85 @@
+/*
+ * Friend activity. A sealed row is deliberately not a lesser version of
+ * an open one: it keeps the same weight and says plainly what is
+ * waiting, because "someone reacted to this and you have not yet" is
+ * the interesting fact, not an absence.
+ */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hd-space-5);
+}
+
+.row {
+  border-left: 1px solid var(--hd-rule);
+  padding-left: var(--hd-space-4);
+}
+
+.row[data-unlocked="true"] {
+  border-left-color: var(--hd-accent);
+}
+
+.film {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--hd-space-3);
+}
+
+.sealedTag {
+  color: var(--hd-accent);
+  letter-spacing: 0.2em;
+}
+
+/* Small enough to be a mark on a line of type rather than an icon. */
+.seal {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.words {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.25rem;
+  line-height: 1.3;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.who {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--hd-accent);
+  margin: 0;
+}
+
+.locked {
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-3);
+  max-width: 44ch;
+}
+
+.link {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: var(--hd-accent);
+}
+
+.empty {
+  color: var(--hd-ink-muted);
+  margin: 0;
+  max-width: 44ch;
+}

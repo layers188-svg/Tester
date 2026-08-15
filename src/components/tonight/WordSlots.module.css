@@ -1,0 +1,141 @@
+/*
+ * Six underlines, and one invisible input lying across them.
+ *
+ * The input has to stay a real, focusable, full-size control: it is
+ * what the member types into and what a screen reader announces. It is
+ * transparent rather than hidden, because `display: none` or
+ * `visibility: hidden` would take it out of the tab order and off the
+ * keyboard entirely.
+ */
+.field {
+  position: relative;
+  margin: var(--hd-space-5) 0 var(--hd-space-4);
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  /*
+   * 16px or larger, or iOS Safari zooms the whole page when the field
+   * takes focus and the member loses the screen they were reading.
+   * Invisible, but it still has to be sized like real type.
+   */
+  font-size: 1rem;
+  color: transparent;
+  caret-color: transparent;
+  opacity: 0;
+  z-index: 2;
+}
+
+.input:disabled {
+  cursor: default;
+}
+
+/*
+ * The global :focus-visible rule would draw a ring around the invisible
+ * input, which is a rectangle around nothing sitting on top of the
+ * slots. The ring goes on .field instead, below.
+ */
+.input:focus-visible {
+  outline: none;
+}
+
+.slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--hd-space-4) var(--hd-space-4);
+}
+
+/* Three across once there is room for a word to sit on one line. */
+@media (min-width: 26rem) {
+  .slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.slot {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--hd-rule);
+  padding-bottom: var(--hd-space-2);
+  transition: border-color var(--hd-motion-panel) var(--hd-ease-standard);
+}
+
+.slot[data-filled="true"] {
+  border-bottom-color: var(--hd-rule-strong);
+}
+
+/*
+ * The slot being written into. Brass, and the only thing on the screen
+ * that moves while the member is thinking — a caret has to blink to
+ * read as a caret.
+ */
+.field:focus-within .slot[data-active="true"] {
+  border-bottom-color: var(--hd-accent);
+}
+
+.field:focus-within .slot[data-active="true"]::after {
+  content: "";
+  width: 1px;
+  height: 1.4rem;
+  margin-left: 1px;
+  background: var(--hd-accent);
+  animation: caret 1.1s steps(1, end) infinite;
+}
+
+@keyframes caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion gets a steady caret rather than none: a caret that
+   does not blink still reads as a caret, an absent one does not. */
+@media (prefers-reduced-motion: reduce) {
+  .field:focus-within .slot[data-active="true"]::after {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.word {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.375rem;
+  line-height: 1.1;
+  color: var(--hd-ink);
+  /* A long word narrows rather than pushing the grid out of shape. */
+  overflow-wrap: anywhere;
+}
+
+.field[data-disabled="true"] .word {
+  color: var(--hd-ink-muted);
+}
+
+/*
+ * The focus ring belongs to the composite, not to the invisible input:
+ * an outline on a transparent element at inset 0 would draw a
+ * rectangle around nothing.
+ */
+.field:focus-within {
+  outline: 2px solid var(--hd-focus);
+  /* Square, like every other edge in the product. A rounded ring at
+     this size reads as a form box drawn around the slots, which is the
+     shape the six underlines exist to avoid. */
+  outline-offset: 10px;
+  border-radius: 0;
+}

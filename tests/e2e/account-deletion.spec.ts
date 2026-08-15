@@ -1,14 +1,38 @@
 import { test, expect } from "@playwright/test";
-import { skipWithoutLiveSupabase } from "./helpers";
+import { signedInAs, skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS } from "./auth-state";
 
 // Brief §17 item 9: "Delete review and account."
 test.describe("delete review and account", () => {
+  // These two are genuinely ordered, not merely grouped: the second one
+  // deletes the expendable persona's account, and the first needs that
+  // account signed in with its seeded six-word review still present.
+  // Under the config's `fullyParallel` they raced, and the review test
+  // failed with "waiting for getByRole('button', { name: 'Delete' })" —
+  // the account had already been deleted underneath it, so /tonight had
+  // bounced to /join. It passed or failed on worker scheduling alone,
+  // which is the worst kind of test. Serial mode pins the order.
+  test.describe.configure({ mode: "serial" });
+
   test.beforeEach(() => skipWithoutLiveSupabase());
+  signedInAs(PERSONAS.expendable);
 
   test("member deletes their own six-word review", async ({ page }) => {
+    // Reached the way a member reaches it, not by deep link. This
+    // persona has already published, so /tonight gives them the House
+    // rather than the reveal card, and the House has to carry a route
+    // back to their own words — otherwise the deletion this journey
+    // asserts is a capability nothing in the product can find.
     await page.goto("/tonight");
+    await page.getByRole("link", { name: /change your words/i }).click();
+    await expect(page).toHaveURL(/\/opening\//);
+
     await page.getByRole("button", { name: "Delete" }).click();
-    await expect(page.getByPlaceholder("Six words, exactly.")).toBeVisible();
+    // Deleting returns the member to the empty field, ready to write
+    // again. Asserted on the heading rather than on the field's
+    // placeholder, which the six-slot input does not have.
+    await expect(page.getByText(/six words after the picture/i)).toBeVisible();
+    await expect(page.getByLabel("Your six words")).toHaveValue("");
   });
 
   test("member deletes their account from You", async ({ page }) => {

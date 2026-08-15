@@ -4,6 +4,39 @@
   min-height: 100dvh;
 }
 
+/*
+ * Not sticky. On a 320px-tall-ish phone viewport the ritual pages need
+ * every line they can get, and a bar that follows you down the page is
+ * exactly the "app chrome" the brief argues against.
+ */
+.header {
+  display: flex;
+  align-items: center;
+  padding: var(--hd-space-4) var(--hd-space-4) var(--hd-space-3);
+  /*
+   * The wide container, not the reading column. Library uses the wide
+   * one, and a masthead centred on 30rem sat visibly off to the right
+   * of its content. Aligning to the widest page keeps the wordmark at
+   * the same left edge everywhere.
+   */
+  max-width: var(--hd-max-width-wide);
+  width: 100%;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.brand {
+  color: var(--hd-ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--hd-focus);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
 .main {
   flex: 1;
   padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));

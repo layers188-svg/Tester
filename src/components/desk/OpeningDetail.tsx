@@ -121,7 +121,7 @@ export function OpeningDetail({
       if (!isDurationInPreferredRange(meta.duration)) {
         setMessage("Uploaded. Note: outside the preferred 8-12 second duration.");
       } else if (payload.warnings?.length) {
-        setMessage("Uploaded, with a note — see below.");
+        setMessage("Uploaded, with a note. See below.");
       } else {
         setMessage("No Trailer uploaded.");
       }
@@ -246,8 +246,19 @@ export function OpeningDetail({
         <strong>{approvedAt ? "Yes" : "No"}</strong>
       </p>
 
-      {error && <p className={formStyles.error}>{error}</p>}
-      {message && <p className={formStyles.success}>{message}</p>}
+      {/* The Desk acts on one opening through many small controls, so
+          both outcomes are announced from one region rather than being
+          attached to whichever button was pressed. */}
+      {error && (
+        <p className={formStyles.error} role="alert">
+          {error}
+        </p>
+      )}
+      {message && (
+        <p className={formStyles.success} role="status">
+          {message}
+        </p>
+      )}
 
       <section className={styles.section}>
         <h2>Lifecycle</h2>
@@ -523,7 +534,7 @@ export function OpeningDetail({
               <ul className={styles.cuesPreview}>
                 {providers.map((p) => (
                   <li key={p.id}>
-                    {p.provider_name} — {p.access_type}
+                    {p.provider_name}, {p.access_type}
                   </li>
                 ))}
               </ul>

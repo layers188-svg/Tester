@@ -1,5 +1,6 @@
 import type {
   AccessType,
+  AnalyticsEventName,
   ModerationState,
   PlaybackAccessType,
   ReviewVisibility,
@@ -53,4 +54,24 @@ export const MODERATION_STATE_LABEL: Record<ModerationState, string> = {
   visible: "Visible",
   hidden: "Hidden",
   removed: "Removed",
+};
+
+/**
+ * Owner-facing wording for the brief §15 events on /desk/analytics.
+ * These never reach a member, but the same rule applies: no underscored
+ * enum in the interface.
+ */
+export const ANALYTICS_EVENT_LABEL: Record<AnalyticsEventName, string> = {
+  sign_in_completed: "Signed in",
+  opening_viewed: "Opening viewed",
+  dimming_started: "Dimming started",
+  no_trailer_completed: "No Trailer watched to the end",
+  reveal_completed: "Title revealed",
+  provider_handoff_selected: "Provider opened",
+  saved_for_later: "Saved for later",
+  marked_watched: "Marked watched",
+  six_words_submitted: "Six words left",
+  recommendation_sent: "Film sent under seal",
+  circle_invitation_accepted: "Circle invitation accepted",
+  screening_attendance_response: "Screening response",
 };

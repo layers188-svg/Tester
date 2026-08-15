@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { validateSixWords } from "@/lib/validation/six-words";
 import { enqueueNotification } from "@/lib/email/queue";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
+import { openingNumberFor } from "@/lib/analytics/opening-number";
 
 const createSchema = z
   .object({
@@ -52,6 +54,14 @@ export async function POST(request: Request) {
   }
 
   await enqueueNotification({ userId: user.id, type: "after_credits", payload: {} });
+
+  // Brief §15 event 9. §15 forbids sending a review body to analytics,
+  // so only the fact of submission is recorded — not the six words.
+  await recordAnalyticsEvent({
+    event: "six_words_submitted",
+    actorId: user.id,
+    openingNumber: await openingNumberFor(supabase, parsed.data.openingId),
+  });
 
   return NextResponse.json(data, { headers: { "Cache-Control": "no-store" } });
 }

@@ -3,12 +3,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./NoTrailerPlayer.module.css";
 
+/** The sample is exactly ten seconds, whatever the asset's own length. */
+const SAMPLE_SECONDS = 10;
+
 interface NoTrailerPlayerProps {
   /** Public Storage URL for the No Trailer file. Never a title, never a descriptive filename (brief §12). */
   src: string;
   posterSrc?: string | null;
   /** WebVTT captions URL. Required whenever the No Trailer carries speech (brief §16). */
   captionsSrc?: string | null;
+  /**
+   * The opening's safe cues. Used only if the video cannot play, so a
+   * member who gets nothing still gets something to go on. They are the
+   * same words already shown on the sealed card, so this reveals
+   * nothing new and cannot leak a title.
+   */
+  fallbackCues?: string[];
+  /**
+   * Whether the clue owns the viewport (FOCUS) rather than sitting in a
+   * column. Changes how the stage is sized, nothing else.
+   */
+  fill?: boolean;
   onComplete: () => void;
 }
 
@@ -27,7 +42,14 @@ type Status = "idle" | "playing" | "ended" | "error";
  * so an unmuted start is rejected in practice. Muted always plays; the
  * member turns the room tone on with the control below.
  */
-export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoTrailerPlayerProps) {
+export function NoTrailerPlayer({
+  src,
+  posterSrc,
+  captionsSrc,
+  fallbackCues = [],
+  fill = false,
+  onComplete,
+}: NoTrailerPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
   const [muted, setMuted] = useState(true);
@@ -83,10 +105,20 @@ export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoT
     start();
   }, [reducedMotion, start]);
 
+  /**
+   * Ten seconds, measured on the media clock rather than a timer, so a
+   * slow start cannot hand the member eleven seconds of footage. The
+   * asset may be longer; the sample is not.
+   */
   function handleTimeUpdate() {
     const video = videoRef.current;
-    if (!video || !video.duration) return;
-    setProgress(Math.min(1, video.currentTime / video.duration));
+    if (!video) return;
+    setProgress(Math.min(1, video.currentTime / SAMPLE_SECONDS));
+    if (video.currentTime >= SAMPLE_SECONDS) {
+      video.pause();
+      setProgress(1);
+      setStatus("ended");
+    }
   }
 
   function handleEnded() {
@@ -110,8 +142,32 @@ export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoT
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} data-fill={fill}>
       <div className={styles.stage}>
+        {/*
+         * The monogram's own linework, separated into the frame around
+         * the film. The H stem and the shared spine become the left and
+         * right edges, their serif bars the corners. It is the mark
+         * taken apart rather than a border drawn to look like one, so
+         * nothing here is a redrawn logo.
+         */}
+        <svg
+          className={styles.frame}
+          viewBox="0 0 300 400"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <g fill="none" stroke="currentColor" strokeLinecap="square">
+            <path d="M18 40 L18 360" strokeWidth="3" />
+            <path d="M8 40 L28 40" strokeWidth="1.5" />
+            <path d="M8 360 L28 360" strokeWidth="1.5" />
+            <path d="M282 40 L282 360" strokeWidth="3" />
+            <path d="M272 40 L292 40" strokeWidth="1.5" />
+            <path d="M272 360 L292 360" strokeWidth="1.5" />
+          </g>
+        </svg>
+
         <video
           ref={videoRef}
           className={styles.video}
@@ -121,7 +177,7 @@ export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoT
           muted
           controls={false}
           preload="auto"
-          aria-label="Tonight's No Trailer — an original, spoiler safe introduction"
+          aria-label="Tonight's No Trailer, an original, spoiler safe introduction"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
           onError={handleError}
@@ -147,12 +203,29 @@ export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoT
           </div>
         )}
 
+        {/*
+         * A failed asset is not a dead end and never an excuse to show
+         * the title. The member gets the same safe cues the sealed card
+         * carried, so they can still decide.
+         */}
         {status === "error" && (
           <div className={styles.overlay}>
-            <p>The No Trailer could not play.</p>
-            <button type="button" className={styles.overlayButton} onClick={retry}>
-              Try again
-            </button>
+            <p className={styles.fallbackLead}>Tonight&rsquo;s clue will not play.</p>
+            {fallbackCues.length > 0 && (
+              <ul className={styles.fallbackCues}>
+                {fallbackCues.map((cue) => (
+                  <li key={cue}>{cue}</li>
+                ))}
+              </ul>
+            )}
+            <div className={styles.fallbackActions}>
+              <button type="button" className={styles.overlayButton} onClick={retry}>
+                Try again
+              </button>
+              <button type="button" className={styles.overlayButtonPrimary} onClick={onComplete}>
+                Continue
+              </button>
+            </div>
           </div>
         )}
 
@@ -168,7 +241,7 @@ export function NoTrailerPlayer({ src, posterSrc, captionsSrc, onComplete }: NoT
         )}
       </div>
 
-      <div className={styles.controls}>
+      <div className={styles.controls} data-quiet={status === "playing"}>
         <button
           type="button"
           className={styles.control}

@@ -9,6 +9,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/unit/**/*.test.ts", "tests/unit/**/*.test.tsx"],
+    // Placeholder env so server modules can boot; see the file's header.
+    setupFiles: ["tests/setup-env.ts"],
   },
   resolve: {
     alias: {

@@ -7,14 +7,32 @@ import { defineConfig, devices } from "@playwright/test";
  * configured — see LAUNCH_CHECKLIST.md. The public-site and PWA checks
  * always run.
  */
+/**
+ * An externally hosted app to test against, or undefined to start one.
+ *
+ * Normalised through `||` rather than read twice: with `??`, an exported
+ * but empty `PLAYWRIGHT_BASE_URL` set `baseURL` to `""` while the
+ * webServer block still started a server, and setup died on
+ * `new URL("")` — "TypeError: Invalid URL" pointing at a cookie domain,
+ * which says nothing about the actual cause. Empty now means unset.
+ */
+const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL || undefined;
+
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Mints a real session per persona when a live project is configured,
+  // and returns immediately when one is not — so the public suite runs
+  // unchanged with no Supabase at all. See tests/e2e/global-setup.ts.
+  globalSetup: "./tests/e2e/global-setup.ts",
+  // Removes the accounts and content the setup created, and fails the
+  // run if anything survives. See tests/e2e/global-teardown.ts.
+  globalTeardown: "./tests/e2e/global-teardown.ts",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: [["list"]],
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100",
+    baseURL: externalBaseURL ?? "http://localhost:3100",
     trace: "on-first-retry",
   },
   projects: [
@@ -31,12 +49,36 @@ export default defineConfig({
       },
     },
   ],
-  webServer: process.env.PLAYWRIGHT_BASE_URL
+  // Built output, not `next dev`.
+  //
+  // Turbopack's dev server panics while compiling /api/six-words — an
+  // internal turbo-tasks assertion in aggregation_update.rs, nothing to
+  // do with this code — and takes the server down mid-request. The
+  // journey that submits six words hung on "Saving…" until it timed
+  // out, which read exactly like an application bug and was not one.
+  // The production build compiles it without complaint, and is closer
+  // to what a member actually gets.
+  webServer: externalBaseURL
     ? undefined
     : {
-        command: "npm run dev -- -p 3100",
+        command: "npm run build && npx next start -p 3100",
         url: "http://localhost:3100",
         reuseExistingServer: true,
-        timeout: 120_000,
+        timeout: 300_000,
+        env: {
+          /*
+           * Search runs on the house's own 62 films for the suite.
+           *
+           * Not because the wide catalogue is untrusted, but because a
+           * journey that reaches Wikidata is a journey that fails when
+           * Wikidata is slow, rate limits an anonymous caller, or is
+           * simply having a bad afternoon. None of that is a fact about
+           * House Dark, and a test that reports it as one stops meaning
+           * anything. The composition itself is covered in
+           * tests/unit/film-provider.test.ts, where the far side can be
+           * made to fail on purpose.
+           */
+          HOUSE_DARK_WIDE_CATALOGUE: "off",
+        },
       },
 });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { toRevealPayload } from "@/lib/reveal/payload";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
 
 /** Sealed recommendation reveal — see the opening reveal route for the security notes; same pattern. */
 export async function POST(
@@ -29,6 +30,12 @@ export async function POST(
   }
 
   const [result] = data;
+
+  // Brief §15 event 5, the sealed-recommendation half. No opening
+  // number exists for a recommendation, and the recommendation id is
+  // deliberately not recorded — it joins back to the film.
+  await recordAnalyticsEvent({ event: "reveal_completed", actorId: user.id });
+
   return NextResponse.json(toRevealPayload(result), {
     headers: { "Cache-Control": "no-store" },
   });

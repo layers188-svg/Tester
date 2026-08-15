@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { NewOpeningForm } from "@/components/desk/NewOpeningForm";
 
-export const metadata: Metadata = { title: "New opening — Programming Desk" };
+export const metadata: Metadata = { title: "New opening · Programming Desk" };
 
 export default function NewOpeningPage() {
   return (

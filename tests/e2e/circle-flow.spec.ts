@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { skipWithoutLiveSupabase } from "./helpers";
+import { PERSONAS, storageStateFor } from "./auth-state";
 
 // Brief §17 item 5: "Create a Circle and accept an invitation." Needs
 // two authenticated members (a creator and a joiner) — see
@@ -8,7 +9,7 @@ test.describe("create a Circle and accept an invitation", () => {
   test.beforeEach(() => skipWithoutLiveSupabase());
 
   test("creator starts a Circle and a second member joins by code", async ({ browser }) => {
-    const creator = await browser.newContext();
+    const creator = await browser.newContext({ storageState: storageStateFor(PERSONAS.member) });
     const creatorPage = await creator.newPage();
     await creatorPage.goto("/circle");
     await creatorPage.getByPlaceholder("Circle name").fill(`E2E Circle ${Date.now()}`);
@@ -18,7 +19,7 @@ test.describe("create a Circle and accept an invitation", () => {
     const inviteCode = await creatorPage.getByLabel("Invite code").textContent();
     expect(inviteCode?.trim()).toBeTruthy();
 
-    const joiner = await browser.newContext();
+    const joiner = await browser.newContext({ storageState: storageStateFor(PERSONAS.friend) });
     const joinerPage = await joiner.newPage();
     await joinerPage.goto("/circle");
     await joinerPage.getByPlaceholder("Invite code").fill(inviteCode!.trim());

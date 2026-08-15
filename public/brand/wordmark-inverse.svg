@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="420" viewBox="0 0 1800 420">
+  <title>House Dark — Approved Wordmark</title>
+  <desc>House Dark primary wordmark: HOUSE upright, DARK italic.</desc>
+
+  <g fill="#E9E0D0">
+    <text x="70" y="285"
+          font-family="Newsreader, serif"
+          font-size="260"
+          font-weight="400"
+          font-style="normal"
+          font-variation-settings="'opsz' 72, 'wght' 400"
+          letter-spacing="-2">HOUSE</text>
+
+    <text x="910" y="285"
+          font-family="Newsreader, serif"
+          font-size="260"
+          font-weight="400"
+          font-style="italic"
+          font-variation-settings="'opsz' 72, 'wght' 400"
+          letter-spacing="-2">DARK</text>
+  </g>
+</svg>

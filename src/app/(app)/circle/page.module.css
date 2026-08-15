@@ -59,3 +59,107 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
+/*
+ * ---------------------------------------------------------------------
+ * Under seal, as the page rather than as a row.
+ *
+ * A person chose a film for you and you do not know what it is. That is
+ * the whole of Circle, and it was previously a bordered list item below
+ * a heading, a lead and a primary button — the shape of an admin
+ * screen. At full scale it is what the page is about, and everything
+ * administrative moves below it.
+ *
+ * Nothing here is an envelope, a wax seal or a ticket. The concealment
+ * is expressed by what is absent: there is no title on this screen, and
+ * the composition is built around the space where one would go.
+ * ---------------------------------------------------------------------
+ */
+.waiting {
+  padding: var(--hd-space-6) 0 var(--hd-space-7);
+  margin-bottom: var(--hd-space-6);
+  border-bottom: 1px solid var(--hd-rule);
+}
+
+.waitingLabel {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-4);
+}
+
+/* The largest thing on the page, and deliberately not a film name. */
+.waitingTitle {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  line-height: 1;
+  margin: 0 0 var(--hd-space-5);
+  text-wrap: balance;
+}
+
+.waitingFrom {
+  font-family: var(--hd-font-editorial);
+  font-size: 1.375rem;
+  color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-2);
+}
+
+.waitingMeta {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-ink-muted);
+  margin: 0 0 var(--hd-space-5);
+}
+
+/* Anything after the first stays a list. One thing is the page; three
+   things are a queue, and a queue is read rather than felt. */
+.alsoWaiting {
+  list-style: none;
+  margin: var(--hd-space-6) 0 0;
+  padding: 0;
+}
+
+.alsoLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--hd-space-4);
+  padding: var(--hd-space-4) 0;
+  border-top: 1px solid var(--hd-rule);
+  min-height: var(--hd-touch-min);
+}
+
+.quietHead {
+  margin-bottom: var(--hd-space-6);
+}
+
+/* Sending is a thing you do, not the reason you came. It sits under the
+   film that is waiting rather than above it. */
+.sendRow {
+  margin-bottom: var(--hd-space-7);
+}
+
+@media (min-width: 60rem) {
+  .waitingTitle {
+    font-size: clamp(3.5rem, 7vw, 5.5rem);
+  }
+}
+
+/*
+ * The seal on the waiting film.
+ *
+ * Named to match the one on the recommendation page, so choosing this
+ * carries the object across rather than drawing a second copy of it
+ * there. Set above the label rather than beside it: on this screen the
+ * seal is the subject, not an icon decorating a heading.
+ */
+.waitingSeal {
+  view-transition-name: hd-seal;
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: var(--hd-space-5);
+}

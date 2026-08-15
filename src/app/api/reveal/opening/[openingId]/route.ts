@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { toRevealPayload } from "@/lib/reveal/payload";
+import { recordAnalyticsEvent } from "@/lib/analytics/record";
+import { openingNumberFor } from "@/lib/analytics/opening-number";
 
 /**
  * The single path from "sealed" to "revealed" for a nightly opening
@@ -35,6 +37,15 @@ export async function POST(
   }
 
   const [result] = data;
+
+  // Brief §15 event 5. `result` holds the title at this point — nothing
+  // from it is passed on; only the opaque opening number is.
+  await recordAnalyticsEvent({
+    event: "reveal_completed",
+    actorId: user.id,
+    openingNumber: await openingNumberFor(supabase, openingId),
+  });
+
   return NextResponse.json(toRevealPayload(result), {
     headers: { "Cache-Control": "no-store" },
   });

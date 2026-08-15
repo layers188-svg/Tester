@@ -1,56 +1,63 @@
 .panel {
   border-top: 1px solid var(--hd-rule);
-  padding-top: var(--hd-space-5);
-  margin-top: var(--hd-space-5);
+  padding-top: var(--hd-space-6);
+  margin-top: var(--hd-space-6);
 }
 
-.hint {
-  font-size: var(--hd-size-small);
-  max-width: 34ch;
+.eyebrow {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--hd-size-micro);
+  color: var(--hd-accent);
+  margin: 0 0 var(--hd-space-3);
 }
 
-.textarea {
-  width: 100%;
-  min-height: 4.5rem;
-  background: var(--hd-surface);
-  border: 1px solid var(--hd-rule-strong);
-  border-radius: var(--hd-radius-control);
-  color: var(--hd-ink);
+/* Restrained on purpose: one line, and the field is the next thing. */
+.lead {
   font-family: var(--hd-font-editorial);
   font-size: 1.125rem;
-  padding: var(--hd-space-3);
-  resize: none;
-}
-
-.textarea:focus {
-  border-color: var(--hd-accent);
+  color: var(--hd-ink-muted);
+  margin: 0;
+  max-width: 32ch;
 }
 
 .meta {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: var(--hd-space-4);
   font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
   font-size: var(--hd-size-micro);
   color: var(--hd-ink-muted);
-  margin: var(--hd-space-2) 0 var(--hd-space-4);
+  margin: 0 0 var(--hd-space-5);
 }
 
 .error {
   color: var(--hd-danger-ink);
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
+/* Coming back to words already left. The same named object as the
+   submission moment and the Room: this branch and that one never
+   render together, so the name is only ever on one element at a time. */
 .ownWord {
   font-family: var(--hd-font-editorial);
-  font-style: italic;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  line-height: 1.25;
   color: var(--hd-ink);
+  margin: 0 0 var(--hd-space-4);
+  text-wrap: balance;
+  view-transition-name: hd-my-six-words;
 }
 
 .ownActions {
   display: flex;
-  gap: var(--hd-space-4);
-  margin-bottom: var(--hd-space-5);
+  gap: var(--hd-space-5);
+  margin-bottom: var(--hd-space-4);
 }
 
 .linkButton {
@@ -59,33 +66,164 @@
   padding: 0;
   color: var(--hd-ink-muted);
   font-family: var(--hd-font-utility);
-  font-size: var(--hd-size-small);
-  text-decoration: underline;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: var(--hd-size-micro);
   cursor: pointer;
-  min-height: 44px;
+  min-height: var(--hd-touch-min);
 }
 
 .linkButton:hover {
   color: var(--hd-ink);
 }
 
-.afterCredits {
-  border-top: 1px solid var(--hd-rule);
-  padding-top: var(--hd-space-5);
+.roomLink {
+  display: inline-block;
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-small);
+  color: var(--hd-accent);
 }
 
-.words {
-  list-style: none;
-  margin: var(--hd-space-3) 0 0;
-  padding: 0;
+/*
+ * ---------------------------------------------------------------------
+ * The submission moment.
+ *
+ * The six words the member just wrote, alone on the page, and then two
+ * short lines. It takes about two seconds end to end and does nothing a
+ * progress indicator would do: there is no work happening here, the
+ * save already finished. The pause is the acknowledgement.
+ *
+ * This does NOT dim the house. It used to, borrowing the clue's
+ * gesture, which took the four tabs away from a member who had just
+ * finished writing and might reasonably want to go somewhere else. DIM
+ * is reserved for the ten seconds of the clue, where being unable to
+ * leave is the point. Here the quiet comes from the composition alone:
+ * one line of type in a lot of space.
+ *
+ * Nothing celebrates. No tick, no confetti, no count of how many people
+ * are waiting inside — the room is not a reward for having spoken, it
+ * is the next part of the evening.
+ * ---------------------------------------------------------------------
+ */
+.moment {
+  min-height: 60dvh;
   display: flex;
   flex-direction: column;
-  gap: var(--hd-space-3);
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--hd-space-5);
+  padding: var(--hd-space-6) 0;
 }
 
-.words li {
+/* The words settle: they arrive already written, and only lift.
+   Named so that entering the Room carries them upward into "Your six
+   words" instead of redrawing them there. */
+.momentWords {
+  font-family: var(--hd-font-editorial);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  line-height: 1.15;
+  color: var(--hd-ink);
+  margin: 0;
+  text-wrap: balance;
+  animation: settle var(--hd-motion-reveal) var(--hd-ease-entering) backwards;
+  view-transition-name: hd-my-six-words;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--hd-stage-rise), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The brass rule expands under them. */
+.momentRule {
+  display: block;
+  width: 100%;
+  max-width: 22rem;
+  height: 1px;
+  background: var(--hd-accent);
+  transform-origin: left;
+  opacity: 0.7;
+  animation: expand-rule var(--hd-motion-transform) var(--hd-ease-entering) backwards;
+  animation-delay: var(--hd-motion-reveal);
+}
+
+@keyframes expand-rule {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 0.7;
+  }
+}
+
+.momentSaid,
+.momentRoom {
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: var(--hd-size-small);
+  margin: 0;
+  animation: settle var(--hd-motion-reveal) var(--hd-ease-entering) backwards;
+}
+
+.momentSaid {
+  color: var(--hd-ink-muted);
+}
+
+.momentRoom {
+  color: var(--hd-accent);
+  margin-bottom: var(--hd-space-4);
+}
+
+.momentOpen {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.momentPrivate {
   font-family: var(--hd-font-editorial);
   font-style: italic;
-  border-left: 2px solid var(--hd-accent);
-  padding-left: var(--hd-space-3);
+  color: var(--hd-ink-muted);
+  margin: 0;
+  max-width: 34ch;
+}
+
+/*
+ * Skip for now.
+ *
+ * Quiet, and deliberately below the primary action rather than beside
+ * it: skipping is allowed, not encouraged. The Room stays shut either
+ * way — the rule is that a member's own words come first, not that
+ * they are obliged to have any.
+ */
+.skip {
+  display: block;
+  margin: var(--hd-space-4) auto 0;
+  background: none;
+  border: none;
+  padding: 0 var(--hd-space-4);
+  min-height: var(--hd-touch-min);
+  cursor: pointer;
+  color: var(--hd-ink-muted);
+  font-family: var(--hd-font-utility);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--hd-size-micro);
+  transition: color var(--hd-motion-fast) var(--hd-ease-standard);
+}
+
+.skip:hover {
+  color: var(--hd-ink);
 }

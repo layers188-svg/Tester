@@ -7,7 +7,28 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Send under seal" };
 
-export default async function SendPage() {
+export default async function SendPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  /**
+   * Prefill from a Library row, so "Send under seal" on a film the
+   * member has revealed arrives with the film already filled in rather
+   * than asking them to retype what the house already knows.
+   *
+   * Read as plain query text and passed to the form as a starting
+   * value. Nothing is trusted: what is actually sent goes through the
+   * same validation as a typed send.
+   */
+  const params = await searchParams;
+  const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
+  const prefill = {
+    title: one(params.title).slice(0, 200),
+    releaseYear: one(params.year).replace(/\D/g, "").slice(0, 4),
+    runtimeMinutes: one(params.runtime).replace(/\D/g, "").slice(0, 4),
+  };
+
   const supabase = await getServerSupabase();
   const {
     data: { user },
@@ -53,7 +74,11 @@ export default async function SendPage() {
       <p className={styles.lead}>
         They will see your note and up to three cues. Never the title, never a poster.
       </p>
-      <SendForm recipients={Array.from(recipientMap.values())} circles={circles} />
+      <SendForm
+        recipients={Array.from(recipientMap.values())}
+        circles={circles}
+        prefill={prefill}
+      />
     </div>
   );
 }

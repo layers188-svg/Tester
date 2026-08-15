@@ -15,10 +15,18 @@ body {
   margin: 0;
   background: var(--hd-bg);
   color: var(--hd-ink);
-  font-family: var(--hd-font-utility);
+  font-family: var(--hd-font-body);
   font-size: var(--hd-size-body);
-  line-height: 1.5;
+  line-height: 1.55;
   min-height: 100dvh;
+}
+
+/* See --hd-size-body-desktop. Mobile is untouched: the product is
+   phone first, and 16px is already the right size in the hand. */
+@media (min-width: 48rem) {
+  body {
+    font-size: var(--hd-size-body-desktop);
+  }
 }
 
 h1,
@@ -106,4 +114,237 @@ ol {
 
 .hd-skip-link:focus {
   top: var(--hd-space-3);
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * The motion vocabulary — shared behaviours
+ *
+ * Only the parts that must be identical across screens live here. The
+ * verbs that belong to one screen (FOCUS on the clue stage, REVEAL on
+ * the title) stay in that screen's module, because sharing them would
+ * invite them to be used somewhere they do not mean anything.
+ * ---------------------------------------------------------------------
+ */
+
+/*
+ * Staged entry. A composition arrives in reading order rather than all
+ * at once, which is what makes a screen feel composed instead of
+ * loaded. Set --hd-stage-index on each child to order it.
+ *
+ * This is deliberately NOT scroll-triggered. The brief rules out
+ * fade-up-on-scroll, and it is right to: content that animates every
+ * time it re-enters the viewport is decoration. This plays once, when
+ * the screen arrives, and then the page is still.
+ */
+@keyframes hd-stage-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--hd-stage-rise), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * `backwards`, never `both`.
+ *
+ * `both` holds the final keyframe after the animation ends, which
+ * sounds harmless and is not: it also means the element's resting
+ * state, before the animation has started or if it never starts at
+ * all, is the `from` keyframe — opacity 0. Anything that stops the
+ * animation running leaves the content permanently invisible while
+ * still present in the DOM, which is the worst possible failure for a
+ * decorative effect.
+ *
+ * `backwards` applies `from` during the delay only. After that the
+ * element falls back to its own styles, so the finished state is
+ * "normal", not "whatever the keyframe said".
+ */
+.hd-stage {
+  animation: hd-stage-in var(--hd-motion-reveal) var(--hd-ease-entering) backwards;
+  animation-delay: calc(var(--hd-stage-index, 0) * var(--hd-stage-step));
+}
+
+/*
+ * DIM. The house around the clue goes dark.
+ *
+ * The old dim painted a black sheet over everything at z-index 30,
+ * which covered the shell rather than dimming it — the masthead and the
+ * four tabs were still there underneath, still focusable, waiting to
+ * come back. This takes the chrome itself down, and `inert` (set by the
+ * component, not by CSS) takes it out of the tab order and the
+ * accessibility tree while it is gone. Darkness a screen reader still
+ * reads out is not darkness.
+ */
+.hd-dimmable {
+  transition: opacity var(--hd-motion-dim) var(--hd-ease-standard);
+}
+
+.hd-dimmable[data-dimmed="true"] {
+  opacity: 0;
+}
+
+/*
+ * Moving between sections.
+ *
+ * The navigation and the masthead stay exactly where they are; only the
+ * content between them changes. Native View Transitions do this with no
+ * dependency and no wrapper component: the browser holds the outgoing
+ * frame, we cross it with the incoming one, and anything the transition
+ * cannot handle simply happens instantly, which is the correct fallback.
+ *
+ * Deliberately not a slide. A screen sliding left and right is a
+ * generic mobile app; House Dark is one room whose contents change, so
+ * the outgoing content recedes very slightly and the incoming settles.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+/*
+ * ---------------------------------------------------------------------
+ * HOW LONG A TRANSITION LASTS.
+ *
+ * This block is the reason three motion passes read as cuts.
+ *
+ * A `view-transition-name` makes two elements one object, and the
+ * browser then animates that object with its OWN default: 250ms, on a
+ * default ease. Nothing in this stylesheet had ever overridden it. So
+ * every shared-element morph in the product — the clue frame growing
+ * into the playback stage, the film title travelling into the House,
+ * the member's six words arriving in the Room, the seal opening — has
+ * been running at 250ms, while the tokens that were supposed to govern
+ * them (620ms, 720ms, 900ms) applied only to ordinary CSS transitions
+ * on elements that were not part of a view transition at all.
+ *
+ * 250ms is enough to see that something changed and not enough to see
+ * what. Frame by frame the object was demonstrably surviving; at normal
+ * speed it read as a cut, because it was one. The objects were right
+ * and the clock was wrong.
+ *
+ * The group carries the movement (position, size, shape). The old and
+ * new pseudo-elements carry the content cross-fade, and they have to
+ * last as long or the contents snap while the box is still travelling.
+ * ---------------------------------------------------------------------
+ */
+::view-transition-group(*) {
+  animation-duration: var(--hd-motion-signature);
+  animation-timing-function: var(--hd-ease-entering);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: var(--hd-motion-signature);
+  animation-timing-function: var(--hd-ease-entering);
+}
+
+/*
+ * A page change is not a signature moment, so the root group keeps the
+ * structural speed. Without this every ordinary navigation would take
+ * as long as the reveal, which is the opposite failure: making
+ * everything cinematic is the same as making nothing cinematic.
+ */
+::view-transition-group(root) {
+  animation-duration: var(--hd-motion-standard);
+}
+
+/*
+ * The shell does not animate at all.
+ *
+ * `hd-nav` and `hd-header` are named so the tab bar and masthead stay
+ * put across a navigation — they are the fixed part of the house. Being
+ * named also opts them into the transition, though, and while a group
+ * is animating the real element is replaced by a snapshot that does not
+ * take clicks. At the browser's 250ms default that was a flicker nobody
+ * caught; at 700ms it is a tab bar that ignores you for two thirds of a
+ * second, which the navigation journey found immediately.
+ *
+ * Zero duration keeps them in the transition — so the rest of the page
+ * still animates around them — while making the swap instant.
+ */
+::view-transition-group(hd-nav),
+::view-transition-group(hd-header),
+::view-transition-old(hd-nav),
+::view-transition-new(hd-nav),
+::view-transition-old(hd-header),
+::view-transition-new(hd-header) {
+  animation-duration: 0s;
+}
+
+::view-transition-old(root) {
+  animation: hd-page-out var(--hd-motion-fast) var(--hd-ease-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: hd-page-in var(--hd-motion-standard) var(--hd-ease-entering) both;
+}
+
+/*
+ * A page change is a composition receding and another resolving in its
+ * place, not a cross-fade.
+ *
+ * The old composition lifts as it goes and the new one settles from
+ * below, which gives a navigation a direction and makes the sections
+ * feel like rooms in one house rather than unrelated documents. The
+ * distance is deliberately small: this is the STRUCTURAL level, and
+ * anything larger starts competing with the moments that matter.
+ *
+ * It used to be six pixels, which at that size is a fade with a
+ * rounding error attached.
+ */
+@keyframes hd-page-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -16px, 0);
+  }
+}
+
+@keyframes hd-page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * The shell does not travel with the content. Naming these excludes
+ * them from the root snapshot, so the tab bar and masthead are
+ * continuous across a navigation rather than fading out and back in
+ * with everything else.
+ */
+.hd-persistent-nav {
+  view-transition-name: hd-nav;
+}
+
+.hd-persistent-header {
+  view-transition-name: hd-header;
+}
+
+/*
+ * Reduced motion removes the travel from every transition, not only
+ * the root one.
+ *
+ * The named objects — the film title, the member's six words, the clue
+ * frame — are morphed by the browser's own default animation on
+ * ::view-transition-group, so silencing only the root would leave the
+ * largest movements on the page running. Information and navigation are
+ * untouched: what goes is the travel, never the state change.
+ *
+ * `startViewTransition` in src/lib/motion.ts also refuses to start one
+ * at all under this preference, so this is the second line of defence
+ * and covers cross-document navigations, which JavaScript never sees.
+ */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

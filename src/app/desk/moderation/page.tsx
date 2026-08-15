@@ -3,7 +3,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { ModerationList } from "@/components/desk/ModerationList";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Moderation — Programming Desk" };
+export const metadata: Metadata = { title: "Moderation · Programming Desk" };
 
 export default async function ModerationPage() {
   const supabase = await getServerSupabase();

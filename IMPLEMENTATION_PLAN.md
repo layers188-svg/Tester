@@ -58,6 +58,11 @@ used instead (brief §2, §23) and the gap is logged in
   email, sealed recommendation email, screening reminders, After Credits
   prompts, retries with a cap.
 - Review moderation (hide, not silently rewrite).
+- Analytics (brief §15): the twelve permitted events, first party, with
+  no third party provider and no cookie. The table has no free text
+  column and no film or opening reference, so §15's prohibitions hold by
+  construction rather than by a scan someone has to remember to run.
+  Read back as aggregate counts at `/desk/analytics`.
 
 ## Phase 6 — Launch readiness
 
@@ -72,10 +77,30 @@ used instead (brief §2, §23) and the gap is logged in
 - Playwright critical journeys (brief §17).
 - Cloudflare adapter + deploy config, `README.md`, `OPERATIONS.md`,
   `LAUNCH_CHECKLIST.md`.
+- Resilience (brief §16): loading and error states for every screen, the
+  house's own 404, and idempotent sends. The error boundaries never
+  render `error.message` — §11 lists error messages among the places a
+  title must not appear.
+- Accessibility rule 8: every form error is announced and pointed at by
+  the input that caused it, and the two inputs that had only a
+  placeholder for a label now have one.
 
 ## What is genuinely blocked on Logan
 
-Tracked live in `LAUNCH_CHECKLIST.md`; summary: a real Supabase project,
-a Resend account + verified sending domain, a Cloudflare account, a
-domain, the approved logo source file, and the real seed night
-photography/No Trailer footage. Everything else proceeds autonomously.
+Tracked live in `LAUNCH_CHECKLIST.md`, which is the authority — this
+summary has been wrong before by being written once and left.
+
+As of 14 August, one thing blocks a real member signing in: **a Resend
+account**, wired up as Supabase custom SMTP. Until then no six-digit
+code can be delivered, and `/api/test-signin` stands in for sign-in
+behind a key (checklist item 9 — remove it the same day Resend lands).
+
+After that, and only when inviting a second person: a **domain**, so
+Resend can deliver to an address that is not Logan's own.
+
+Recurring rather than blocking: a **real No Trailer** cut for each
+night that runs. The software cannot make one.
+
+Already done, and no longer to be listed here: the Supabase project,
+the Cloudflare account and deploy, the approved logo, and the legal
+review. Everything else proceeds autonomously.

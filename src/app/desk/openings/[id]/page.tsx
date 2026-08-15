@@ -4,7 +4,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { OpeningDetail } from "@/components/desk/OpeningDetail";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Opening — Programming Desk" };
+export const metadata: Metadata = { title: "Opening · Programming Desk" };
 
 export default async function DeskOpeningDetailPage({
   params,

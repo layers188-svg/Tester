@@ -7,3 +7,15 @@
 .lead {
   margin-top: calc(var(--hd-space-3) * -1);
 }
+
+/*
+ * The Library is the one signed-in page that is a collection rather
+ * than a reading column, so it takes the wider container from 48rem
+ * up. At 30rem a two-up grid on a desktop left most of the canvas
+ * empty and the cards too narrow for a title to sit on one line.
+ */
+@media (min-width: 48rem) {
+  .page {
+    max-width: var(--hd-max-width-wide);
+  }
+}
