@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { LibraryItem } from "@/lib/supabase/types";
 import { WATCH_STATE_LABEL } from "@/lib/labels";
 import { NOTHING_UNDER_THAT_TITLE, searchLibrary } from "@/lib/library/search";
+import { noTrailerUrl } from "@/lib/media/storage";
 import { EntryField } from "./EntryField";
 import styles from "./LibraryArchive.module.css";
 
@@ -21,6 +22,12 @@ import styles from "./LibraryArchive.module.css";
  * The scroll position is preserved by never taking the record out of
  * the list — it is the same <li>, still in document order, which grows.
  * Nothing is unmounted, so there is no scroll to restore.
+ *
+ * A record the member has revealed can play its No Trailer again. It is
+ * the only part of an evening they can return to: the picture speaks
+ * once and is gone, and the six words are theirs, but the No Trailer
+ * was made for them by the House. The path arrives on the same
+ * condition as the title (0019), so a sealed record has neither.
  */
 
 export function LibraryArchive({ items }: { items: LibraryItem[] }) {
@@ -104,6 +111,29 @@ export function LibraryArchive({ items }: { items: LibraryItem[] }) {
                  * resolves after the title has finished moving.
                  */}
                 <div className={styles.detail} hidden={!open}>
+                  {/*
+                   * Mounted only while the record is open, so a Library
+                   * of fifty films is not fifty video elements holding
+                   * connections. `preload="metadata"` fetches just far
+                   * enough to paint a first frame — with "none" the
+                   * member gets a grey box and a spinner where the
+                   * picture should be, which is a worse thing to return
+                   * to than a still.
+                   */}
+                  {open && item.no_trailer_path && (
+                    <div className={styles.replay}>
+                      <p className={styles.replayLabel}>The No Trailer</p>
+                      <video
+                        className={styles.replayVideo}
+                        src={noTrailerUrl(item.no_trailer_path)}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        aria-label={`The No Trailer for ${item.title ?? "this picture"}`}
+                      />
+                    </div>
+                  )}
+
                   {item.six_words && <p className={styles.sixWords}>{item.six_words}</p>}
 
                   {!item.revealed && item.kind === "opening" && (

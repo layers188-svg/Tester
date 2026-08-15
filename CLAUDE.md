@@ -131,6 +131,12 @@ npm run db:reset:local        # DESTRUCTIVE: drops the LOCAL dev database, reapp
                               # this at a linked/remote project.
 ```
 
+The House Dark 500 (`data/house-dark-500.json`) is the catalogue behind
+Trust Us: twenty territories, twenty-five films each, one six-word line
+per film. It is the source of truth — edit the JSON and re-run
+`node scripts/generate-catalogue-migration.mjs`, never edit the
+generated `0018_house_dark_500.sql` by hand.
+
 `/dev/stage` is the staging state simulator: it mounts the real
 components with fixture props and stubs the network, so the signature
 motion can be rendered and measured without a Supabase project. It 404s

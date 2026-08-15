@@ -58,6 +58,10 @@ interface FilmRow {
   runtime_minutes: number;
   country_code: string | null;
   rights_notes: string | null;
+  /** Which canon this came from — editorial context, never shown to a member (0018). */
+  canon_anchor: string | null;
+  /** Opaque object name in the no-trailer bucket (0019). */
+  no_trailer_storage_path: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -218,10 +222,23 @@ interface NotificationQueueRow {
   updated_at: string;
 }
 
+interface TrustUsTerritoryRow {
+  slug: string;
+  label: string;
+  prompt: string;
+  description: string;
+  tags: string[];
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface FilmHouseRecordRow {
   film_id: string;
   six_words_before: string;
+  /** Territory slugs (0018). */
   territories: string[];
+  canon_anchor: string | null;
   pace: string | null;
   intensity: string | null;
   editorial_approved_at: string | null;
@@ -309,6 +326,11 @@ export interface LibraryItem {
   title: string | null;
   release_year: number | null;
   six_words: string | null;
+  /**
+   * The No Trailer, for rows the member has revealed. Follows the title
+   * exactly: null wherever the title is null (0019).
+   */
+  no_trailer_path: string | null;
 }
 
 export interface HouseOpening {
@@ -330,6 +352,19 @@ export interface RoomVoice {
   /** 'circle' — someone the member shares a Circle with. 'house' — an editor-approved voice from the wider House. */
   source: "circle" | "house";
   created_at: string;
+}
+
+/**
+ * A territory the member can offer the House — a mood, in their own
+ * words, from the House Dark 500 catalogue.
+ */
+export interface TrustUsTerritory {
+  slug: string;
+  /** "I want to feel tense" */
+  label: string;
+  /** "Something tense where the pressure never lets up" */
+  prompt: string;
+  description: string;
 }
 
 /** One Trust Us recommendation. There is deliberately nothing here to browse with. */
@@ -461,6 +496,15 @@ export interface Database {
         LibraryAdditionRow,
         Partial<LibraryAdditionRow> & { user_id: string; film_id: string }
       >;
+      trust_us_territories: Table<
+        TrustUsTerritoryRow,
+        Partial<TrustUsTerritoryRow> & {
+          slug: string;
+          label: string;
+          prompt: string;
+          description: string;
+        }
+      >;
       trust_us_responses: Table<
         TrustUsResponseRow,
         Partial<TrustUsResponseRow> & {
@@ -530,7 +574,7 @@ export interface Database {
       };
       list_trust_us_territories: {
         Args: Record<string, never>;
-        Returns: { territory: string }[];
+        Returns: TrustUsTerritory[];
       };
       record_trust_us_response: {
         Args: { p_film_id: string; p_territory: string; p_response: "seen" | "trusted" };

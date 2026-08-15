@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { TrustUsRecommendation } from "@/lib/supabase/types";
+import type { TrustUsRecommendation, TrustUsTerritory } from "@/lib/supabase/types";
 import { useReducedMotion } from "@/lib/motion/reduced-motion";
 import styles from "./TrustUs.module.css";
 
@@ -23,11 +23,11 @@ import styles from "./TrustUs.module.css";
 
 type Stage = "territory" | "recommendation" | "accepted" | "exhausted";
 
-export function TrustUs({ territories }: { territories: string[] }) {
+export function TrustUs({ territories }: { territories: TrustUsTerritory[] }) {
   const reducedMotion = useReducedMotion();
 
   const [stage, setStage] = useState<Stage>("territory");
-  const [territory, setTerritory] = useState<string | null>(null);
+  const [territory, setTerritory] = useState<TrustUsTerritory | null>(null);
   const [recommendation, setRecommendation] = useState<TrustUsRecommendation | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,9 +75,9 @@ export function TrustUs({ territories }: { territories: string[] }) {
     [],
   );
 
-  function chooseTerritory(value: string) {
+  function chooseTerritory(value: TrustUsTerritory) {
     setTerritory(value);
-    void ask(value);
+    void ask(value.slug);
   }
 
   function seenIt() {
@@ -87,12 +87,12 @@ export function TrustUs({ territories }: { territories: string[] }) {
     setLeaving(recommendation);
     if (scrubTimer.current) clearTimeout(scrubTimer.current);
     scrubTimer.current = setTimeout(() => setLeaving(null), reducedMotion ? 0 : 520);
-    void ask(territory, { filmId: recommendation.film_id, response: "seen" });
+    void ask(territory.slug, { filmId: recommendation.film_id, response: "seen" });
   }
 
   function trustUs() {
     if (!recommendation || !territory) return;
-    void ask(territory, { filmId: recommendation.film_id, response: "trusted" });
+    void ask(territory.slug, { filmId: recommendation.film_id, response: "trusted" });
   }
 
   function changeTerritory() {
@@ -118,14 +118,15 @@ export function TrustUs({ territories }: { territories: string[] }) {
         ) : (
           <ul className={styles.territories}>
             {territories.map((value) => (
-              <li key={value}>
+              <li key={value.slug}>
                 <button
                   type="button"
                   className={styles.territory}
                   disabled={busy}
                   onClick={() => chooseTerritory(value)}
                 >
-                  {value}
+                  <span className={styles.territoryLabel}>{value.label}</span>
+                  <span className={styles.territoryPrompt}>{value.prompt}</span>
                 </button>
               </li>
             ))}
@@ -158,7 +159,7 @@ export function TrustUs({ territories }: { territories: string[] }) {
   if (stage === "exhausted") {
     return (
       <div className={styles.stage} data-stage="exhausted">
-        <p className={styles.eyebrow}>{territory}</p>
+        <p className={styles.eyebrow}>{territory?.label}</p>
         <h1 className={styles.question}>That is everything we have there.</h1>
         <p className={styles.lead}>Try another territory.</p>
         <button type="button" className={styles.quietAction} onClick={changeTerritory}>
@@ -171,7 +172,7 @@ export function TrustUs({ territories }: { territories: string[] }) {
   return (
     <div className={styles.stage} data-stage="recommendation">
       <div className={styles.chosenTerritory}>
-        <span className={styles.eyebrow}>{territory}</span>
+        <span className={styles.eyebrow}>{territory?.label}</span>
         <button type="button" className={styles.quietAction} onClick={changeTerritory}>
           Change
         </button>

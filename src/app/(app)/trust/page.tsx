@@ -20,7 +20,6 @@ export default async function TrustUsPage() {
   if (!user) return null;
 
   const { data } = await supabase.rpc("list_trust_us_territories");
-  const territories = (data ?? []).map((row) => row.territory);
 
-  return <TrustUs territories={territories} />;
+  return <TrustUs territories={data ?? []} />;
 }

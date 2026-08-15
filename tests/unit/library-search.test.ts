@@ -23,6 +23,7 @@ function item(overrides: Partial<LibraryItem> = {}): LibraryItem {
     title: "Whiplash",
     release_year: 2014,
     six_words: null,
+    no_trailer_path: null,
     ...overrides,
   };
 }

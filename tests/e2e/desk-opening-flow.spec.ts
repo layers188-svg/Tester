@@ -16,7 +16,7 @@ test.describe("Programming Desk: create and schedule an opening", () => {
     await page.getByRole("button", { name: /create opening/i }).click();
     await expect(page).toHaveURL(/\/desk\/openings\/[0-9a-f-]+/);
 
-    await page.setInputFiles('input[type="file"]', "tests/e2e/fixtures/sample-no-trailer.mp4");
+    await page.setInputFiles('input[type="file"]', "public/film-videos/2f8a41c7e9b04d63.mp4");
     await expect(page.getByText(/no trailer uploaded/i)).toBeVisible();
 
     await page.getByRole("button", { name: "Approve" }).click();

@@ -7,27 +7,32 @@ Each item says exactly what to do, not a general setup lecture.
 
 ---
 
-## 0. Film metadata provider — the only new external blocker
+## 0. No Trailers for the House Dark 500
 
-The August handover asks the Library to "add a watched film from a broad
-metadata catalogue", and Trust Us to draw its recommendations from real
-film metadata rather than hand-written records.
+The catalogue arrived and is in: twenty territories, 500 films, each
+with its six-word line (`data/house-dark-500.json`, imported by
+0018_house_dark_500.sql). Trust Us runs on it.
 
-Everything around it is built and running: `add_library_film()` accepts a
-title and year today, and `film_house_records` holds the editorial
-six-word line per film with its own Programming Desk screen at
-`/desk/records`. What is missing is a catalogue to search.
+One film has a No Trailer — the seed picture, attached to the film it
+was made for by 0020_film_no_trailers.sql. The other 499 have none, and
+the Library shows nothing for them rather than borrowing that one and
+presenting it as theirs.
 
-**Do:** pick a provider (TMDB is the usual one for this) and create an
-API key. It stays server side.
+**Do:** upload No Trailers through the Programming Desk as they are
+made. The Desk already rewrites each to an opaque object name and the
+Library picks it up with no code change.
 
-**Then give me:** the key, as `TMDB_API_KEY` or equivalent. It slots in
-ahead of the existing calls — a provider search replaces the two inputs
-in the add-film form and the Desk record form, and nothing downstream
-changes.
+Two files currently sit in `public/film-videos/` because there is no
+Storage bucket to hold them yet. Once item 1 exists they move, and the
+only thing that changes is a column.
 
-Until then the House works: a member types a title, and an owner writes
-the editorial line. Nothing is a placeholder and nothing is faked.
+### A metadata provider, if you want one
+
+`add_library_film()` takes a title and a year, which is enough for a
+member adding a film the catalogue does not have. A provider search
+would replace those two inputs with a lookup. It needs an account and a
+server-side key (TMDB is the usual choice) — say the word and it slots
+in ahead of the same call.
 
 ---
 

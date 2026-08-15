@@ -428,3 +428,49 @@ begin
     not exists (select 1 from get_my_library() where kind = 'added'));
 end
 $$;
+
+-- =====================================================================
+-- Watching the No Trailer again (0019_territories_and_replay.sql)
+-- =====================================================================
+--
+-- The path follows the title exactly. That is the whole rule: if a
+-- member may not know what the film was, they may not have the picture
+-- the House made for it either — a No Trailer is not the title, but it
+-- is the thing the title was hidden behind, and handing it over would
+-- undo the evening just as surely.
+
+select tests.act_as_service();
+
+update films set no_trailer_storage_path = '/film-videos/test-clip.mp4'
+where id = :film_id;
+
+select tests.act_as(:member_id);
+
+select tests.check('7.R', 'a revealed opening carries its No Trailer',
+  (select no_trailer_path from get_my_library() where kind = 'opening') is not null);
+
+select tests.check('7.R', 'a revealed recommendation carries its No Trailer',
+  (select no_trailer_path from get_my_library() where kind = 'recommendation') is not null);
+
+-- :other_id saved the same opening and never revealed it.
+select tests.act_as(:other_id);
+
+select tests.check('7.R', 'an unrevealed opening carries no No Trailer',
+  (select no_trailer_path from get_my_library() where kind = 'opening') is null,
+  'path was: ' || coalesce((select no_trailer_path from get_my_library() where kind = 'opening'), '(null)'));
+
+select tests.check('7.R', 'the unrevealed payload still leaks no title',
+  not exists (select 1 from get_my_library() l where to_jsonb(l)::text ilike '%whiplash%'));
+
+-- A film with no No Trailer simply has none; nothing is borrowed.
+select tests.act_as(:member_id);
+
+do $$
+declare v_id uuid;
+begin
+  select add_library_film('A Film With No Picture', 1999, 100) into v_id;
+  perform tests.check('7.R', 'a film with no No Trailer returns null rather than another film''s',
+    (select no_trailer_path from get_my_library()
+     where kind = 'added' and title = 'A Film With No Picture') is null);
+end
+$$;

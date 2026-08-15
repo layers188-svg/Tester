@@ -179,3 +179,38 @@
   transition: none;
   animation: none;
 }
+
+/*
+ * Watching the No Trailer again. Native controls here, unlike Tonight:
+ * the ritual's player exists to run ten seconds exactly once and get
+ * out of the way, while this is an archive and the member should be
+ * able to scrub, pause and replay it however they like.
+ */
+.replay {
+  margin: 0 0 var(--hd-space-4);
+}
+
+.replayLabel {
+  margin: 0 0 var(--hd-space-2);
+  font-family: var(--hd-font-utility);
+  font-size: var(--hd-size-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hd-accent);
+}
+
+.replayVideo {
+  width: 100%;
+  max-width: 22rem;
+  aspect-ratio: 9 / 16;
+  background: var(--hd-projection-black);
+  border: 1px solid var(--hd-rule);
+  object-fit: cover;
+}
+
+@media (min-width: 48rem) {
+  .replayVideo {
+    aspect-ratio: 16 / 9;
+    max-width: 28rem;
+  }
+}

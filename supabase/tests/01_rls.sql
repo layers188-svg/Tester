@@ -606,8 +606,15 @@ $$;
 
 select tests.act_as(:owner_id);
 
+-- Access, not arithmetic. This counted rows until the House Dark 500
+-- arrived and made the number an artifact of the catalogue rather than
+-- of the policy under test.
 select tests.check('17.7', 'owner CAN read films',
-  (select count(*) from films) = 1);
+  exists (select 1 from films where id = :film_id));
+
+select tests.check('17.7', 'owner CAN read the whole catalogue',
+  (select count(*) from films) > 500,
+  'rows: ' || (select count(*) from films));
 
 select tests.check('17.7', 'owner CAN read opening_secrets',
   (select count(*) from opening_secrets) = 1);

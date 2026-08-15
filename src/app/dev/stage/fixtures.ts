@@ -1,6 +1,6 @@
 import type { OpeningSafe, MemberOpeningProgress } from "@/lib/opening/queries";
 import type { RoomOpening } from "@/lib/room/queries";
-import type { LibraryItem, RoomVoice } from "@/lib/supabase/types";
+import type { LibraryItem, RoomVoice, TrustUsTerritory } from "@/lib/supabase/types";
 
 /**
  * Staging fixtures, from docs/handover/fixtures.json.
@@ -100,7 +100,33 @@ export const stageVoices: RoomVoice[] = [
 /* Trust Us                                                            */
 /* ------------------------------------------------------------------ */
 
-export const stageTerritories = ["Ambition", "Longing", "Memory", "Something strange"];
+/** Four of the twenty, with the catalogue's own copy (data/house-dark-500.json). */
+export const stageTerritories: TrustUsTerritory[] = [
+  {
+    slug: "ambition-and-obsession",
+    label: "I want ambition and obsession",
+    prompt: "Something about wanting one thing far too much",
+    description: "Films about drive, fixation and the cost of pursuit.",
+  },
+  {
+    slug: "tense",
+    label: "I want to feel tense",
+    prompt: "Something tense where the pressure never lets up",
+    description: "Pressure-driven films built around suspense, pursuit or tightening stakes.",
+  },
+  {
+    slug: "heartbreak",
+    label: "I want heartbreak",
+    prompt: "Something that will quietly break my heart",
+    description: "Films that sit with loss and longing.",
+  },
+  {
+    slug: "beautiful-and-strange",
+    label: "I want something beautiful and strange",
+    prompt: "Something strange that I will keep thinking about",
+    description: "Films that work by image and atmosphere rather than plot.",
+  },
+];
 
 const STAGE_RECORDS = [
   { film_id: "stage-film-1", title: "Territory Film One", release_year: 2001 },
@@ -173,6 +199,7 @@ export const stageLibrary: LibraryItem[] = [
     title: STAGE_TITLE,
     release_year: 2014,
     six_words: "I understood him. That worried me.",
+    no_trailer_path: "/dev/stage-no-trailer.webm",
   },
   {
     kind: "opening",
@@ -184,6 +211,8 @@ export const stageLibrary: LibraryItem[] = [
     title: null,
     release_year: null,
     six_words: null,
+    // Never revealed, so no title and no picture to return to.
+    no_trailer_path: null,
   },
   {
     kind: "added",
@@ -195,6 +224,7 @@ export const stageLibrary: LibraryItem[] = [
     title: "In the Mood for Love",
     release_year: 2000,
     six_words: null,
+    no_trailer_path: "/dev/stage-no-trailer.webm",
   },
   {
     kind: "added",
@@ -206,5 +236,6 @@ export const stageLibrary: LibraryItem[] = [
     title: "Burning",
     release_year: 2018,
     six_words: null,
+    no_trailer_path: null,
   },
 ];
