@@ -1,0 +1,9 @@
+{
+  "name": "house-dark-stage-site",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Static export of /dev/stage. Uses the root project's dependencies; see README.md.",
+  "scripts": {
+    "build": "../node_modules/.bin/next build"
+  }
+}

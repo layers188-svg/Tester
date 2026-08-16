@@ -16,6 +16,8 @@
     "test:e2e": "playwright test",
     "db:migrate": "supabase db push",
     "db:reset:local": "supabase db reset",
+    "stage:build": "node scripts/stage-site-assets.mjs && cd stage-site && next build",
+    "stage:serve": "node scripts/serve-stage-site.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare deploy",

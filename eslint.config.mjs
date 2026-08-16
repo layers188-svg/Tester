@@ -7,9 +7,11 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
+    // Default ignores of eslint-config-next, widened to any depth so
+    // they also cover stage-site/, the second Next app that exports the
+    // motion review site.
+    "**/.next/**",
+    "**/out/**",
     "build/**",
     "next-env.d.ts",
     // Generated build output — Cloudflare adapter bundle, the Wrangler

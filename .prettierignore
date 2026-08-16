@@ -1,4 +1,6 @@
 .next
+stage-site/.next
+stage-site/out
 .open-next
 .wrangler
 node_modules

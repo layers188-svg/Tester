@@ -33,6 +33,17 @@ const PROTECTED_TITLE = /sundown arcadia/i;
 /** Motion principle 5: 3-5px micro motion does not count as the effect. */
 const VISIBLE_TRAVEL_PX = 24;
 
+/**
+ * The way in, wherever this is running.
+ *
+ * These tests run against three deployments: the dev server, the built
+ * Worker, and the exported review site, which is published under a base
+ * path and writes trailing slashes. All three are the same application
+ * and the assertion is about where the door leads, so it is matched
+ * rather than compared.
+ */
+const JOIN_HREF = /\/join\/?$/;
+
 async function gotoStage(page: Page, state: string) {
   await page.goto(`${STAGE}?state=${state}`);
   await page.waitForLoadState("networkidle");
@@ -510,7 +521,11 @@ test.describe("The entry", () => {
       await expect(entry).toHaveAttribute("data-phase", /closing|held/);
     }).toPass({ timeout: 2000 });
 
-    await page.waitForURL("**/join", { timeout: 8000 });
+    // What matters is that it lands on /join, not the exact string. The
+    // published review site is served from a subdirectory with trailing
+    // slashes, so an equality check would be testing the deployment's
+    // URL style rather than the aperture's exit. See JOIN_HREF.
+    await page.waitForURL(JOIN_HREF, { timeout: 8000 });
   });
 
   test("is not a trap without JavaScript", async ({ browser }) => {
@@ -531,7 +546,7 @@ test.describe("The entry", () => {
     await expect(house.locator("h1").first()).toBeVisible();
     await expect(house.getByRole("link", { name: /join or sign in/i })).toHaveAttribute(
       "href",
-      "/join",
+      JOIN_HREF,
     );
 
     await context.close();

@@ -44,7 +44,7 @@ import styles from "./stage.module.css";
  * security-definer function in Postgres.
  */
 
-type StageState =
+export type StageState =
   "sealed" | "revealed" | "watched" | "door" | "room" | "trust" | "seal" | "library";
 
 const STATES: { value: StageState; label: string }[] = [
@@ -57,6 +57,18 @@ const STATES: { value: StageState; label: string }[] = [
   { value: "seal", label: "Under Seal" },
   { value: "library", label: "Library" },
 ];
+
+/**
+ * `?state=` to a state, defaulting to sealed.
+ *
+ * Shared, because it is read in two places that cannot share a runtime:
+ * the product's route reads it on the server, and the exported review
+ * site reads it in the browser. One list of valid states means a deep
+ * link cannot mean two different things.
+ */
+export function parseStageState(value: string | null | undefined): StageState {
+  return STATES.some((state) => state.value === value) ? (value as StageState) : "sealed";
+}
 
 /**
  * Answers the handful of calls the ritual makes, with the same shapes

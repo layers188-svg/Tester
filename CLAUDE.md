@@ -145,6 +145,12 @@ geometry rather than class names — run it whenever you touch a signature
 transition, because "the CSS is there" is not evidence that anything
 moves.
 
+`stage-site/` exports the aperture and the stage to flat files for free
+hosting on GitHub Pages (`npm run stage:build`, `npm run stage:serve`).
+Its pages are one-line re-exports of the product's own components, never
+copies — see `stage-site/README.md`. The motion suite must pass against
+the export as well as the dev server.
+
 See `README.md` for setup, `OPERATIONS.md` for the daily opening workflow,
 and `LAUNCH_CHECKLIST.md` for the only actions still waiting on Logan.
 

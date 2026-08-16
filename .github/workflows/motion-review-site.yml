@@ -1,0 +1,75 @@
+name: Motion review site
+
+# Publishes stage-site/ to GitHub Pages.
+#
+# The review link has to be free, and this is the one hosting that is:
+# the repository is public, so Pages costs nothing, and the site is flat
+# files because /dev/stage needs no server. The alternative — deploying
+# the whole application to Cloudflare Workers — needs the Paid plan,
+# because a server-rendered Next.js app is ~2 MiB of Worker script
+# against a 1 MiB free limit, and no trimming closes that gap.
+#
+# One setting has to be turned on by hand, once: Settings → Pages →
+# Build and deployment → Source → GitHub Actions. Nothing here can do
+# that for itself.
+
+on:
+  push:
+    branches: [claude/new-session-qvb1ur]
+    paths:
+      - "stage-site/**"
+      - "src/**"
+      - "public/dev/**"
+      - ".github/workflows/motion-review-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never two deploys at once, and never cancel one half-done — a
+# cancelled Pages deploy can leave the site on a partial upload.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build the export
+        run: npm run stage:build
+        # A project site is served from /<repo>, so the build needs to
+        # know its own prefix. Taken from the repository rather than
+        # written down, so a rename cannot silently break every asset.
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}
+
+      # Belt and braces: irrelevant to the Actions deploy, which does not
+      # run Jekyll, but it keeps _next/ intact if the source is ever
+      # switched to a branch.
+      - run: touch stage-site/out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: stage-site/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { StageHarness } from "./StageHarness";
+import { StageHarness, parseStageState } from "./StageHarness";
 
 /**
  * The staging state simulator's front door.
@@ -37,16 +37,6 @@ export default async function StagePage({
   if (!stageEnabled()) notFound();
 
   const { state } = await searchParams;
-  const initial =
-    state === "revealed" ||
-    state === "watched" ||
-    state === "room" ||
-    state === "trust" ||
-    state === "seal" ||
-    state === "library" ||
-    state === "door"
-      ? state
-      : "sealed";
 
-  return <StageHarness initialState={initial} />;
+  return <StageHarness initialState={parseStageState(state)} />;
 }

@@ -16,6 +16,10 @@
 # next.js
 /.next/
 /out/
+/stage-site/.next/
+/stage-site/out/
+# copied from public/dev at build time by scripts/stage-site-assets.mjs
+/stage-site/public/
 
 # production
 /build

@@ -5,8 +5,9 @@ configuration. `/dev/stage` mounts the real components with fixture
 props and stubs the network, so everything below runs from a clean
 checkout in about two minutes.
 
-If you want the whole product live rather than the motion, skip to
-[Putting it online](#putting-it-online).
+For a link you can open on a phone instead, skip to
+[Putting it online, free](#putting-it-online-free) — it costs nothing
+and needs one setting changed.
 
 ---
 
@@ -66,32 +67,48 @@ travels, the seal's compression percentage.
 
 ---
 
-## Putting it online
+## Putting it online, free
 
-Two separate things are needed, and only the first is required for a
-link that shows the motion.
+The motion needs no server. `/dev/stage` mounts the real components and
+answers their network calls itself, and the entry aperture is client
+side, so both export to flat files — and flat files on a public
+repository are free forever on GitHub Pages. That is what
+`stage-site/` builds, and it is already wired up.
 
-### A link that shows the motion — Cloudflare only
+**One switch, once, and only you can throw it:**
 
-`/dev/stage` is a 404 in production unless it is explicitly switched on,
-so a preview deploy can carry it without exposing it by accident.
-Verified against a real production build: 404 without the flag, 200 with
-it, and the full rendered-motion suite passes against the built Worker
-running under Wrangler.
+> **Settings → Pages → Build and deployment → Source → GitHub Actions**
+>
+> <https://github.com/layers188-svg/Tester/settings/pages>
 
-**What I need from you:** a Cloudflare account **on the Workers Paid
-plan**, and an API token with Workers permissions
-(`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
+Nothing else. No account, no card, no token, no DNS. The workflow
+(`.github/workflows/motion-review-site.yml`) is already on the branch and
+runs on every push to it; the moment the source is set it will build and
+publish. If it has already run and failed for want of that setting, use
+**Actions → Motion review site → Run workflow** to run it again.
 
-Then:
+The link will be:
 
-```bash
-npx wrangler secret put HOUSE_DARK_ENABLE_STAGE   # value: true
-npm run cf:deploy
+```
+https://layers188-svg.github.io/Tester/
 ```
 
-#### Why the plan matters
+It opens on the projection aperture, exactly as the product does. Come
+through it and the page you land on has a button through to the
+simulator, at `/Tester/dev/stage/`. Deep links work too —
+`…/dev/stage/?state=room` and so on for each of the eight.
 
+All fifteen rendered-motion tests pass against that export, run against
+the same bytes that get published — see `stage-site/README.md` for how
+that is checked, and for the two places the review site deliberately
+differs from the product.
+
+What will not work there is the House itself: signing in, tonight's
+opening, your Circle. Those need a database, which is the next section.
+
+### Why not Cloudflare
+
+The whole application, server rendered, is what needs paying for.
 Measured with `npx wrangler deploy --dry-run`:
 
 |                                                  |                                 |
@@ -106,14 +123,19 @@ however it is built; there is no trimming that gets it under 1 MiB. An
 account-less `wrangler deploy --temporary` uses a free preview account
 and fails with `code: 10027` for exactly this reason.
 
-That deploy attempt also found a real problem, now fixed: Cloudflare
-refuses any static asset over 5 MB, and the seed No Trailer master (9.9
-MB) had briefly been placed in `public/`. It lives in
-`assets/no-trailers/` now, unserved, which is where the architecture
-always said it belonged.
+That deploy attempt found a real problem, now fixed: Cloudflare refuses
+any static asset over 5 MB, and the seed No Trailer master (9.9 MB) had
+briefly been placed in `public/`. It lives in `assets/no-trailers/` now,
+unserved, which is where the architecture always said it belonged.
 
-The signed-in product on such a deploy will not work, because it has no
-database.
+If you do end up on the Workers Paid plan, `/dev/stage` can ride along on
+a preview deploy — it is a 404 in production unless explicitly switched
+on, verified against a real production build:
+
+```bash
+npx wrangler secret put HOUSE_DARK_ENABLE_STAGE   # value: true
+npm run cf:deploy
+```
 
 > Leave `HOUSE_DARK_ENABLE_STAGE` unset — or set it to anything other
 > than `true` — on the real production deployment. The route checks it
