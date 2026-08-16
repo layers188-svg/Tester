@@ -1,0 +1,29 @@
+{
+  "filmCount": 500,
+  "uniqueFilmCount": 500,
+  "themeCount": 20,
+  "filmsPerTheme": {
+    "I want to feel tense": 25,
+    "I want to be scared": 25,
+    "I want a mystery": 25,
+    "I want something mind-bending": 25,
+    "I want big adventure": 25,
+    "I want science-fiction wonder": 25,
+    "I want romance without clichés": 25,
+    "I want heartbreak": 25,
+    "I want something warm": 25,
+    "I want to laugh": 25,
+    "I want dark comedy": 25,
+    "I want coming-of-age": 25,
+    "I want family drama": 25,
+    "I want friendship and connection": 25,
+    "I want crime and moral compromise": 25,
+    "I want ambition and obsession": 25,
+    "I want power and politics": 25,
+    "I want war and survival": 25,
+    "I want music and performance": 25,
+    "I want something beautiful and strange": 25
+  },
+  "sixWordFailures": [],
+  "spoilerSafeFailures": []
+}

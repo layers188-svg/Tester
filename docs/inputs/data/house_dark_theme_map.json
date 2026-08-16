@@ -1,0 +1,304 @@
+{
+  "themes": [
+    {
+      "themeNumber": 1,
+      "primarySearchTheme": "I want to feel tense",
+      "exampleUserSearch": "Something tense where the pressure never lets up",
+      "matchingTags": [
+        "tense",
+        "suspense",
+        "pressure",
+        "chase",
+        "claustrophobic",
+        "edge of seat"
+      ],
+      "meaning": "Pressure-driven films built around suspense, pursuit or tightening stakes.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 2,
+      "primarySearchTheme": "I want to be scared",
+      "exampleUserSearch": "Something genuinely scary and unsettling",
+      "matchingTags": [
+        "horror",
+        "scary",
+        "creepy",
+        "dread",
+        "disturbing",
+        "supernatural"
+      ],
+      "meaning": "Horror chosen for atmosphere, dread and the feeling that something is wrong.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 3,
+      "primarySearchTheme": "I want a mystery",
+      "exampleUserSearch": "Give me a mystery I can get lost in",
+      "matchingTags": [
+        "mystery",
+        "detective",
+        "investigation",
+        "secrets",
+        "puzzle",
+        "noir"
+      ],
+      "meaning": "Films driven by unanswered questions, investigation, hidden motives or uncertain truth.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 4,
+      "primarySearchTheme": "I want something mind-bending",
+      "exampleUserSearch": "Something that will mess with my head",
+      "matchingTags": [
+        "mind bending",
+        "surreal",
+        "reality",
+        "memory",
+        "identity",
+        "strange"
+      ],
+      "meaning": "Reality slips, identity blurs and the film keeps asking you to reconsider what you saw.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 5,
+      "primarySearchTheme": "I want big adventure",
+      "exampleUserSearch": "A big adventure I can disappear into",
+      "matchingTags": [
+        "adventure",
+        "epic",
+        "journey",
+        "quest",
+        "action",
+        "escape"
+      ],
+      "meaning": "Large-scale journeys, quests, chases and worlds that reward surrendering to the ride.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 6,
+      "primarySearchTheme": "I want science-fiction wonder",
+      "exampleUserSearch": "Science fiction that makes me feel awe",
+      "matchingTags": [
+        "science fiction",
+        "space",
+        "future",
+        "technology",
+        "aliens",
+        "awe"
+      ],
+      "meaning": "Speculative films built around wonder, discovery, future worlds and big human questions.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 7,
+      "primarySearchTheme": "I want romance without clichés",
+      "exampleUserSearch": "Romantic, but complicated and not cheesy",
+      "matchingTags": [
+        "romance",
+        "longing",
+        "chemistry",
+        "complicated love",
+        "intimate",
+        "desire"
+      ],
+      "meaning": "Love stories with friction, restraint, ambiguity and people who feel real.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 8,
+      "primarySearchTheme": "I want heartbreak",
+      "exampleUserSearch": "I want something that will destroy me",
+      "matchingTags": [
+        "sad",
+        "cry",
+        "grief",
+        "loss",
+        "devastating",
+        "emotional"
+      ],
+      "meaning": "Films that land emotionally through grief, loss, regret, sacrifice or quiet devastation.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 9,
+      "primarySearchTheme": "I want something warm",
+      "exampleUserSearch": "Something comforting that leaves me hopeful",
+      "matchingTags": [
+        "warm",
+        "comforting",
+        "hopeful",
+        "kind",
+        "gentle",
+        "wholesome"
+      ],
+      "meaning": "Gentle, generous films that restore faith in people without becoming saccharine.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 10,
+      "primarySearchTheme": "I want to laugh",
+      "exampleUserSearch": "I just want something properly funny",
+      "matchingTags": [
+        "funny",
+        "comedy",
+        "witty",
+        "silly",
+        "playful",
+        "feel good"
+      ],
+      "meaning": "Comedies that still work as films, from verbal wit to visual chaos.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 11,
+      "primarySearchTheme": "I want dark comedy",
+      "exampleUserSearch": "Something funny, but a little wrong",
+      "matchingTags": [
+        "dark comedy",
+        "satire",
+        "cynical",
+        "awkward",
+        "absurd",
+        "uncomfortable"
+      ],
+      "meaning": "Films that find humour inside power, violence, failure, social discomfort or moral rot.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 12,
+      "primarySearchTheme": "I want coming-of-age",
+      "exampleUserSearch": "Something about growing up and figuring it out",
+      "matchingTags": [
+        "coming of age",
+        "youth",
+        "adolescence",
+        "school",
+        "first love",
+        "growing up"
+      ],
+      "meaning": "Young people forming identities, leaving home, finding freedom or seeing adulthood clearly.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 13,
+      "primarySearchTheme": "I want family drama",
+      "exampleUserSearch": "A family story with real emotional weight",
+      "matchingTags": [
+        "family",
+        "parents",
+        "siblings",
+        "marriage",
+        "home",
+        "generational"
+      ],
+      "meaning": "Families under pressure, where love, history and resentment live in the same room.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 14,
+      "primarySearchTheme": "I want friendship and connection",
+      "exampleUserSearch": "Something about friendship or finding your people",
+      "matchingTags": [
+        "friendship",
+        "connection",
+        "chosen family",
+        "companionship",
+        "loneliness",
+        "community"
+      ],
+      "meaning": "Films about the people who make isolation bearable, whether briefly or for life.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 15,
+      "primarySearchTheme": "I want crime and moral compromise",
+      "exampleUserSearch": "A smart crime film with morally grey people",
+      "matchingTags": [
+        "crime",
+        "gangster",
+        "heist",
+        "cops",
+        "noir",
+        "moral grey"
+      ],
+      "meaning": "Crime stories where professionalism, loyalty, greed and conscience keep colliding.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 16,
+      "primarySearchTheme": "I want ambition and obsession",
+      "exampleUserSearch": "Something about obsession, talent or ambition",
+      "matchingTags": [
+        "ambition",
+        "obsession",
+        "perfection",
+        "fame",
+        "career",
+        "greatness"
+      ],
+      "meaning": "People who want something badly enough to sacrifice work, love, identity or sanity.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 17,
+      "primarySearchTheme": "I want power and politics",
+      "exampleUserSearch": "Something sharp about power, politics or corruption",
+      "matchingTags": [
+        "politics",
+        "power",
+        "corruption",
+        "protest",
+        "systems",
+        "justice"
+      ],
+      "meaning": "Films about institutions, ideology, propaganda, resistance and who gets to control the story.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 18,
+      "primarySearchTheme": "I want war and survival",
+      "exampleUserSearch": "A war film that feels human, not heroic",
+      "matchingTags": [
+        "war",
+        "survival",
+        "resistance",
+        "conflict",
+        "historical",
+        "occupation"
+      ],
+      "meaning": "War seen through survival, moral compromise, resistance and ordinary human consequence.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 19,
+      "primarySearchTheme": "I want music and performance",
+      "exampleUserSearch": "Something about music, artists or performing",
+      "matchingTags": [
+        "music",
+        "band",
+        "performance",
+        "artist",
+        "concert",
+        "dance"
+      ],
+      "meaning": "Films where performance is work, identity, escape, obsession or pure joy.",
+      "filmCount": 25
+    },
+    {
+      "themeNumber": 20,
+      "primarySearchTheme": "I want something beautiful and strange",
+      "exampleUserSearch": "Something visually beautiful and a bit strange",
+      "matchingTags": [
+        "beautiful",
+        "dreamlike",
+        "poetic",
+        "visual",
+        "slow",
+        "strange"
+      ],
+      "meaning": "Films where image, rhythm and atmosphere matter as much as conventional plot.",
+      "filmCount": 25
+    }
+  ]
+}

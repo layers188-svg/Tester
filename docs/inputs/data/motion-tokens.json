@@ -1,0 +1,39 @@
+{
+  "easing": {
+    "house": "cubic-bezier(.18,.82,.18,1)",
+    "long": "cubic-bezier(.22,.61,.36,1)"
+  },
+  "timingMs": {
+    "fast": [
+      150,
+      220
+    ],
+    "standard": [
+      280,
+      360
+    ],
+    "slow": [
+      450,
+      650
+    ],
+    "cinematic": [
+      650,
+      900
+    ],
+    "hold": [
+      200,
+      500
+    ]
+  },
+  "signatureSequences": [
+    "entry",
+    "sealed_to_clue",
+    "clue_to_no_trailer",
+    "no_trailer_to_reveal",
+    "reveal_to_house",
+    "home_to_room",
+    "trust_us_seen_it",
+    "send_under_seal",
+    "library_unfold"
+  ]
+}

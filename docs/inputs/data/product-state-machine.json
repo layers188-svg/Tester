@@ -1,0 +1,114 @@
+{
+  "tonight": {
+    "states": [
+      "sealed",
+      "clue",
+      "no_trailer_ready",
+      "no_trailer_playing",
+      "reveal_pending",
+      "revealed",
+      "watched",
+      "review_undecided",
+      "review_skipped",
+      "review_submitted",
+      "room"
+    ],
+    "transitions": [
+      [
+        "sealed",
+        "clue",
+        "member deliberately opens clue"
+      ],
+      [
+        "clue",
+        "no_trailer_ready",
+        "member continues"
+      ],
+      [
+        "no_trailer_ready",
+        "no_trailer_playing",
+        "explicit Play"
+      ],
+      [
+        "no_trailer_playing",
+        "reveal_pending",
+        "media ended"
+      ],
+      [
+        "reveal_pending",
+        "revealed",
+        "server reveal recorded and title returned"
+      ],
+      [
+        "revealed",
+        "watched",
+        "member marks watched"
+      ],
+      [
+        "watched",
+        "review_undecided",
+        "review prompt opens"
+      ],
+      [
+        "review_undecided",
+        "review_submitted",
+        "1 to 6 words submitted"
+      ],
+      [
+        "review_undecided",
+        "review_skipped",
+        "skip for now"
+      ],
+      [
+        "review_submitted",
+        "room",
+        "enter Room"
+      ],
+      [
+        "review_skipped",
+        "room",
+        "enter Room"
+      ]
+    ]
+  },
+  "trustUs": {
+    "states": [
+      "theme",
+      "recommendation",
+      "accepted_blind"
+    ],
+    "transitions": [
+      [
+        "theme",
+        "recommendation",
+        "House chooses one film"
+      ],
+      [
+        "recommendation",
+        "recommendation",
+        "Seen it, advance to next for same theme"
+      ],
+      [
+        "recommendation",
+        "accepted_blind",
+        "Trust us"
+      ]
+    ]
+  },
+  "circle": {
+    "incoming": [
+      "sealed_received",
+      "opened",
+      "revealed",
+      "watched",
+      "response_available"
+    ],
+    "outgoing": [
+      "choose_recipient",
+      "choose_film",
+      "review_seal",
+      "sending",
+      "sent"
+    ]
+  }
+}
