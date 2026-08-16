@@ -1,12 +1,21 @@
 /* Dev chrome only. Nothing here is part of the House. */
 
+/*
+ * Sticky and wrapping, not fixed and single-row.
+ *
+ * Eight states plus a label do not fit across a phone. Fixed, the ones
+ * past the fold were simply unreachable — nothing can scroll a fixed
+ * element into view — so on the width everything else here is measured
+ * at, half the simulator had no way in. Sticky keeps it in flow, which
+ * also means the content below needs no padding guessed to match its
+ * height.
+ */
 .bar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 100;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--hd-space-2);
   padding: var(--hd-space-2) var(--hd-space-3);
@@ -42,5 +51,5 @@
 }
 
 .main {
-  padding-top: 3rem;
+  padding-top: var(--hd-space-4);
 }

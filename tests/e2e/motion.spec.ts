@@ -552,3 +552,37 @@ test.describe("The entry", () => {
     await context.close();
   });
 });
+
+test.describe("The simulator itself", () => {
+  test("every state is reachable at phone width", async ({ page }) => {
+    await gotoStage(page, "sealed");
+
+    // The bar was fixed and single-row, so on the width everything else
+    // in this file is measured at, the last states sat off-screen with
+    // no way to reach them — nothing can scroll a fixed element into
+    // view. Half the review was unreachable on the only device that
+    // matters. The states are read from the bar rather than listed here,
+    // so a ninth would be covered the day it is added.
+    const buttons = page.locator("[data-stage-state]");
+    const count = await buttons.count();
+    expect(count).toBeGreaterThanOrEqual(8);
+
+    const viewport = page.viewportSize()!;
+
+    for (let i = 0; i < count; i += 1) {
+      const button = buttons.nth(i);
+      const state = await button.getAttribute("data-stage-state");
+      const box = (await button.boundingBox())!;
+
+      expect(box.x, `${state} starts within the viewport`).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width, `${state} ends within the viewport`).toBeLessThanOrEqual(
+        viewport.width,
+      );
+
+      // Reachable is not the same as present: it has to answer.
+      await button.click();
+      await expect(button).toHaveAttribute("data-active", "true");
+      await expect(page.locator("#hd-main")).not.toBeEmpty();
+    }
+  });
+});
