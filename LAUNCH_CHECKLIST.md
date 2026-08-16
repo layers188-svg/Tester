@@ -13,18 +13,20 @@ The catalogue arrived and is in: twenty territories, 500 films, each
 with its six-word line (`data/house-dark-500.json`, imported by
 0018_house_dark_500.sql). Trust Us runs on it.
 
-One film has a No Trailer — the seed picture, attached to the film it
-was made for by 0020_film_no_trailers.sql. The other 499 have none, and
-the Library shows nothing for them rather than borrowing that one and
-presenting it as theirs.
+None of the 500 has a No Trailer yet, and the Library shows nothing for
+them rather than borrowing another film's and presenting it as theirs.
+0020_film_no_trailers.sql wires the general rule instead: a film
+inherits the No Trailer of the opening it was programmed as, so every
+past opening lights up the moment Storage exists.
 
 **Do:** upload No Trailers through the Programming Desk as they are
-made. The Desk already rewrites each to an opaque object name and the
-Library picks it up with no code change.
+made. It rewrites each to an opaque object name and the Library picks
+it up with no code change.
 
-Two files currently sit in `public/film-videos/` because there is no
-Storage bucket to hold them yet. Once item 1 exists they move, and the
-only thing that changes is a column.
+The masters sit in `assets/no-trailers/` — in the repository, not
+served. They cannot be served from the app: Cloudflare Workers refuses
+a static asset over 5 MB and the seed master is 9.9 MB. Storage is
+where they belong, which needs item 1.
 
 ### A metadata provider, if you want one
 

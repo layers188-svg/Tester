@@ -75,9 +75,13 @@ link that shows the motion.
 
 `/dev/stage` is a 404 in production unless it is explicitly switched on,
 so a preview deploy can carry it without exposing it by accident.
+Verified against a real production build: 404 without the flag, 200 with
+it, and the full rendered-motion suite passes against the built Worker
+running under Wrangler.
 
-**What I need from you:** a Cloudflare account and an API token with
-Workers permissions (`CLOUDFLARE_API_TOKEN`, and `CLOUDFLARE_ACCOUNT_ID`).
+**What I need from you:** a Cloudflare account **on the Workers Paid
+plan**, and an API token with Workers permissions
+(`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
 
 Then:
 
@@ -86,8 +90,30 @@ npx wrangler secret put HOUSE_DARK_ENABLE_STAGE   # value: true
 npm run cf:deploy
 ```
 
-That gives a URL where the stage is reachable. The signed-in product on
-it will not work, because it has no database.
+#### Why the plan matters
+
+Measured with `npx wrangler deploy --dry-run`:
+
+|                                                  |                                 |
+| ------------------------------------------------ | ------------------------------- |
+| Worker upload                                    | 10,779 KiB                      |
+| **Compressed — the number the limit applies to** | **2,038 KiB (≈2.0 MiB)**        |
+| Free plan limit                                  | 1 MiB — too small               |
+| Workers Paid limit                               | 10 MiB — fits, with 8 MiB spare |
+
+A Next.js app rendered on the server is a couple of megabytes of Worker
+however it is built; there is no trimming that gets it under 1 MiB. An
+account-less `wrangler deploy --temporary` uses a free preview account
+and fails with `code: 10027` for exactly this reason.
+
+That deploy attempt also found a real problem, now fixed: Cloudflare
+refuses any static asset over 5 MB, and the seed No Trailer master (9.9
+MB) had briefly been placed in `public/`. It lives in
+`assets/no-trailers/` now, unserved, which is where the architecture
+always said it belonged.
+
+The signed-in product on such a deploy will not work, because it has no
+database.
 
 > Leave `HOUSE_DARK_ENABLE_STAGE` unset — or set it to anything other
 > than `true` — on the real production deployment. The route checks it

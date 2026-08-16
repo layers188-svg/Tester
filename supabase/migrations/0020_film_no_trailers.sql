@@ -1,29 +1,31 @@
 -- House Dark — 0020_film_no_trailers
 --
--- Attaches the No Trailers the House actually has to the films they
--- belong to, so a Library record has something to play.
+-- A film's No Trailer, so a Library record has something to play.
 --
--- There is exactly one of them today: the seed No Trailer, which was
--- made for Whiplash and is film 379 in the House Dark 500. The other
--- 499 films get nothing, and the Library shows nothing for them —
--- rather than borrowing this one and presenting it as theirs, which
--- would be a fake standing in for a backend feature (CLAUDE.md rule 4)
--- and would also be a lie about what the member is watching.
+-- The only rule here is the general one: a film inherits the No Trailer
+-- of the opening it was programmed as. That is the honest source —
+-- the picture the House actually made for it — and it means the
+-- Library replay lights up for every past opening the moment Storage
+-- exists, with no per-film bookkeeping.
 --
--- The path is served from public/film-videos/ under an opaque name,
--- which is interim. Real No Trailers belong in Supabase Storage,
--- uploaded through the Programming Desk, which rewrites them to a UUID
--- object name. Nothing in the code cares which it is: noTrailerUrl()
--- passes an absolute path through untouched and prefixes a bare object
--- name with the bucket, so moving these to Storage is a change to this
--- column and nothing else.
+-- No film is given a No Trailer that was made for a different one. The
+-- catalogue's 500 have none until one is uploaded through the
+-- Programming Desk, and the Library shows nothing for them rather than
+-- borrowing another film's and presenting it as theirs.
+--
+-- Where the masters live
+-- ----------------------
+-- `assets/no-trailers/` — in the repository, not served. They were
+-- briefly under `public/`, which was wrong twice over: the architecture
+-- always said Storage is the home for these, and Cloudflare Workers
+-- refuses a static asset over 5 MB, which the seed master (9.9 MB)
+-- exceeds. Upload them through the Desk, which rewrites each to an
+-- opaque object name in the no-trailer bucket.
+--
+-- Nothing in the code cares which it is: noTrailerUrl() passes an
+-- absolute path or URL through untouched and prefixes a bare object
+-- name with the bucket.
 
-update films
-set no_trailer_storage_path = '/film-videos/2f8a41c7e9b04d63.mp4'
-where id = '75980d30-e092-5ecf-812c-4f510b86cdfc';
-
--- The opening that seeds local development points at the same picture,
--- so an evening watched there can be returned to afterwards.
 update films f
 set no_trailer_storage_path = coalesce(f.no_trailer_storage_path, o.no_trailer_storage_path)
 from opening_secrets os

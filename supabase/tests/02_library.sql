@@ -441,7 +441,7 @@ $$;
 
 select tests.act_as_service();
 
-update films set no_trailer_storage_path = '/film-videos/test-clip.mp4'
+update films set no_trailer_storage_path = '/no-trailer/test-clip.mp4'
 where id = :film_id;
 
 select tests.act_as(:member_id);
