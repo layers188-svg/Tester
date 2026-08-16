@@ -9,13 +9,21 @@ name: Motion review site
 # because a server-rendered Next.js app is ~2 MiB of Worker script
 # against a 1 MiB free limit, and no trimming closes that gap.
 #
-# One setting has to be turned on by hand, once: Settings → Pages →
-# Build and deployment → Source → GitHub Actions. Nothing here can do
-# that for itself.
+# Two settings have to be changed by hand, once, and nothing here can do
+# either for itself:
+#
+#   1. Settings → Pages → Build and deployment → Source → GitHub Actions.
+#   2. Settings → Environments → github-pages → Deployment branches.
+#      Enabling Pages creates that environment restricted to the default
+#      branch, so a run from anywhere else is rejected before it starts —
+#      no steps, no log, only an annotation. Either allow this branch, or
+#      merge to the default branch, which the trigger below also covers.
 
 on:
   push:
-    branches: [claude/new-session-qvb1ur]
+    branches:
+      - claude/new-session-qvb1ur
+      - claude/website-build-g60lsp
     paths:
       - "stage-site/**"
       - "src/**"
