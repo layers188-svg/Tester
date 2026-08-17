@@ -1,0 +1,79 @@
+{
+  "$comment": [
+    "House Dark No Trailer assets. Technical metadata only.",
+    "There is deliberately no film title, no mapping to a film, and no",
+    "descriptive name anywhere in this file. openings.no_trailer_storage_path",
+    "is client-visible before the reveal, so an asset path or manifest entry",
+    "that named its film would hand the member the title while the picture",
+    "is still sealed. The film-to-asset mapping belongs in the database,",
+    "behind the owner-only tables, and is set through the Programming Desk.",
+    "assetId order follows the upload digests, not the titles, so the",
+    "numbering itself carries nothing either.",
+    "approvedForPublicUse stays false until a human records the spoiler,",
+    "rights and ownership checks the handover requires. Existing in the",
+    "repository is not approval."
+  ],
+  "version": 1,
+  "assets": [
+    {
+      "assetId": "HDNT-001",
+      "file": "media/no-trailer/HDNT-001.mp4",
+      "durationSeconds": 10.08,
+      "bytes": 12073850,
+      "container": "mp4",
+      "hasAudioTrack": false,
+      "sha256": "b73f495e966773364b51c3dbfe304798ee3964c8f127ef5068bbe7fecc82054d",
+      "approvedForPublicUse": false
+    },
+    {
+      "assetId": "HDNT-002",
+      "file": "media/no-trailer/HDNT-002.mp4",
+      "durationSeconds": 10.08,
+      "bytes": 11409905,
+      "container": "mp4",
+      "hasAudioTrack": false,
+      "sha256": "7d3371beb1710db7d29424ecfb8caced01867a4ed4393ffc4f32659d67369c0a",
+      "approvedForPublicUse": false
+    },
+    {
+      "assetId": "HDNT-003",
+      "file": "media/no-trailer/HDNT-003.mp4",
+      "durationSeconds": 10.08,
+      "bytes": 11465104,
+      "container": "mp4",
+      "hasAudioTrack": false,
+      "sha256": "72ded1564d25695a3e0b67e245cda0d04dcda1d38322a3e1c448023a1f1f8d51",
+      "approvedForPublicUse": false
+    },
+    {
+      "assetId": "HDNT-004",
+      "file": "media/no-trailer/HDNT-004.mp4",
+      "durationSeconds": 10.08,
+      "bytes": 12774894,
+      "container": "mp4",
+      "hasAudioTrack": false,
+      "sha256": "3b3427ac30a7273491ea8b798f6670b46240fc9f635ed4615e4b0e11135da6e2",
+      "approvedForPublicUse": false
+    },
+    {
+      "assetId": "HDNT-005",
+      "file": "media/no-trailer/HDNT-005.mp4",
+      "durationSeconds": 10.08,
+      "bytes": 10636533,
+      "container": "mp4",
+      "hasAudioTrack": false,
+      "sha256": "3707554ab4692f0ff6f7edcdcc8bd7d1368adc18a8cdd9836f21b51b9b3d9b6a",
+      "approvedForPublicUse": false
+    },
+    {
+      "assetId": "HDNT-006",
+      "file": "media/no-trailer/HDNT-006.mp4",
+      "durationSeconds": 10.08,
+      "bytes": 10349225,
+      "container": "mp4",
+      "hasAudioTrack": false,
+      "sha256": "7eb87fd2a66c1eacc2000ecfe7dfbb2080f09e7a1b787e3b16daa18636d81878",
+      "approvedForPublicUse": false
+    }
+  ]
+}
