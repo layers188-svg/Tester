@@ -606,8 +606,14 @@ $$;
 
 select tests.act_as(:owner_id);
 
+-- `>= 1`, not `= 1`. What this case is named for is that the owner can
+-- read films at all — the anon and member counterparts assert 0 rows,
+-- and those are the assertions that would catch a leak. Pinning an
+-- exact count made it a fixture-inventory test as well, so importing
+-- the Trust Us corpus in 0018 broke it while the guarantee it exists
+-- to protect was untouched.
 select tests.check('17.7', 'owner CAN read films',
-  (select count(*) from films) = 1);
+  (select count(*) from films) >= 1);
 
 select tests.check('17.7', 'owner CAN read opening_secrets',
   (select count(*) from opening_secrets) = 1);
