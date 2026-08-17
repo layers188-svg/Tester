@@ -50,3 +50,41 @@ select tests.check('18.5', 'there are exactly 20 curated themes',
      where t like 'I want%') = 20,
   'themes: ' || (select count(distinct t) from film_house_records r, unnest(r.territories) t
      where t like 'I want%'));
+
+-- ---------------------------------------------------------------------
+-- 0019: the House offers themes, not tags.
+-- ---------------------------------------------------------------------
+-- Importing the corpus briefly put 138 values in front of the member,
+-- because tags and themes shared one column. The member is offered a
+-- territory; tags only resolve free text into one.
+
+-- All 20 are present, rather than the offer being exactly 20. Any
+-- approved record adds its own territory by design — the fixtures here
+-- do, and the Desk will — so pinning the total made this an inventory
+-- of the test data rather than a check that the corpus is fully offered.
+select tests.check('19.1', 'every one of the 20 curated themes is offered',
+  (select count(*) from (
+     select distinct primary_theme t from film_house_records
+     where primary_theme like 'I want%'
+   ) corpus
+   where not exists (
+     select 1 from list_trust_us_territories() o where o.territory = corpus.t
+   )) = 0,
+  'curated themes offered: ' || (select count(*) from list_trust_us_territories()
+     where territory like 'I want%'));
+
+-- Not "every offer is a full sentence" — the handover lets the
+-- interface shorten a label, and the pre-corpus records use short ones.
+-- What must never appear is a raw search tag, which is the thing that
+-- would turn the offer back into filter configuration.
+select tests.check('19.2', 'no raw search tag is ever offered',
+  (select count(*) from list_trust_us_territories()
+     where territory in ('tense','suspense','chase','claustrophobic','horror',
+                         'scary','creepy','dread','pressure','edge of seat')) = 0,
+  'tags offered: ' || (select string_agg(territory, ', ') from list_trust_us_territories()
+     where territory in ('tense','suspense','chase','claustrophobic','horror',
+                         'scary','creepy','dread','pressure','edge of seat')));
+
+select tests.check('19.3', 'tags still exist for matching, and outnumber the offer',
+  (select count(distinct t) from film_house_records r, unnest(r.territories) t) > 100,
+  'match surface: ' || (select count(distinct t) from film_house_records r, unnest(r.territories) t));
